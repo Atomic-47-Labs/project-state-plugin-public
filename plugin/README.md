@@ -40,7 +40,8 @@ descriptions when you say things like "record a decision" or "draft the weekly".
 profile-driven — they read their behavior from the active pack's YAML profiles.
 
 **Templates** (`templates/`): scaffolder seeds — phase presets, phase manifests,
-the manifest/reporting-matrix templates, and the kanban + website starters.
+the manifest/reporting-matrix templates, and the website starter. The kanban
+dashboard is bundled in the keep-state-app desktop app, not distributed here.
 
 ## How it works
 

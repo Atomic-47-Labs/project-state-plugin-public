@@ -643,7 +643,7 @@ On initialization (Chapter 8), write:
 |------|----------|
 | `project-state/manifest.yaml` | All project identity, dates, budget, consortium, phases, packs_loaded, surfaces — from intake record |
 | `project-state/reporting-matrix.yaml` | Seeded from packs via `project-scaffolder seed-matrix` |
-| `project-state/milestones/M<NN>-<slug>.yaml` | One file per captured milestone |
+| `project-state/milestones/M<NN>-<slug>.yaml` | One file per captured milestone — always set `status: planned` on new milestones |
 | `project-state/references/examples/` | Example outputs to model (good/) and anti-patterns (avoid/) from Chapter 6 |
 | `project-state/references/examples/good/` | Any positive example documents or descriptions |
 | `project-state/references/examples/avoid/anti-patterns.md` | Any negative examples or anti-patterns |

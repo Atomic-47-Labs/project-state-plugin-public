@@ -33,7 +33,7 @@ Every other field (planned/actual dates, deliverables, owner, budget category, s
 ### `list_milestones(filter?)`
 
 Read every file under `milestones/`. Return an array sorted by id. Optional filters:
-- `status: planned | in_progress | at_risk | complete | blocked`
+- `status: planned | in_progress | at_risk | complete | blocked` — `blocked` renders in the **At Risk** column in the kanban
 - `owner_short: "OrgA" | "OrgB"`
 - `proposal_phase: "Phase 1 – ..."` (loose match)
 - `at_risk: true` (shortcut for status in {at_risk, blocked})

@@ -10,6 +10,7 @@ defaults:
     surface: gmail.draft
     generator: project-funder-reporting
     profile: pic-pcais.funder-reporting
+    fixed: true   # funder-set deadline — cannot be moved on the calendar
 
   - stakeholder_group: funder.pic
     report: sc-meeting-pack
