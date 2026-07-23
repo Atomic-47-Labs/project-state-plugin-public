@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Progress against the delivery plan — project-state</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* project-state terracotta document theme — BRIEF altitude (2–3pp).
+     Footnote provenance (formal audiences); print CSS → PDF via headless Chrome. */
+  :root {
+    --paper: #f6f1e9; --raised: #fdfaf5; --ink: #2d2a26; --mid: #6f675d; --mid-2: #9a9083;
+    --terra: #b0562e; --terra-deep: #8c3d1d; --terra-wash: #f3e2d5; --gold: #c99a3f; --gold-deep: #8f6a22;
+    --rule: #e4dccf; --rule-soft: #ece5d9;
+    --serif: Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 14.5px/1.6 -apple-system, "Segoe UI", sans-serif; }
+  .page { max-width: 780px; margin: 0 auto; padding: 52px 44px 60px; }
+
+  .brandrow { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .diamond { width: 14px; height: 14px; background: var(--terra); transform: rotate(45deg); border-radius: 3px; }
+  .brandrow .name { font-weight: 700; font-size: 14px; }
+  .brandrow .name span { color: var(--terra); }
+  .brandrow .meta { margin-left: auto; color: var(--mid-2); font-size: 12px; text-align: right; }
+
+  .kicker { font-family: var(--serif); color: var(--terra-deep); font-size: 12.5px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; margin: 26px 0 10px; }
+  h1 { font-family: var(--serif); font-size: 30px; line-height: 1.16; font-weight: 600; margin-bottom: 12px; }
+  .lede { color: var(--mid); font-size: 16px; margin-bottom: 20px; }
+  h2 { font-family: var(--serif); font-size: 17.5px; font-weight: 600; margin: 26px 0 8px;
+    padding-top: 14px; border-top: 1px solid var(--rule-soft); }
+  p { margin-bottom: 11px; }
+  ul { margin: 0 0 11px 20px; }
+  li { margin-bottom: 6px; }
+
+  /* milestone table */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 13px; }
+  th { font-family: var(--serif); text-align: left; color: var(--terra-deep); font-size: 11.5px;
+    letter-spacing: .1em; text-transform: uppercase; padding: 6px 10px; border-bottom: 2px solid var(--terra); }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  td.id { font-family: var(--mono); font-size: 11.5px; color: var(--terra); white-space: nowrap; }
+  td.pct { font-family: var(--mono); white-space: nowrap; }
+  tr.at-risk td { background: #fbf3ec; }
+  .status { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 10.5px;
+    font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .status.complete { background: #e7efdd; color: #4c6b2f; }
+  .status.in_progress { background: var(--terra-wash); color: var(--terra-deep); }
+  .status.at_risk { background: #f8e3d8; color: #a04a26; }
+  .status.planned { background: var(--rule-soft); color: var(--mid); }
+
+  /* KPI band */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+  .kpi { background: var(--raised); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; }
+  .kpi .v { font-family: var(--serif); font-size: 21px; font-weight: 600; }
+  .kpi .v small { font-size: 13px; color: var(--mid-2); font-family: -apple-system, sans-serif; }
+  .kpi .l { color: var(--mid); font-size: 11.5px; margin-top: 1px; }
+
+  /* footnote provenance */
+  sup.fn { font-size: 10px; }
+  sup.fn a { color: var(--terra); text-decoration: none; font-family: var(--mono); }
+  .footnotes { margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 12px;
+    color: var(--mid); font-size: 11.5px; }
+  .footnotes h3 { font-family: var(--serif); color: var(--terra-deep); font-size: 11.5px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+  .footnotes ol { margin-left: 18px; }
+  .footnotes li { margin-bottom: 3px; }
+  .footnotes code { font-family: var(--mono); font-size: 11px; color: var(--terra); }
+
+  footer { margin-top: 22px; border-top: 1px solid var(--rule); padding-top: 12px;
+    color: var(--mid-2); font-size: 11.5px; display: flex; gap: 14px; flex-wrap: wrap; }
+  footer .prov { font-family: var(--mono); }
+
+  @media print {
+    body { background: #fff; }
+    .page { padding: 10px 4px; max-width: none; }
+    @page { margin: 15mm 17mm; }
+    table, .kpi { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    .footnotes { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brandrow">
+    <span class="diamond"></span>
+    <span class="name">project-state<span> · funder brief</span></span>
+    <span class="meta">audience: funder · 2026-07-15<br>as-of state snapshot seq 523</span>
+  </div>
+
+  <div class="kicker">reporting period · phase 04 release</div>
+  <h1>Progress against the delivery plan</h1>
+  <p class="lede">The third major platform release is delivered, the operator surface is at 70%, and one deliverable is at risk with a recovery decision scheduled. All figures below cite their records of fact.</p>
+
+  
+  <h2>1. Summary of progress</h2>
+  <p>The platform's third major release is delivered: the v3.2 plugin release completed the generic core and the
+  compliance-pack architecture.<sup class="fn"><a href="#fn1">[1]</a></sup> The operator desktop application and intelligence surface stands at 70%
+  complete and is in active use operating this project.<sup class="fn"><a href="#fn2">[2]</a></sup> Platform capability now stands at 31 of 40 planned
+  skills<sup class="fn"><a href="#fn3">[3]</a></sup> and 7 of 10 planned compliance packs.<sup class="fn"><a href="#fn4">[4]</a></sup> One deliverable is at risk in the period: the v-mcp fork
+  specification (M10) is fifteen days past its due date at 15% complete;<sup class="fn"><a href="#fn5">[5]</a></sup> a recovery decision — complete,
+  descope, or withdraw — is scheduled for the coming week.</p>
+
+  <h2>2. Milestone status</h2>
+  <table>
+    <tr><th>ID</th><th>Deliverable</th><th>Complete</th><th>Status</th></tr>
+  <tr><td class="id">M01</td><td>v2.0 → v3.2 plugin release — generic core, compliance packs<sup class="fn"><a href="#fn1">[1]</a></sup></td><td class="pct">100%</td><td><span class="status complete">complete</span></td></tr>
+  <tr><td class="id">M12</td><td>Operator desktop application &amp; intelligence surface<sup class="fn"><a href="#fn2">[2]</a></sup></td><td class="pct">70%</td><td><span class="status in_progress">in progress</span></td></tr>
+  <tr class="at-risk"><td class="id">M10</td><td>v-mcp fork — specification &amp; architecture decision<sup class="fn"><a href="#fn5">[5]</a></sup></td><td class="pct">15%</td><td><span class="status at_risk">at risk</span></td></tr>
+  <tr><td class="id">M02</td><td>Starter pack hardening to production</td><td class="pct">5%</td><td><span class="status in_progress">in progress</span></td></tr>
+  <tr><td class="id">M04</td><td>Pack registry — install by name</td><td class="pct">0%</td><td><span class="status in_progress">in progress</span></td></tr>
+  <tr><td class="id">M09</td><td>Substrate validation &amp; health-check suite</td><td class="pct">0%</td><td><span class="status planned">planned</span></td></tr>
+  <tr><td class="id">M15–M21</td><td>keep-state appliance programme — seven staged milestones<sup class="fn"><a href="#fn14">[14]</a></sup></td><td class="pct">0%</td><td><span class="status planned">planned</span></td></tr>
+  </table>
+
+  <h2>3. Decisions of record (period)</h2>
+  <ul>
+    <li><b>Local-first architecture adopted</b> — the hosted server was decommissioned in favour of disk-first
+      state with a private repository hub and read-only stakeholder viewer.<sup class="fn"><a href="#fn6">[6]</a></sup></li>
+    <li><b>Desktop control plane adopted</b> — the operator surface ships as a desktop application in addition
+      to the browser.<sup class="fn"><a href="#fn7">[7]</a></sup></li>
+    <li><b>v-mcp fork direction confirmed</b> — a parallel MCP-server track was approved, tracked under M10.<sup class="fn"><a href="#fn8">[8]</a></sup></li>
+  </ul>
+
+  <h2>4. Indicator movement</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="v">31<small> / 40</small></div><div class="l">skills shipped<sup class="fn"><a href="#fn3">[3]</a></sup></div></div>
+    <div class="kpi"><div class="v">7<small> / 10</small></div><div class="l">compliance packs<sup class="fn"><a href="#fn4">[4]</a></sup></div></div>
+    <div class="kpi"><div class="v">59<small> / 80%</small></div><div class="l">wiki coverage<sup class="fn"><a href="#fn9">[9]</a></sup></div></div>
+    <div class="kpi"><div class="v">4<small> / target 0</small></div><div class="l">broken links open<sup class="fn"><a href="#fn10">[10]</a></sup></div></div>
+  </div>
+
+  <h2>5. Risk posture</h2>
+  <p>Stated in the register's own wording. <b>Single maintainer — bus factor of one</b><sup class="fn"><a href="#fn11">[11]</a></sup>: mitigation is to
+  recruit at least one co-maintainer with write access, prioritising compliance-pack co-ownership.
+  <b>Zero automated tests or CI/CD pipeline</b><sup class="fn"><a href="#fn12">[12]</a></sup>: mitigation is a minimal validation suite as the first
+  deliverable of M09. <b>Overlapping milestone timeline</b><sup class="fn"><a href="#fn13">[13]</a></sup>: mitigation is ruthless prioritisation, with
+  M09 identified as highest value. <b>API credit exhaustion</b><sup class="fn"><a href="#fn15">[15]</a></sup>: immediate mitigation is a credit top-up;
+  near-term, budget alerting.</p>
+
+  <h2>6. Next period</h2>
+  <ul>
+    <li>Resolve the M10 recovery decision (complete / descope / withdraw).<sup class="fn"><a href="#fn5">[5]</a></sup></li>
+    <li>Complete the operator desktop surface (M12, 70% → 100%).<sup class="fn"><a href="#fn2">[2]</a></sup></li>
+    <li>Commence the validation suite (M09) — the highest-value risk mitigation on the register.<sup class="fn"><a href="#fn12">[12]</a></sup></li>
+  </ul>
+
+  <div class="footnotes">
+    <h3>Provenance — records of fact</h3>
+    <ol>
+            <li id="fn1">M01 — v3.2 plugin release — <code>milestones/M01-v2-release.yaml</code></li>
+      <li id="fn2">M12 — operator desktop & intelligence surface — <code>milestones/M12-operator-desktop-intelligence-surface.yaml</code></li>
+      <li id="fn3">KPI-01 — skills shipped — <code>kpis/KPI-01-skills.yaml</code></li>
+      <li id="fn4">KPI-02 — compliance packs — <code>kpis/KPI-02-packs.yaml</code></li>
+      <li id="fn5">M10 — v-mcp fork specification — <code>milestones/M10-vmcp-fork-preparation.yaml</code></li>
+      <li id="fn6">Decision 2026-05-29 — local-first architecture; hosted MCP server decommissioned — <code>decisions/2026-05-29-pivot-local-first-decommission-railway.yaml</code></li>
+      <li id="fn7">Decision 2026-05-29 — desktop control plane (Tauri) — <code>decisions/2026-05-29-adopt-tauri-desktop-control-plane.yaml</code></li>
+      <li id="fn8">Decision 2026-05-12 — v-mcp fork direction — <code>decisions/2026-05-12-vmcp-fork-direction.yaml</code></li>
+      <li id="fn9">KPI-03 — wiki coverage — <code>kpis/KPI-03-wiki-coverage.yaml</code></li>
+      <li id="fn10">KPI-04 — broken links — <code>kpis/KPI-04-broken-links.yaml</code></li>
+      <li id="fn11">R-01 — single maintainer — <code>risks/R-01-single-maintainer.yaml</code></li>
+      <li id="fn12">R-03 — no automated tests or CI — <code>risks/R-03-no-tests-or-ci.yaml</code></li>
+      <li id="fn13">R-07 — overlapping milestone timeline — <code>risks/R-07-timeline-overload.yaml</code></li>
+      <li id="fn14">M15–M21 — keep-state appliance programme — <code>milestones/M15…M21 (7 records)</code></li>
+      <li id="fn15">R-12 — API credit exhaustion (headless runtime) — <code>risks/R-12-claude-api-credits-exhausted.yaml</code></li>
+    </ol>
+  </div>
+
+  <footer>
+    <span>Generated from project state — every claim cites its record (see provenance).</span>
+    <span class="prov">recipe: reports/custom-defs/funder-brief.yaml · regenerable</span>
+  </footer>
+</div>
+</body>
+</html>

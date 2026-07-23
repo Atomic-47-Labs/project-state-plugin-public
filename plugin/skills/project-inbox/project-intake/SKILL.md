@@ -18,7 +18,7 @@ Three phases, one confirmation screen, zero repeated questions.
 
 The output is identical to what project-scaffolder + project-onboarding produce —
 a valid `project-state/` with a filled manifest, a seeded reporting matrix, and a
-compiled `automation/schedule.yaml` — but the path is document-first rather than
+compiled `automation/tasks.yaml` — but the path is document-first rather than
 conversation-first.
 
 ---
@@ -198,7 +198,7 @@ project-state/
   reporting-matrix.yaml
   state.json
   automation/
-    schedule.yaml         ← written by project-automator in step 3d
+    tasks.yaml            ← written by project-automator in step 3d
   phases/
   milestones/             ← one file per extracted milestone
   people/
@@ -236,7 +236,7 @@ Always include `internal.team` as the baseline stakeholder.
 ### 3d. Call project-automator generate
 
 After writing the matrix, immediately run `project-automator generate` to compile
-`automation/schedule.yaml`. This makes the schedule ready without a separate step.
+`automation/tasks.yaml` (the canonical cadence registry). This makes the schedule ready without a separate step.
 
 If project-automator needs a timezone and none was found in documents or manifest:
 ask once — "What timezone for scheduled jobs? (e.g. America/Vancouver)" — before calling.
@@ -307,7 +307,7 @@ After all files are written, show a status summary:
 
   ✅  project-state/manifest.yaml            [N fields set, N gaps]
   ✅  project-state/reporting-matrix.yaml    [N entries from pack-id]
-  ✅  project-state/automation/schedule.yaml [N cron, N event-hook]
+  ✅  project-state/automation/tasks.yaml [N time-fired, N event-hook]
   ✅  project-state/milestones/              [N files]
   ✅  project-state/logs/activity.ndjson     [project.intake.completed]
   ✅  .gitattributes                         [logs merge=union]
@@ -371,7 +371,7 @@ On confirmation, patches only the changed fields and appends an
 ## Integration
 
 - **project-state** — all writes route through it; intake-record.yaml, activity.ndjson appended
-- **project-automator** — called automatically at end of Phase 3 to compile schedule.yaml
+- **project-automator** — called automatically at end of Phase 3 to compile automation/tasks.yaml
 - **project-milestone-manager** — milestone files written by intake are ready for progress updates immediately
 - **project-orchestrator** — reads the compiled schedule.yaml; works immediately after intake
 - **project-onboarding** — the deep interview path; use when documents are unavailable or a guided tour is preferred

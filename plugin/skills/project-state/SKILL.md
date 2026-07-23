@@ -26,6 +26,23 @@ while dir != "/":
 raise "No project-state/ found walking up from " + cwd
 ```
 
+`$PROJECT_STATE_DIR`, when set, short-circuits the walk (the appliance runner and prototype installs use this).
+
+## Substrate binding — one substrate, two transports
+
+Some skills (today: `project-harvester`; the pattern is available to any `*-state` facility) can persist either to the local filesystem or to a remote project-state.app substrate. This skill owns the resolver; adopting skills route through it. Spec: `docs/HARVEST-CONNECTIVITY-ROADMAP.md` §3.
+
+**Resolution (fail-safe toward local):**
+
+1. If `$PS_ENDPOINT` is set AND a personal `ksm_` token is available (`$PS_TOKEN`, else `~/.config/project-state/token`) → **deposit binding**: reads/writes go over HTTPS to that endpoint, authenticated with the token. Identity is the token's email — server-resolved, never claimed.
+2. Otherwise → **file binding**: root per "Finding `project-state/`" above. This is the default and the base case — a machine with no cloud config behaves exactly as documented in the rest of this file, and no skill may prompt the user about cloud setup.
+
+**Rules (binding):**
+
+- A project has **one** canonical substrate. A given machine is either file-local or deposit-remote for a project — never both. The deposit binding handles an unreachable endpoint by keeping the batch and retrying, then stopping with a report; it never falls back to writing local files (that forks the substrate).
+- The five harvest persist verbs and their mappings live in `project-harvester`'s "Substrate binding" section (`read-context`, `seen?`/`mark-seen`, `write-doc`, `advance-cursor`, `append-activity`). On the deposit binding, locking, dedup, cursor advance, and activity logging are enforced server-side by the deposit module — the same write protocol in this file, executed by the app.
+- Harvest cursors are file-per-entity at `harvest/cursors/{email}--{surface}.yaml` — one writer per file, no lock. The `state.json` advisory-lock protocol still applies to everything else.
+
 ## Schema
 
 The canonical schema lives in `project-state/SCHEMA.md` *in the project itself*. This skill validates against that file; it does not carry its own schema because different projects may extend the schema for their specific needs.

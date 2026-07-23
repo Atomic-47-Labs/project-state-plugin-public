@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}} — {{PROJECT}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* project-state terracotta document theme — screen + print (PDF via
+     headless Chrome --print-to-pdf). Placeholders: {{...}}. */
+  :root {
+    --paper: #f6f1e9; --raised: #fdfaf5; --ink: #2d2a26; --mid: #6f675d; --mid-2: #9a9083;
+    --terra: #b0562e; --terra-deep: #8c3d1d; --terra-wash: #f3e2d5; --gold: #c99a3f; --gold-deep: #8f6a22;
+    --rule: #e4dccf; --rule-soft: #ece5d9;
+    --serif: Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 15px/1.6 -apple-system, "Segoe UI", sans-serif; }
+  .page { max-width: 760px; margin: 0 auto; padding: 52px 44px 60px; }
+
+  .brandrow { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .diamond { width: 14px; height: 14px; background: var(--terra); transform: rotate(45deg); border-radius: 3px; }
+  .brandrow .name { font-weight: 700; font-size: 14px; }
+  .brandrow .name span { color: var(--terra); }
+  .brandrow .meta { margin-left: auto; color: var(--mid-2); font-size: 12px; text-align: right; }
+
+  .kicker { font-family: var(--serif); color: var(--terra-deep); font-size: 12.5px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; margin: 26px 0 10px; }
+  h1 { font-family: var(--serif); font-size: 33px; line-height: 1.15; font-weight: 600; margin-bottom: 12px; }
+  .lede { color: var(--mid); font-size: 16.5px; margin-bottom: 22px; }
+
+  h2 { font-family: var(--serif); font-size: 19px; font-weight: 600; margin: 26px 0 8px; }
+  p { margin-bottom: 12px; }
+  ul { margin: 0 0 12px 20px; }
+  li { margin-bottom: 7px; }
+  b, strong { color: var(--ink); }
+
+  /* proof points */
+  .points { display: grid; gap: 10px; margin: 14px 0 6px; }
+  .point { background: var(--raised); border: 1px solid var(--rule); border-left: 3px solid var(--terra);
+    border-radius: 10px; padding: 12px 16px; }
+  .point b { display: block; font-family: var(--serif); font-size: 15.5px; margin-bottom: 2px; }
+  .point span { color: var(--mid); font-size: 13.5px; }
+
+  /* the honest risk */
+  .risk { background: #fbf3ec; border: 1px solid #ecd3c2; border-radius: 10px; padding: 12px 16px; margin: 14px 0; }
+  .risk .tag { font-family: var(--serif); color: #a04a26; font-size: 11.5px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; }
+  .risk p { color: var(--mid); font-size: 13.5px; margin: 4px 0 0; }
+
+  /* the ask */
+  .ask { border-top: 2px solid var(--terra); margin-top: 22px; padding-top: 12px; }
+  .ask .tag { font-family: var(--serif); color: var(--terra-deep); font-size: 11.5px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; }
+  .ask p { font-size: 15px; margin-top: 4px; }
+
+  /* provenance chips — every claim auditable back to a typed record */
+  .rec { display: inline-block; font-family: var(--mono); font-size: 10px; color: var(--terra);
+    background: var(--terra-wash); border-radius: 4px; padding: 0 5px; margin-left: 3px;
+    vertical-align: 1px; white-space: nowrap; }
+
+  footer { margin-top: 34px; border-top: 1px solid var(--rule); padding-top: 12px;
+    color: var(--mid-2); font-size: 11.5px; display: flex; gap: 14px; flex-wrap: wrap; }
+  footer .prov { font-family: var(--mono); }
+
+  @media print {
+    body { background: #fff; }
+    .page { padding: 24px 8px; max-width: none; }
+    @page { margin: 14mm 16mm; }
+    .point, .risk { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brandrow">
+    <span class="diamond"></span>
+    <span class="name">{{PROJECT}}<span> · {{DOC_KIND}}</span></span>
+    <span class="meta">{{AUDIENCE}} · {{DATE}}<br>as-of state snapshot {{SNAPSHOT}}</span>
+  </div>
+
+  <div class="kicker">{{KICKER}}</div>
+  <h1>{{TITLE}}</h1>
+  <p class="lede">{{LEDE}}</p>
+
+  {{BODY}}
+
+  <div class="risk">
+    <span class="tag">The honest risk</span>
+    <p>{{RISK}}</p>
+  </div>
+
+  <div class="ask">
+    <span class="tag">The ask</span>
+    <p>{{ASK}}</p>
+  </div>
+
+  <footer>
+    <span>Generated from project state — every claim cites its record.</span>
+    <span class="prov">recipe: {{RECIPE}} · regenerable</span>
+  </footer>
+</div>
+</body>
+</html>

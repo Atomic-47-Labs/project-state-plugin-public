@@ -1,0 +1,35 @@
+# project-state/tenders/profiles/<slug>.yaml
+id: profile-slug
+kind: tender-profile
+created: 2026-01-01T00:00:00Z
+created_by: user@example.org
+last_modified: 2026-01-01T00:00:00Z
+last_modified_by: user@example.org
+phase: operations
+name: Profile Name
+enabled: true
+include:
+  exact_phrases: []
+  concepts: []
+  commodity_codes: []   # [{code: "", source: CanadaBuys}]
+exclude:
+  exact_phrases: []
+buyers:
+  preferred_types: []
+geography:
+  preferred: []
+  excluded: []
+commercial:
+  minimum_days_remaining: 10
+  maximum_estimated_bonding: 0
+  allow_document_fees: true
+delivery:
+  accepted: []
+weights:            # must sum to 100
+  title_match: 20
+  description_match: 20
+  capability_fit: 20
+  buyer_fit: 10
+  geography_fit: 10
+  timeline_fit: 10
+  experience_fit: 10

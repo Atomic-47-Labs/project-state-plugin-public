@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}} — {{PROJECT}}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* project-state terracotta document theme — BRIEF altitude (2–3pp).
+     Footnote provenance (formal audiences); print CSS → PDF via headless Chrome. */
+  :root {
+    --paper: #f6f1e9; --raised: #fdfaf5; --ink: #2d2a26; --mid: #6f675d; --mid-2: #9a9083;
+    --terra: #b0562e; --terra-deep: #8c3d1d; --terra-wash: #f3e2d5; --gold: #c99a3f; --gold-deep: #8f6a22;
+    --rule: #e4dccf; --rule-soft: #ece5d9;
+    --serif: Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 14.5px/1.6 -apple-system, "Segoe UI", sans-serif; }
+  .page { max-width: 780px; margin: 0 auto; padding: 52px 44px 60px; }
+
+  .brandrow { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .diamond { width: 14px; height: 14px; background: var(--terra); transform: rotate(45deg); border-radius: 3px; }
+  .brandrow .name { font-weight: 700; font-size: 14px; }
+  .brandrow .name span { color: var(--terra); }
+  .brandrow .meta { margin-left: auto; color: var(--mid-2); font-size: 12px; text-align: right; }
+
+  .kicker { font-family: var(--serif); color: var(--terra-deep); font-size: 12.5px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; margin: 26px 0 10px; }
+  h1 { font-family: var(--serif); font-size: 30px; line-height: 1.16; font-weight: 600; margin-bottom: 12px; }
+  .lede { color: var(--mid); font-size: 16px; margin-bottom: 20px; }
+  h2 { font-family: var(--serif); font-size: 17.5px; font-weight: 600; margin: 26px 0 8px;
+    padding-top: 14px; border-top: 1px solid var(--rule-soft); }
+  p { margin-bottom: 11px; }
+  ul { margin: 0 0 11px 20px; }
+  li { margin-bottom: 6px; }
+
+  /* milestone table */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 13px; }
+  th { font-family: var(--serif); text-align: left; color: var(--terra-deep); font-size: 11.5px;
+    letter-spacing: .1em; text-transform: uppercase; padding: 6px 10px; border-bottom: 2px solid var(--terra); }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  td.id { font-family: var(--mono); font-size: 11.5px; color: var(--terra); white-space: nowrap; }
+  td.pct { font-family: var(--mono); white-space: nowrap; }
+  tr.at-risk td { background: #fbf3ec; }
+  .status { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 10.5px;
+    font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .status.complete { background: #e7efdd; color: #4c6b2f; }
+  .status.in_progress { background: var(--terra-wash); color: var(--terra-deep); }
+  .status.at_risk { background: #f8e3d8; color: #a04a26; }
+  .status.planned { background: var(--rule-soft); color: var(--mid); }
+
+  /* KPI band */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+  .kpi { background: var(--raised); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; }
+  .kpi .v { font-family: var(--serif); font-size: 21px; font-weight: 600; }
+  .kpi .v small { font-size: 13px; color: var(--mid-2); font-family: -apple-system, sans-serif; }
+  .kpi .l { color: var(--mid); font-size: 11.5px; margin-top: 1px; }
+
+  /* footnote provenance */
+  sup.fn { font-size: 10px; }
+  sup.fn a { color: var(--terra); text-decoration: none; font-family: var(--mono); }
+  .footnotes { margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 12px;
+    color: var(--mid); font-size: 11.5px; }
+  .footnotes h3 { font-family: var(--serif); color: var(--terra-deep); font-size: 11.5px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; margin-bottom: 8px; }
+  .footnotes ol { margin-left: 18px; }
+  .footnotes li { margin-bottom: 3px; }
+  .footnotes code { font-family: var(--mono); font-size: 11px; color: var(--terra); }
+
+  footer { margin-top: 22px; border-top: 1px solid var(--rule); padding-top: 12px;
+    color: var(--mid-2); font-size: 11.5px; display: flex; gap: 14px; flex-wrap: wrap; }
+  footer .prov { font-family: var(--mono); }
+
+  @media print {
+    body { background: #fff; }
+    .page { padding: 10px 4px; max-width: none; }
+    @page { margin: 15mm 17mm; }
+    table, .kpi { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    .footnotes { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brandrow">
+    <span class="diamond"></span>
+    <span class="name">{{PROJECT}}<span> · {{DOC_KIND}}</span></span>
+    <span class="meta">{{AUDIENCE}} · {{DATE}}<br>as-of state snapshot {{SNAPSHOT}}</span>
+  </div>
+
+  <div class="kicker">{{KICKER}}</div>
+  <h1>{{TITLE}}</h1>
+  <p class="lede">{{LEDE}}</p>
+
+  {{BODY}}
+
+  <div class="footnotes">
+    <h3>Provenance — records of fact</h3>
+    <ol>
+      {{FOOTNOTES}}
+    </ol>
+  </div>
+
+  <footer>
+    <span>Generated from project state — every claim cites its record (see provenance).</span>
+    <span class="prov">recipe: {{RECIPE}} · regenerable</span>
+  </footer>
+</div>
+</body>
+</html>

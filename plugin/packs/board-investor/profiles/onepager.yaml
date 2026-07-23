@@ -1,0 +1,25 @@
+profile_id: board-investor.onepager
+# Audience voice profiles for project-onepager under the board/investor pack.
+
+audiences:
+  exec:
+    tone: crisp, outcomes over outputs
+    leads_with: objective/KPI movement and the crucial few
+    must_include:
+      - KPI deltas against target
+      - the single most important decision owed
+      - one explicit ask
+    must_omit:
+      - implementation detail below the milestone level
+    provenance: chips
+    format: html+pdf
+    signoff_required: [ceo]
+
+  investor:
+    tone: confident but audit-safe — nothing that can't survive diligence
+    leads_with: traction metrics, then milestones
+    must_include: [highlights, lowlights, metrics, asks]   # house format
+    must_omit: [unlaunched-feature promises, people-level attribution]
+    provenance: footnotes
+    format: html+pdf
+    signoff_required: [ceo]

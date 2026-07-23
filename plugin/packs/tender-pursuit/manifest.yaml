@@ -1,0 +1,24 @@
+pack:
+  id: "tender-pursuit"
+  name: "Tender Pursuit Defaults"
+  version: "1.0.0"
+  compatible_core: ">=4.0,<5.0"
+  description: |
+    Pack for facilities running the tender-intelligence package. Configures the
+    notifier's alert thresholds and immediate-alert rules, a weekly pipeline
+    review meeting, and reporting-matrix lines for pipeline reporting. Pair with
+    any other pack — tender pursuit composes with grant, client, or agile packs.
+  authors:
+    - "David Olsson <david@atomic47.co>"
+  released: "2026-07-21"
+  maturity: "stable"
+
+provides:
+  profiles:
+    - notifier           # tender alert thresholds and rules
+    - review-meeting     # weekly pipeline review
+  reporting_matrix_defaults: true
+
+requires:
+  packages:
+    - tender-intelligence

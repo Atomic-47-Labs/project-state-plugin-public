@@ -86,6 +86,14 @@ surfaces:
   google_calendar:
     enabled: true
     calendar_id: "primary"
+    # Harvest scope — the calendar harvester imports ONLY events matching these
+    # keywords (title/description/attendees). The operator's calendar is personal;
+    # with no keywords set, the harvester refuses to import anything.
+    harvest:
+      keywords: []              # e.g. ["projectname", "funder", "steering committee"]
+      window_past_days: 90
+      window_future_days: 180
+      prune_out_of_scope: true  # remove previously imported gcal events that no longer match
   blog:
     enabled: false
     site_slug: ~

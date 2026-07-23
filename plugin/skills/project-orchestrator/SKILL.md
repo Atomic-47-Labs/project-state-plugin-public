@@ -80,19 +80,27 @@ Every line links to the skill that handles it, so the user can say "yes, do the 
 
 The orchestrator understands named routines:
 
-### `tick` — the matrix-driven scheduler
+### `tick` — the registry-driven scheduler
 
 The single routine that makes reporting *automatic*. It is deterministic: read the
-matrix, compute what is due today, dispatch the generators. Each generator now
+cadence registry, compute what is due today, dispatch the generators. Each generator
 self-queues its draft into `outbox/queue/` (see each skill's "Outbox emission"),
 so a tick's whole job is **decide what's due and call the right generator** — it
 authors nothing and sends nothing.
 
 **Algorithm:**
 
-1. Read `project-state/reporting-matrix.yaml` (`entries[]`). **Skip any entry with
-   `enabled: false`** — that flag is the Schedule view's per-report on/off switch.
-2. For each remaining entry, evaluate its `cadence` against today's date and the relevant
+1. Read `project-state/automation/tasks.yaml` (`tasks[]`) — the **canonical cadence
+   registry** (`project-automator` compiles it from the matrix; the kanban calendar
+   writes operator reschedules into it, so it always carries the live schedule).
+   Resolve each task's target: `kind: matrix` → the matching `reporting-matrix.yaml`
+   entry (generator, profile, surface; the matrix `enabled` flag is authoritative for
+   matrix tasks); `kind: action` → the named skill action; `kind: adhoc` → the task's
+   own stored prompt. Skip disabled tasks and `status: proposed` tasks (unaccepted
+   ghost holds never fire). **Fallback:** only if `automation/tasks.yaml` does not
+   exist, read `reporting-matrix.yaml` entries directly (skipping `enabled: false`)
+   as in v2.0.
+2. For each remaining task, evaluate its `cadence` against today's date and the relevant
    `state.json:pointers` (e.g. `last_weekly_report`):
    - `weekly` (`day: <dow>`) → due if today is that weekday **and** no run is
      recorded since the start of this week.
@@ -174,11 +182,12 @@ When the user signals end of day, end of session, or "wrapping up":
 The orchestrator does not run itself. It is invoked:
 - On user demand ("what should I do?")
 - By the `schedule` skill (a scheduled task calls `project-orchestrator daily` each morning)
-- By a cron firing **`project-orchestrator tick`** on the matrix's natural cadence
+- By a cron firing **`project-orchestrator tick`** on the registry's natural cadence
   (e.g. early each weekday). The cron is a thin trigger; all scheduling *logic* lives
-  in the `tick` routine reading `reporting-matrix.yaml`, so the schedule is testable
+  in the `tick` routine reading `automation/tasks.yaml` (falling back to
+  `reporting-matrix.yaml` when no registry exists), so the schedule is testable
   and inspectable in the substrate rather than buried in cron config. The kanban
-  **Schedule view** (`/schedule`) renders the same matrix with computed next-due and
+  **Calendar view** (`/calendar`) renders the same registry with computed next-due and
   last-run so a human can see what the next tick will do.
 
 `project-state/manifest.yaml` does not specify schedules; those are managed via the `schedule` skill and should be configured separately.

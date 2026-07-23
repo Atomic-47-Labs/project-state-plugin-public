@@ -1,0 +1,19 @@
+recipe: onepager
+slug: exec-onepager
+audience: exec
+altitude: onepager
+purpose: >
+  Give leadership the state of the platform in one page and force the M10
+  decision that unblocks the keep-state runway.
+evidence:
+  objectives: true
+  milestones: { include: all }
+  decisions: { last_days: 90 }
+  risks: { min_severity: high }
+  activity: { last_days: 30 }
+omit: [implementation-detail-below-milestones]
+sections: default
+last_generated:
+  at: "2026-07-15T06:05:00Z"
+  activity_seq: 522
+  artifact: reports/onepagers/2026-07-15-exec-onepager.html

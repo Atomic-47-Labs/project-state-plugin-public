@@ -1,6 +1,6 @@
 ---
 name: project-harvester
-description: "Harvest external signals (Slack, Gmail, GDocs, scsiwyg, Jira, Confluence, Linear) relevant to a specific project and write them as classified intel docs into `project-state/documents/inbox/`. Jira, Confluence, and Linear are pulled through their Claude MCP connectors (Atlassian + Linear). Reads the project manifest to discover which channels, contacts, keywords, projects/boards, spaces, and surfaces to watch. Tracks per-surface cursors in `project-state/state.json`. Designed to be called by `project-orchestrator` as part of the daily routine. Trigger: `/project-harvester` or invoked by project-orchestrator."
+description: "Harvest external signals (Slack, Gmail, GDocs, scsiwyg, Jira, Confluence, Linear) relevant to a specific project and write them as classified intel docs into `project-state/documents/inbox/`. Jira, Confluence, and Linear are pulled through their Claude MCP connectors (Atlassian + Linear). Reads the project manifest to discover which channels, contacts, keywords, projects/boards, spaces, and surfaces to watch. Tracks per-user, per-surface cursors in `project-state/harvest/cursors/`. Persists through the substrate binding: local file writes by default, or the project-state.app deposit API when a cloud endpoint + personal token are configured (see HARVEST-CONNECTIVITY-ROADMAP.md). Designed to be called by `project-orchestrator` as part of the daily routine. Trigger: `/project-harvester` or invoked by project-orchestrator."
 ---
 
 # project-harvester
@@ -107,25 +107,38 @@ consortium:
 
 ---
 
+## Substrate binding — where reads and writes go
+
+The skill persists through five verbs — `read-context`, `seen?`/`mark-seen`, `write-doc`, `advance-cursor`, `append-activity` — with two interchangeable bindings (resolver owned by the `project-state` memory-layer skill; see its "Substrate binding" section):
+
+- **File binding (default).** Root = `$PROJECT_STATE_DIR`, else `./project-state`. All verbs are the file operations described in this document. This is what a local-only user AND the appliance's own headless runner use. **No cloud config → this binding, byte-identical behavior — never ask about cloud setup.**
+- **Deposit binding.** Active only when `$PS_ENDPOINT` and a personal `ksm_` token (`$PS_TOKEN` or `~/.config/project-state/token`) are both set. `read-context` = `GET {PS_ENDPOINT}/api/harvest/context?project={id}`; `write-doc` + `advance-cursor` + dedup + activity = one `POST {PS_ENDPOINT}/api/harvest/deposit` batch at the end of each surface. The server dedups and advances cursors only for docs it accepted — retries are idempotent, so a failed POST means: keep the batch, retry once, then stop and report. **Never fall back to writing local files when the endpoint is unreachable** — a project has one canonical substrate; queue and retry, don't fork it.
+
+**Harvester identity** (used for cursor ownership and provenance): `$PS_USER_EMAIL`, else `git config user.email`, else `local`. On the deposit binding the server ignores the claimed identity and uses the token's email.
+
+---
+
 ## Cursor management
 
-Cursors are stored in `project-state/state.json`:
+Cursors are file-per-entity — one YAML file per (identity, surface) at:
 
-```json
-{
-  "harvest_cursors": {
-    "slack":      "2026-05-04T00:00:00Z",
-    "gmail":      "2026-05-04T00:00:00Z",
-    "gdocs":      "2026-05-04T00:00:00Z",
-    "scsiwyg":    "2026-05-04T00:00:00Z",
-    "jira":       "2026-05-04T00:00:00Z",
-    "confluence": "2026-05-04T00:00:00Z",
-    "linear":     "2026-05-04T00:00:00Z"
-  }
-}
+```
+project-state/harvest/cursors/{email}--{surface}.yaml
 ```
 
+```yaml
+# project-state/harvest/cursors/keystone@stonemaps.org--slack.yaml
+surface: slack
+email: keystone@stonemaps.org
+cursor: "2026-07-20T00:00:00Z"
+updated_at: "2026-07-23T09:12:00Z"
+```
+
+File-per-cursor means N people (and the server) can harvest the same project concurrently with no lock contention and no clobbering — the concurrency rule is the same file-per-entity rule the rest of the substrate uses. **Org-scoped server harvests** (the appliance running with service credentials) use the reserved identity `server` — one project-grain cursor per surface, e.g. `server--slack.yaml`.
+
 Default cursor when missing: 7 days ago. Cursor is only advanced after a surface is fully harvested without errors.
+
+**Migration from v1 cursors:** if `project-state/state.json` still contains a `harvest_cursors` map, on first run copy each value to `harvest/cursors/{identity}--{surface}.yaml` for the current identity, then delete the `harvest_cursors` key from `state.json` (under its advisory lock). One-way, once.
 
 ---
 
@@ -160,6 +173,8 @@ space: ~                               # confluence only (space key)
 relevance_signals:                     # why this was flagged
   - contact_match: "r.rohozinski@secdev.com"
   - channel_match: "#ledger-rt"
+harvested_by: "keystone@stonemaps.org" # harvester identity (see Substrate binding)
+harvest_plane: local                   # local | server | desktop | claude-ai
 status: inbox                          # always "inbox" on write; curator promotes
 ---
 
@@ -184,7 +199,7 @@ Read `project-state/manifest.yaml`:
 - Build the **contact roster**: all emails from `consortium.*.contacts[].email` + `consortium.lead_applicant.contact.email`
 - Build the **keyword list**: project `id`, project `name`, any explicit `surfaces.*.keywords[]`
 
-Read `project-state/state.json` → `harvest_cursors`. Default missing cursors to 7 days ago.
+Read this identity's cursor files from `project-state/harvest/cursors/{email}--{surface}.yaml` (run the v1 migration first if `state.json` still has `harvest_cursors`). Default missing cursors to 7 days ago. On the deposit binding, manifest config and cursors arrive together from `GET /api/harvest/context`.
 
 ### Step 2 — Slack harvest (if `surfaces.slack.enabled`)
 
@@ -325,7 +340,7 @@ for each issue:
 For each item flagged for ingest:
 1. Build the filename: `{YYYY-MM-DD}-{surface}-{slug}.md` where slug = sanitized title or channel+ts
 2. Check if file already exists (dedup by source_id hash) — skip if so
-3. Write the markdown file to `project-state/documents/inbox/`
+3. Write the markdown file to `project-state/documents/inbox/` (file binding) or add it to the surface's deposit batch (deposit binding — the batch POSTs in Step 7 with the proposed cursor)
 4. Append a one-line entry to `project-state/harvest/harvest.log`:
    ```
    2026-05-04T12:00:00Z  slack   #ledger-rt/1714389612.123456  → 2026-05-04-slack-ledger-rt-abc123.md
@@ -333,18 +348,16 @@ For each item flagged for ingest:
 
 ### Step 7 — Advance cursors
 
-For each surface that completed without error:
-```json
-state.harvest_cursors["slack"] = max_message_timestamp_seen
-state.harvest_cursors["gmail"] = max_thread_date_seen
-state.harvest_cursors["gdocs"] = now
-state.harvest_cursors["scsiwyg"] = now
-state.harvest_cursors["jira"] = max_issue_updated_seen
-state.harvest_cursors["confluence"] = max_page_modified_seen
-state.harvest_cursors["linear"] = max_issue_updated_seen
-```
+For each surface that completed without error, write this identity's cursor file:
 
-Write back to `project-state/state.json`.
+| Surface | New cursor value |
+|---|---|
+| slack | max message timestamp seen |
+| gmail | max thread date seen |
+| gdocs / scsiwyg | now |
+| jira / confluence / linear | max issue/page updated seen |
+
+File binding: rewrite `harvest/cursors/{email}--{surface}.yaml` (single-writer per identity — no lock needed). Deposit binding: the proposed cursor rides in the deposit batch and the server advances it only past accepted docs.
 
 ### Step 8 — Report
 
@@ -387,6 +400,8 @@ Dedup key: `{surface}:{source_id}`. Stored in `project-state/harvest/seen.json` 
 
 `seen.json` is append-only — never prune. It stays small (one 12-byte hash per harvested item).
 
+Dedup is **load-bearing across harvesters**, not just re-run safety: two users watching the same Slack channel, or a user and the server harvesting the same surface, must produce one inbox doc. On the deposit binding the server owns `seen.json` and dedups the batch — the client-side check is only an optimization to shrink the upload.
+
 ---
 
 ## Integration with project-orchestrator
@@ -412,7 +427,9 @@ Dedup key: `{surface}:{source_id}`. Stored in `project-state/harvest/seen.json` 
 | Rate limit on a surface            | Pause 5s, retry once; then skip + log         |
 | Malformed message/doc              | Skip item; log; continue                      |
 | Disk write failure                 | Halt; do NOT advance cursor; report error     |
-| `project-state/` not found        | Fail fast — wrong working directory           |
+| `project-state/` not found        | Fail fast — wrong working directory (file binding) |
+| Deposit endpoint unreachable       | Retry once; then stop and report. Cursor unchanged. Do NOT write local files instead |
+| Deposit rejects batch (401/403)    | Stop; report token/grant problem; nothing written |
 
 ---
 

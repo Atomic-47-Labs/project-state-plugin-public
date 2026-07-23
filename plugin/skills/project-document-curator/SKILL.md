@@ -32,7 +32,27 @@ All documents live under `project-state/documents/`:
 | `published/`      | Versions delivered to PIC/Consortium (frozen)                           |
 | `pic-templates/`  | PIC-provided blank templates                                            |
 
-The index is at `documents/index.yaml`. Its schema is in `project-state/SCHEMA.md` (see entry "Document registry").
+The index is at `documents/index.yaml` — top-level key `docs:` (canonical; readers tolerate `documents:`/`entries:` but always WRITE `docs:`). Its schema is in `project-state/SCHEMA.md` (see entry "Document registry").
+
+## Provenance & lineage fields (v4.2 — every entry SHOULD carry these)
+
+Location never determines identity — the record does. On registration, stamp:
+
+```yaml
+origin: imported            # imported | generated | observed | received | unknown
+provenance:
+  method: upload            # upload | orient-ingest | harvester | chat-session | report-generator | manual
+  actor: <substrate user id>
+  session: <chat/job session id, when an agent did the ingesting>
+  at: <ISO timestamp>
+lifecycle: ingested         # dropped → classified → ingesting → ingested → grounded | parked | superseded
+pinned: false               # true = vital key asset; surfaces on the pinned shelf
+became: []                  # lineage: what this document produced
+  # - { kind: milestone|risk|decision|insight|report, id or path, note }
+cited_by: []                # entity ids/paths that cite this document
+```
+
+Rules: `origin` is recorded at the moment of arrival by whoever moves the file — never inferred from folder location afterwards. Never fabricate provenance during backfills: use `origin: unknown` when the true origin is not known. When any skill or session derives an artifact from a registered document, it appends a `became:` edge (and the derived entity may record the doc id in its own provenance). A citation is stable as `<slug>@<git commit>` — the commit service's snapshots make any cited revision retrievable.
 
 ## The classification decision
 

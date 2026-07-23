@@ -1,0 +1,88 @@
+# project-state/tenders/t-<year>-<seq>.yaml
+id: t-2026-0000
+kind: tender
+created: 2026-01-01T00:00:00Z
+created_by: tender-harvester
+last_modified: 2026-01-01T00:00:00Z
+last_modified_by: tender-harvester
+phase: operations
+
+title: ""
+normalized_title: ""
+solicitation_number: null
+
+buyer:
+  name: ""
+  normalized_name: ""
+  type: null          # municipality | provincial government | federal government | university | health authority | crown corporation | school authority | utility | other
+  jurisdiction: null
+  wiki_page: null
+
+procurement:
+  type: null          # RFP | RFQ | ITT | RFI | SOI | NPP | other
+  status: open        # open | amended | closed | cancelled | awarded
+  contract_duration: null
+  estimated_value: null
+  currency: CAD
+
+dates:
+  published_at: null
+  questions_due_at: null
+  mandatory_meeting_at: null
+  closing_at: null
+  original_timezone: null
+
+location:
+  regions: []
+  delivery_modes: []
+  travel_required: null
+
+summary:
+  source_synopsis: ""
+  generated_summary: ""
+  scope_summary: ""
+
+matching:
+  profiles: []
+  matched_terms: []
+  relevance_score: null
+  strategic_value_score: null
+  urgency_score: null
+  evidence: []
+
+qualification:
+  status: preliminary   # preliminary | needs_review | qualified | disqualified
+  mandatory_requirements: []
+  possible_disqualifiers: []
+  missing_information: []
+  human_approved: false
+
+documents:
+  available: null
+  retrieved: false
+  login_required: null
+  ids: []
+
+sources: []
+  # - portal: CanadaBuys
+  #   source_id: ""
+  #   role: discovery      # discovery | documents | submission
+  #   discovery_url: ""
+  #   document_url: null
+  #   submission_url: null
+  #   first_seen_at: null
+  #   last_checked_at: null
+  #   message_id: null
+
+workflow:
+  status: discovered
+  owner: null
+  decision_id: null
+  next_action: null
+  dismissal_reason: null
+
+monitoring:
+  followed: false
+  watch_feed_url: null
+  last_change_at: null
+  amendment_count: 0

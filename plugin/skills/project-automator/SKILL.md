@@ -1,6 +1,6 @@
 ---
 name: project-automator
-description: "Compile the project's reporting-matrix.yaml into a machine-readable automation/schedule.yaml that a scheduling host (keep-state, cron, or any external scheduler) can consume. Reads every matrix entry, classifies it as cadence (cron) or event-driven (hook), applies the configured time window, reasons through current milestone and phase state to activate or suppress achievement-based triggers, then writes project-state/automation/schedule.yaml. Modes: plan (preview), generate (write), update (re-diff), status (last-run + enabled count). Does NOT register crons itself — the host app reads schedule.yaml. Trigger: /project-automator"
+description: "Compile the project's reporting-matrix.yaml into automation/tasks.yaml — the canonical cadence registry that every scheduling host (the kanban in-app scheduler, the cron-curled /api/cron/tick, the appliance headless runner) fires from and the calendar UI edits. Reads every matrix entry, classifies it as cadence (time-fired) or event-driven (hook), normalizes to the task cadence shape (kind/day/hour/dom/month/start), spreads fire hours across the configured window, and writes tasks additively — never clobbering operator reschedules made in the calendar. Also applies named cadence presets (typical daily/weekly/funder/agile bundles) per project or per milestone. Modes: plan (preview), generate (write), update (re-diff, preserve overrides), status (registry health), preset list|apply. Does NOT register crons or call generators — the host fires, the orchestrator tick dispatches. Trigger: /project-automator"
 ---
 
 # project-automator
@@ -8,30 +8,36 @@ description: "Compile the project's reporting-matrix.yaml into a machine-readabl
 ## Purpose
 
 The reporting matrix is the source of truth for *what* runs. This skill is the compiler
-that turns the matrix into a structured schedule any host can execute — without the user
-having to translate cadences by hand or re-register jobs every time the matrix changes.
+that turns the matrix into the **canonical cadence registry** — `project-state/automation/tasks.yaml` —
+the single file every scheduling host fires from and the kanban calendar edits.
 
 Two tracks:
 
 | Track | Source | Compiled to |
 |---|---|---|
-| **Cadence** | Matrix entries with `kind: weekly \| monthly \| quarterly \| annual \| sprint-aligned \| bi-weekly` | Cron expressions placed inside the configured time window |
-| **Achievement** | Matrix entries with `kind: ad-hoc \| post-event \| on-publish` + current milestone/phase state | Event-hook definitions + optional one-shot activations |
+| **Cadence** | Matrix entries with `kind: daily \| weekly \| bi-weekly \| monthly \| quarterly \| annual \| sprint-aligned` | Time-fired tasks with a normalized cadence, fire hours spread across the configured window |
+| **Achievement** | Matrix entries with `kind: ad-hoc \| post-event \| on-publish \| event-driven` | Event tasks (no fire time) that the scheduler's activity-log event hooks fire |
 
-Output: `project-state/automation/schedule.yaml` — a single derived file. The reporting
-matrix remains the source; re-running this skill regenerates the schedule from scratch.
+Output: `project-state/automation/tasks.yaml`. The matrix stays the source of *what*;
+the registry owns *when* — including any reschedules the operator makes by dragging
+cards on the calendar, which this skill **must never overwrite** (see `update`).
+
+> **Retired:** `automation/schedule.yaml` (v2.0 output). No host ever consumed it.
+> If `status` finds one, report it as legacy and offer to delete it.
 
 ---
 
 ## Invocation
 
 ```
-/project-automator               → plan mode (preview, no writes)
-/project-automator generate      → write automation/schedule.yaml
-/project-automator update        → diff current schedule vs. matrix; patch changed entries
-/project-automator status        → show last-run, enabled jobs, pending achievement triggers
+/project-automator                    → plan mode (preview, no writes)
+/project-automator generate           → write automation/tasks.yaml
+/project-automator update             → add new matrix entries; preserve existing tasks
+/project-automator status             → registry health, orphans, last tick, legacy files
+/project-automator preset list        → list available cadence presets
+/project-automator preset apply <id>  → apply a preset (additive, idempotent)
+/project-automator preset apply milestone-checkins --milestone M03
 /project-automator --window 23:00-05:00   → override time window
-/project-automator --tz America/Vancouver → override timezone
 ```
 
 ---
@@ -40,188 +46,98 @@ matrix remains the source; re-running this skill regenerates the schedule from s
 
 1. Walk up from cwd to find `project-state/manifest.yaml`. Fail fast if not found.
 2. Read `project-state/reporting-matrix.yaml` → `entries[]`.
-3. Read `project-state/state.json` → current phase, health, milestone pointers.
-4. Read `project-state/manifest.yaml` → `id`, `timezone` (if set under `automation.timezone`
-   or `project.timezone`). If timezone is absent from both, **prompt**: "What timezone should
-   scheduled jobs run in? (e.g. America/Vancouver)" before proceeding.
-5. Read window from args, then from `manifest.yaml:automation.window`, then default `23:00–05:00`.
+3. Read `project-state/automation/tasks.yaml` if present → existing `tasks[]`.
+4. Read `project-state/state.json` → phase, milestone pointers, `sprint_calendar`.
+5. Window: args, then `manifest.yaml:automation.window`, then default `23:00–05:00`.
 
----
+## Step 1 — Classify and normalize
 
-## Step 1 — Classify entries
+One task per matrix entry, `id: auto-<entry.id>`, `target: {kind: matrix, ref: <entry.id>}`.
+Matrix tasks carry **no `enabled` flag** — the matrix entry is the enable authority.
 
-For each entry in `entries[]`:
+### Cadence entries (time-fired)
 
-### Cadence entries (→ cron jobs)
+Normalize the matrix's rich cadence into the registry shape
+`{kind, day?, hour?, dom?, month?, start?}`:
 
-| `cadence.kind` | Logic |
+| Matrix `cadence.kind` | Normalized |
 |---|---|
-| `weekly` | Emit one cron per week on `cadence.day`. Place it at `window.start`. |
-| `bi-weekly` | Emit one cron on `cadence.day` (odd/even week via `%2`). |
-| `monthly` | Emit one cron. If `day_of_month: last-business-day` → last weekday of month; `first-monday` → first Monday; else nth day. Place at `window.start + 30min` to stagger. |
-| `quarterly` | Emit one cron per quarter boundary aligned to `cadence.alignment`. Place at `window.start + 60min`. |
-| `annual` | Emit one cron on `cadence.due_month`. Place at `window.start + 90min`. |
-| `sprint-aligned` | Emit one cron on sprint-end day (read from `state.json:sprint_calendar`). |
+| `daily` | `{kind: daily, hour}` |
+| `weekly` | `{kind: weekly, day, hour}` |
+| `bi-weekly` | `{kind: bi-weekly, day, hour, start: <next natural fire date>}` — `start` anchors which week of the fortnight |
+| `monthly` | `{kind: monthly, dom, hour}` — `day_of_month: last-business-day` → `dom: 28`; clamp 1–28 |
+| `quarterly` | `{kind: quarterly, dom, hour}` — fires day `dom` of Jan/Apr/Jul/Oct |
+| `annual` | `{kind: annual, month: <due_month>, dom: 1, hour}` |
+| `sprint-aligned` | `{kind: sprint-aligned, hour}` — fires last day of sprint; inert until `state.json:sprint_calendar` (`{length_days, anchor}`) exists. If absent, note it in the output: "sprint-aligned tasks compiled but dormant — set sprint_calendar". |
 
-**Time-window placement rule:** distribute jobs evenly across the window so they do not
-all start at 23:00. Spacing = `window_minutes / job_count` (minimum 5 min between jobs).
-Assign each job a slot in order of priority (URGENT deadlines first, then weekly, monthly,
-quarterly, annual). Never schedule past `window.end`.
+**Window placement:** assign each task an `hour` spread across the window (deadline-bound
+first, then weekly, monthly, quarterly, annual) so jobs don't stack on one hour.
+`lead_time_days`/`lead_time_hours` subtract from the natural due date (e.g. monthly due
+the 1st with `lead_time_days: 2` → `dom: 28`).
 
-**lead_time offsets:** subtract `lead_time_days` or `lead_time_hours` from the natural
-due date when computing the cron fire time. E.g. a monthly report due on the 1st with
-`lead_time_days: 2` fires on the 29th/30th.
+### Event-driven entries (hooks)
 
-### Event-driven entries (→ hooks)
+`ad-hoc`, `post-event`, `on-publish`, and `event-driven` all compile to a task whose
+cadence is just `{kind: <matrix kind>}` — no fire time. The scheduler's activity-log
+event hooks fire them on `on_event` / `on` / `trigger` matches (`phase.transition`,
+`milestone.completed`, `documents/published/`); the calendar renders them in the
+event-driven tray. Preserve the trigger verbatim on the task as `trigger: <value>`
+so the hook matcher needs no matrix lookup.
 
-| `cadence.kind` | Emitted hook `on:` field |
-|---|---|
-| `ad-hoc` | `cadence.on_event` verbatim (e.g. `milestone.completed`, `phase.transition`) |
-| `post-event` | `cadence.on` (e.g. `sc-meeting.held`) with `within_business_days` preserved |
-| `on-publish` | `cadence.trigger` (e.g. `documents/published/`) |
+## Step 2 — Write discipline (the override-preservation rule)
 
-For `ad-hoc` entries, also **inspect current state** to determine if the trigger condition
-is already satisfied (the achievement already happened but the report wasn't run):
-- `on_event: milestone.completed` → check `milestones/` for any `status: completed` with
-  no corresponding activity-log `report.generated` entry since the completion. If found,
-  set `activation: immediate` in the hook — the host should fire it on next available slot.
-- `on_event: phase.transition` → check if the current phase is newer than the last
-  `phase-gate.transition` log event. If so, set `activation: immediate`.
+`tasks.yaml` is **shared-write**: this skill, the calendar UI, and the scheduler's
+proposal engine all write it. Non-negotiable rules:
 
----
-
-## Step 2 — Build schedule.yaml
-
-```yaml
-schema_version: 1
-manifest_kind: automation_schedule
-generated_from: project-state/reporting-matrix.yaml
-generated_at: <ISO-8601 UTC>
-project: <manifest.id>
-
-window:
-  start: "23:00"
-  end:   "05:00"
-  timezone: "America/Vancouver"
-
-jobs:
-  # ── Cadence (cron) ───────────────────────────────────────────────
-  - id: <entry.id>
-    type: cron
-    cron: "<computed cron expression>"    # standard 5-field
-    skill: "project-orchestrator tick --entry <entry.id>"
-    label: "<entry.report>"
-    generator: <entry.generator>
-    surfaces: <entry.surface split into array>
-    enabled: true                          # false if entry has enabled: false
-    source_entry: <entry.id>
-    next_due: "<ISO-8601 date>"            # informational; host may ignore
-
-  # ── Achievement (event hooks) ────────────────────────────────────
-  - id: <entry.id>
-    type: event
-    on: "<on_event or on or trigger>"
-    within_business_days: <N>              # post-event entries only
-    skill: "project-orchestrator tick --entry <entry.id>"
-    label: "<entry.report>"
-    generator: <entry.generator>
-    surfaces: <entry.surface split into array>
-    enabled: true
-    activation: deferred                   # or: immediate (already triggered, not yet run)
-    source_entry: <entry.id>
-```
-
-One job per matrix entry. Disabled matrix entries (`enabled: false`) emit `enabled: false`
-jobs — the host sees them but skips execution.
-
----
+1. Take the advisory lockfile (`automation/tasks.yaml.lock`, 300s TTL) before writing.
+2. **Never modify an existing task.** If `auto-<entry.id>` already exists, leave it —
+   its cadence may be an operator's drag-reschedule. `generate`/`update` only **add**
+   tasks for matrix entries with no task, and list (never auto-delete) orphaned matrix
+   tasks whose entry disappeared — deleting requires explicit confirmation.
+3. Never touch `status: proposed` tasks, adhoc tasks, or action tasks — they belong to
+   the proposal engine, the operator, and presets.
+4. Keep `schema_version: 1`, `manifest_kind: automation_tasks`.
 
 ## Step 3 — Output by mode
 
-### `plan` (default)
-Print the compiled job list to the terminal. **Do not write any files.** Show:
+- **`plan`** — print the compiled task list (new / existing-preserved / orphaned), no writes.
+- **`generate`** — write additively per Step 2; append `automator.generate` to `logs/activity.ndjson`.
+- **`update`** — same as generate plus a diff summary; confirm before deleting orphans.
+- **`status`** — task counts by kind/status, dormant sprint tasks, orphans, last
+  `orchestrator.tick`, and any legacy `schedule.yaml` (offer deletion).
 
-```
-# Automation plan — <project-id> — <date>
+## Presets — typical cadences as bundles
 
-Window: 23:00–05:00 America/Vancouver
-Source: project-state/reporting-matrix.yaml (<N> entries)
+A preset is a named op-list applied additively (skip refs that already have tasks).
+Sources: built-ins below, `templates/cadence-presets/*.yaml`, and the active pack's
+`reporting-matrix-defaults.yaml` (each pack is a de-facto preset).
 
-## Cron jobs (<N>)
-  <time>  <entry.id>  →  <generator>  [<surface>]
-  ...
+| Preset | Adds |
+|---|---|
+| `daily-ops` | harvest, inbox-triage, orchestrate-daily (action tasks, weekday hours) |
+| `weekly-core` | weekly-status, weekly-retro, comms drafts (weekly, reporting day) |
+| `funder` | quarterly-claim chain + SC prep (quarterly + lead-time holds) |
+| `agile-default` | sprint-aligned retro + planning set (needs `sprint_calendar`) |
+| `milestone-checkins` | per `--milestone <id>`: weekly review + due-minus-7 review, scoped `{milestone, until: due}` so they retire when it completes |
 
-## Event hooks (<N>)
-  on:<event>  <entry.id>  →  <generator>  [<surface>]
-  ...
-  ⚡ <entry.id>  activation=immediate  (trigger already met — fires on next slot)
-
-To write: /project-automator generate
-```
-
-### `generate`
-Write `project-state/automation/schedule.yaml`. Confirm with the user before writing if
-any `activation: immediate` jobs are present ("These N jobs have already met their trigger
-condition and will fire on the next scheduler run. Proceed?"). Append one
-`automator.generate` event to `logs/activity.ndjson`.
-
-### `update`
-Read the existing `automation/schedule.yaml`. Diff it against the freshly-compiled plan.
-Print a change summary (added / removed / changed entries). Ask "Apply these changes?"
-before writing. Append `automator.update` event to activity log.
-
-### `status`
-Read `automation/schedule.yaml` and tail the activity log for `automator.*` events.
-Report: last generated, enabled job count, immediate-activation count, last tick timestamp
-(if the host writes it back to `state.json:automation_last_tick`).
-
----
-
-## Automation config in manifest.yaml
-
-The skill reads (and the scaffolder may seed) this optional block:
-
-```yaml
-# project-state/manifest.yaml
-automation:
-  window:
-    start: "23:00"
-    end: "05:00"
-  timezone: "America/Vancouver"
-  enabled: true           # master switch; if false, all emitted jobs have enabled: false
-```
-
-If the block is absent, the skill uses defaults and prompts for timezone on first run.
-After prompting, it offers to write the block back: "Save these settings to manifest.yaml
-for future runs?"
-
----
+The kanban applies the same presets through `lib/automation.ts:applyPreset` (the
+"Set up cadence" picker and chat-to-schedule `apply-preset` op) — one implementation
+server-side; this skill is the CLI/headless door to it.
 
 ## What this skill does NOT do
 
-- Does not register crons. The host (keep-state or otherwise) reads `schedule.yaml` and
-  registers them. This skill is the compiler, not the executor.
-- Does not call generators directly. That is the orchestrator's `tick` routine.
-- Does not modify the reporting matrix. The matrix is the source of truth; this skill
-  only reads it.
-- Does not manage the 11pm–5am window enforcement at runtime. The host enforces that via
-  the cron expressions this skill emits.
-- Does not send, post, or draft anything. Read + compute + write one file.
-
----
+- Does not register crons or fire tasks. Hosts fire; the orchestrator `tick` dispatches.
+- Does not call generators directly.
+- Does not modify the reporting matrix (single exception: nothing — enable toggles go
+  through the UI's comment-preserving matrix write, not this skill).
+- Does not overwrite operator reschedules (Step 2 rule 2).
+- Does not send, post, or draft anything.
 
 ## Integration
 
-**Triggered by the user** (`/project-automator generate`) when the matrix changes or a
-new project is set up.
-
-**Triggered by `project-scaffolder`** after seeding the reporting matrix from packs —
-it calls `project-automator generate` as the final step so the schedule is ready
-immediately.
-
-**Read by keep-state (or any host)** on its polling interval. The host is responsible for
-detecting when `schedule.yaml` changes (via mtime or git hash) and re-loading it.
-
-**The kanban Schedule view** (`/schedule`) renders `schedule.yaml` alongside the reporting
-matrix so a human can see the computed crons, toggle individual jobs (`enabled: false`),
-and see `activation: immediate` warnings — without having to read YAML directly.
+- **`project-intake` / `project-scaffolder`** call `project-automator generate` as their
+  final step, so a new project's calendar is populated and armed out of the gate.
+- **Hosts** (kanban scheduler, `/api/cron/tick`, appliance runner) fire from `tasks.yaml`;
+  they detect changes by mtime.
+- **The kanban Calendar view** (`/calendar`) renders the registry with next-due/last-run,
+  edits cadences by drag, and applies presets — all against the same file this skill writes.

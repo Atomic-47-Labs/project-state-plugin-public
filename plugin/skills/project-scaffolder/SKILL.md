@@ -390,7 +390,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
     | ✅ | `project-state/manifest.yaml` | 3 TODOs remain (MPA date, review designates, funder contacts) |
     | ✅ | `project-state/state.json` | Phase: [selected] |
     | ✅ | `project-state/reporting-matrix.yaml` | Seeded from [pack] defaults |
-    | ✅ | `project-state/automation/schedule.yaml` | Compiled from matrix by project-automator |
+    | ✅ | `project-state/automation/tasks.yaml` | Compiled from matrix by project-automator |
     | ✅ | `project-state/logs/activity.ndjson` | `project.scaffolded` event |
     | ✅ | `.gitattributes` | `merge=union` on logs (if git model) |
     | ✅ | Git repo | Initial commit: "project-state: facility scaffolded — [slug]" |
@@ -416,7 +416,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
 | ✅     | project-state/manifest.yaml                 | 3 TODOs remain                 |
 | ✅     | project-state/state.json                    | Phase: [selected]              |
 | ✅     | project-state/reporting-matrix.yaml         | Seeded from [pack] defaults    |
-| ✅     | project-state/automation/schedule.yaml      | Compiled from matrix           |
+| ✅     | project-state/automation/tasks.yaml         | Compiled from matrix           |
 | ✅     | project-state/logs/activity.ndjson          | project.scaffolded event       |
 | ✅     | .gitattributes                              | merge=union on logs            |
 | ✅     | Git repo initialized                        | Initial commit made            |

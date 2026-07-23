@@ -1,0 +1,18 @@
+# One-pager recipe template — copy into reports/custom-defs/<slug>.yaml
+# A document is a recipe rendered against current state (see skills/project-onepager).
+recipe: onepager
+slug: example-onepager
+audience: exec                # funder | exec | technical | public | <pack-profile key>
+altitude: onepager            # onepager | brief | deepdive | whitepaper
+purpose: >
+  One sentence: what this document must achieve with this audience.
+evidence:
+  objectives: true
+  milestones: { include: all }        # all | [M07, M10] | { phase: current }
+  decisions: { last_days: 90 }
+  risks: { min_severity: high }
+  activity: { last_days: 30 }
+  documents: []                       # extra corpus paths for deepdive/whitepaper
+omit: []                              # audience-safety filters (profile adds more)
+sections: default                     # or explicit list for whitepaper altitude
+last_generated: null                  # maintained by the skill: {at, activity_seq, artifact}
