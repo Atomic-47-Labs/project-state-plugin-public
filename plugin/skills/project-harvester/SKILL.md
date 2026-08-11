@@ -1,6 +1,6 @@
 ---
 name: project-harvester
-description: "Harvest external signals (Slack, Gmail, GDocs, scsiwyg, Jira, Confluence, Linear) relevant to a specific project and write them as classified intel docs into `project-state/documents/inbox/`. Jira, Confluence, and Linear are pulled through their Claude MCP connectors (Atlassian + Linear). Reads the project manifest to discover which channels, contacts, keywords, projects/boards, spaces, and surfaces to watch. Tracks per-user, per-surface cursors in `project-state/harvest/cursors/`. Persists through the substrate binding: local file writes by default, or the project-state.app deposit API when a cloud endpoint + personal token are configured (see HARVEST-CONNECTIVITY-ROADMAP.md). Designed to be called by `project-orchestrator` as part of the daily routine. Trigger: `/project-harvester` or invoked by project-orchestrator."
+description: "Harvest external signals (Slack, Gmail, GDocs, scsiwyg, Jira, Confluence, Linear, GitHub) relevant to a specific project and write them as classified intel docs into `project-state/documents/inbox/`. Jira, Confluence, and Linear are pulled through their Claude MCP connectors (Atlassian + Linear); GitHub via its MCP connector or the gh CLI (commits digested per repo/day, plus PRs, releases, issues). Reads the project manifest to discover which channels, contacts, keywords, projects/boards, spaces, and surfaces to watch. Tracks per-user, per-surface cursors in `project-state/harvest/cursors/`. Persists through the substrate binding: local file writes by default, or the project-state.app deposit API when a cloud endpoint + personal token are configured (see HARVEST-CONNECTIVITY-ROADMAP.md). Designed to be called by `project-orchestrator` as part of the daily routine. Trigger: `/project-harvester` or invoked by project-orchestrator."
 ---
 
 # project-harvester
@@ -92,6 +92,12 @@ surfaces:
     teams: []                           # Linear team keys to watch, e.g. ["ENG","PLAT"]
     projects: []                        # optional Linear project ids/names to scope to
     query: ~                            # optional free-text/filter query
+  github:                               # via the GitHub MCP connector OR the gh CLI
+    enabled: false
+    repos: []                           # "owner/repo" to watch, e.g. ["Atomic-47-Labs/project-state"]
+    events: [commits, pulls, releases, issues]  # which activity to pull (subset ok)
+    branch: ~                           # limit commits to a branch (null = default branch)
+    query: ~                            # optional GitHub search qualifier (overrides repo scan)
 
 # Consortium contacts are the other key input:
 consortium:
@@ -154,7 +160,7 @@ YYYY-MM-DD-{surface}-{slug}.md
 
 ```markdown
 ---
-source: slack                          # slack | gmail | gdocs | scsiwyg | jira | confluence | linear
+source: slack                          # slack | gmail | gdocs | scsiwyg | jira | confluence | linear | github
 source_id: "C123/1714389612.123456"   # channel/ts, thread_id, doc_id, post_id, issue_key, page_id
 harvested_at: "2026-05-04T12:00:00Z"
 surface_timestamp: "2026-05-04T09:30:00Z"
@@ -335,6 +341,53 @@ for each issue:
     issue_url=issue.url, issue_status=issue.state, author=assignee, surface_timestamp=issue.updatedAt
 ```
 
+### Step 5e — GitHub harvest (if `surfaces.github.enabled`)
+
+The engineering pulse of the project: commits, pull requests, releases, and issues
+in the watched repos since the cursor. This is where "what the code did this week"
+becomes project intel the curator can link to milestones.
+
+> **Access.** Two paths, discovered at runtime — use whichever is present:
+> a **GitHub MCP connector** (server name `ps_github`; the appliance renders it from
+> an enrolled GitHub PAT via the surface-grant → connector-render generator), OR the
+> **`gh` CLI** (local / desktop, already authenticated). Both are read-only. If
+> neither is available, skip the surface and log it.
+
+```
+for each repo in surfaces.github.repos:   # or run surfaces.github.query instead
+  # --- commits (grouped, not one doc per commit) ---
+  if 'commits' in events:
+    <gh api repos/{repo}/commits?since={cursor}&sha={branch}>   # or the MCP list-commits tool
+    → ONE inbox doc per repo per day summarizing that day's commits (sha, message
+      first line, author) — a commit digest, so a busy day is one signal not fifty.
+  # --- pull requests ---
+  if 'pulls' in events:
+    <gh pr list --repo {repo} --state all --search "updated:>={cursor_date}">
+    → one doc per PR touched since cursor: number, title, state (open/merged/closed),
+      author, body excerpt, merged_at.
+  # --- releases ---
+  if 'releases' in events:
+    <gh release list --repo {repo}>  → filter published/updated > cursor
+    → one doc per release: tag, name, notes.
+  # --- issues ---
+  if 'issues' in events:
+    <gh issue list --repo {repo} --state all --search "updated:>={cursor_date}">
+    → one doc per issue touched: number, title, state, labels, author, latest comment.
+
+  emit each item if:
+    - it's in a watched repo (all such activity is relevant), OR
+    - title/message/body contains a project keyword, OR
+    - author/committer/assignee ∈ contact_roster (by GitHub login or email where exposed)
+  → frontmatter: source=github, source_id="{repo}#{kind}:{id}" (kind ∈ commit-digest|
+    pr|release|issue; id = date | pr-number | tag | issue-number),
+    repo, ref_url (link back), issue_status (PR/issue state), author,
+    surface_timestamp = committed/updated/published time
+```
+
+Commits are **digested per repo per day** (not one doc per commit) so a heavy push
+lands as a single readable signal; PRs, releases, and issues are one doc each since
+those are already the natural units.
+
 ### Step 6 — Write inbox docs
 
 For each item flagged for ingest:
@@ -356,6 +409,7 @@ For each surface that completed without error, write this identity's cursor file
 | gmail | max thread date seen |
 | gdocs / scsiwyg | now |
 | jira / confluence / linear | max issue/page updated seen |
+| github | max commit/PR/release/issue timestamp seen |
 
 File binding: rewrite `harvest/cursors/{email}--{surface}.yaml` (single-writer per identity — no lock needed). Deposit binding: the proposed cursor rides in the deposit batch and the server advances it only past accepted docs.
 
@@ -374,6 +428,7 @@ Return a summary:
 | Jira       | 6           | 6       | 0             | 0      |
 | Confluence | 2           | 2       | 0             | 0      |
 | Linear     | 4           | 4       | 0             | 0      |
+| GitHub     | 9           | 9       | 0             | 0      |
 
 12 new docs in project-state/documents/inbox/ — run /project-document-curator to classify.
 ```
@@ -388,6 +443,7 @@ Return a summary:
 /project-harvester --surface slack         # single surface only
 /project-harvester --surface gmail,gdocs   # comma-separated surfaces
 /project-harvester --surface jira,linear   # connector surfaces (jira | confluence | linear)
+/project-harvester --surface github        # commits (digested), PRs, releases, issues
 /project-harvester --dry-run               # show what would be written, don't write
 /project-harvester --no-advance-cursor     # harvest but don't move cursors (re-run safe)
 ```
@@ -437,6 +493,6 @@ Dedup is **load-bearing across harvesters**, not just re-run safety: two users w
 
 - Does not classify or promote docs — that's `project-document-curator`
 - Does not send or modify anything on any surface — read-only
-- Does not harvest GitHub (commits are already in `work-state`; surface them via the kanban's milestone linking instead)
+- Harvests GitHub as a first-class surface (Step 5e) — commits (digested per repo/day), PRs, releases, issues for the watched repos. (This supersedes the earlier "GitHub lives only in work-state" stance; work-state remains the raw event store, project-harvester is the project-scoped lens.)
 - Does not run sentiment analysis — that's downstream
 - Does not replace the work-state harvesters — it's a project-scoped lens on the same surfaces

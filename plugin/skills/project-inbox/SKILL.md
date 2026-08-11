@@ -47,6 +47,7 @@ Run the full classification pass on all documents with `triage_state: unprocesse
    - `seed-risks` — contains a risk register or risk narrative
    - `seed-people` — contains a stakeholder list, org chart, or named contacts
    - `seed-budget` — contains budget figures or financial breakdown
+   - `seed-issue` — contains a bug-shaped claim about the project-state product itself (plugin, skills, kanban, appliance, docs); drained by `project-feedback capture --from-signals`
    - `example-output` — suitable for `references/examples/good/`
    - `reference-material` — general reference; useful to keep available
 

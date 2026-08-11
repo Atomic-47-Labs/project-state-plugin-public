@@ -1,6 +1,6 @@
 # Project State (Claude Code plugin)
 
-A generic operational substrate for multi-stakeholder projects. It bundles **34
+A generic operational substrate for multi-stakeholder projects. It bundles **41
 skills** that turn routine reporting into a byproduct of normal work — milestones,
 objectives/KPIs, phase gates, document curation, status reports, funder/grant
 compliance, and a local kanban dashboard. Behavior is configured by swappable
@@ -32,7 +32,7 @@ descriptions when you say things like "record a decision" or "draft the weekly".
 | Core ops | `project-phase-gate`, `project-document-curator`, `project-milestone-manager`, `project-goal-tracker`, `project-status-reporter`, `project-inbox` |
 | Surfaces & automation | `project-orchestrator`, `project-notifier`, `project-review-meeting`, `project-funder-reporting`, `project-change-register`, `project-blog-publisher`, `project-website-publisher`, `project-jira-publisher`, `project-kanban`, `project-doc-suite`, `project-tech-reports` |
 | Compliance (pack-driven) | `project-sred-tracker`, `project-sred-reviewer` |
-| Polish | `project-onboarder`, `project-ip-tracker`, `project-external-comms`, `project-lessons`, `project-archive`, `project-git`, `project-harvester` |
+| Polish | `project-onboarder`, `project-ip-tracker`, `project-external-comms`, `project-lessons`, `project-archive`, `project-git`, `project-harvester`, `project-feedback` |
 | Grant | `grant-state`, `grant-scaffolder`, `grant-ingestor` |
 
 **Packs** (`packs/`): `pic-pcais`, `grant-canada`, `sred-canada`, `board-investor`,

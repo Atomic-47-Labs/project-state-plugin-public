@@ -156,6 +156,8 @@ Return a short table: total docs, by kind, by phase, SoT count, warnings.
 
 ## Integration with other skills
 
+- **project-feedback** — when a classified doc carries `action_flags: [seed-issue]`, `project-feedback capture --from-signals` drafts feedback records from it (one per distinct claim) and registers them as GitHub issues. The curator only sets the flag; it never files.
+
 - **project-inbox** — if a document in `documents/inbox/` has already been triaged by `project-inbox` (i.e., `triage_state: processed` in `documents/index.yaml`), the curator presents the pre-classification for confirmation rather than running the 5-question classification from scratch. Smart inbox metadata fields are always preserved in the index entry.
 - **project-state** — all writes to `documents/index.yaml` and `manifest.yaml` go through `project-state`'s locking/logging. This skill reads/writes intent; `project-state` executes.
 - **project-phase-gate** — when a doc is registered that matches a gate's `required_artifacts_paths`, populate that path. If all gate artifacts are present, `project-phase-gate` can offer to transition.
