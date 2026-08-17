@@ -1,0 +1,25 @@
+schema_version: 1
+entity: "technological_advancement"
+id: "ADV-NN"
+slug: "<slug>"
+
+# CRA Section G language — knowledge gained, not product delivered
+linked_tu: "TU-NN"                # required
+linked_experiments: ["EX-NN"]     # at least one required
+advancement_statement: |
+  The work established that ...
+knowledge_gained: |
+  [What is now known that was not known before. Proportionate to the linked
+   experiments' observed results — no broader.]
+
+# Internal — not filed
+proportionality_note: |
+  [Does this advancement match the scope of the linked experiments' results?]
+
+established_date: "YYYY-MM-DD"
+fiscal_year: "YYYY"
+claim_fy: "FYYYYY"
+
+review_notes: []
+created_by: "TODO"
+last_modified: "YYYY-MM-DDThh:mm:ssZ"

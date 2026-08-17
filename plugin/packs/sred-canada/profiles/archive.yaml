@@ -1,0 +1,25 @@
+# sred-canada — archive profile
+# SR&ED's defining wrinkle: the claim outlives project closeout. Filing can legitimately
+# occur up to 18 months after fiscal year end — after the project is archived.
+profile_id: "sred-canada.archive"
+
+closeout_requirements:
+  # Evaluated per fiscal year with non-terminal claim status at closeout gate-out.
+  per_open_fiscal_year:
+    one_of:
+      - "T661 draft package exists (narrative + evidence map + cost categorization + project summary)"
+      - "documented waive decision exists (decisions/YYYY-MM-DD-sred-waive-<FY>.yaml)"
+  note: |
+    Closeout does not require FILING — it requires the package or the decision.
+    Filing remains the human's act, on the advisor's counsel, inside the 18-month window.
+
+archive_tail:
+  # Fiscal years still open at archive time.
+  register: "each open FY is recorded as an archive tail in state/sred.json"
+  deadline_tasks: "survive archive — project-automator does not retire deadline tasks for open FYs"
+  escalation: "the orchestrator tick continues escalation tiers post-archive until each FY reaches filed | waived | forfeited"
+  record: "the archived project's sred/ directories are the record the advisor works from"
+
+post_close:
+  retention: "indefinite — CRA can request contemporaneous records in an audit years later"
+  final_entry: "on each FY reaching terminal status post-archive, append sred.claim.status-changed to the archived activity log"

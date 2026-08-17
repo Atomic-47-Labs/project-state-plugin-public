@@ -1,0 +1,17 @@
+# sred-deadlines — one strip per open fiscal year (V1.1; declarative)
+view:
+  id: sred-deadlines
+  title: "SR&ED Deadlines"
+  requires: "capability=sred"
+  kind: strips
+  source: "state/sred.json:fiscal_years"
+  exclude_where: "claim_status in [filed, waived, forfeited]"
+  strip:
+    title: "{fy} — {claim_status}"
+    fields:
+      - { label: "Target (FY+15mo)", value: target_date, countdown: true }
+      - { label: "HARD deadline (FY+18mo)", value: hard_deadline, countdown: true,
+          tier_colors: { red: "<=30d or <=90d", amber: "<=180d", green: ">180d" } }
+      - { label: "Chain", value: "progress across sred.annual-cost-categorization → t661-narrative-draft → t661-review → advisor-handoff task completions for this FY" }
+      - { label: "Unconfirmed evidence candidates", value: "count of sred/inbox/ stubs" }
+    alert: "past hard_deadline with open status → permanent red: 'claim window forfeited unless filed'"

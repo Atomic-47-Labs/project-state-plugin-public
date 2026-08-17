@@ -108,6 +108,16 @@ authors nothing and sends nothing.
    - `quarterly` / deadline-bound (`Apr/Jul/Oct/Jan`) → due when today falls inside
      the entry's `lead_time` window before the deadline (default 14 days).
    - `sprint-aligned` → due on the sprint boundary from the active sprint calendar.
+   - `deadline` → due when today ≥ (`due` − `lead_days`), once per period (the task's `fy`).
+     **Independently of dueness**, compare today against each `escalation` tier relative to
+     the `hard` date; on first crossing (check `state/<capability>.json:escalation_tiers_fired`),
+     emit `<capability>.deadline.warning|alert|critical` and place the item in 🔴
+     (critical/alert) or 🟡 (warning). A task past its `hard` date with non-terminal status
+     is a permanent 🔴 ("claim window forfeited unless filed") until a human records the
+     terminal status. **Chaining:** a task with `after:` dispatches only once the referenced
+     entry has a completed run for the same period; `review_gate:` additionally requires a
+     completion event from the named skill with a verdict in `pass_on`. Chains evaluate
+     within a single tick pass; unsatisfied chains show in the digest as "waiting on <entry>".
    - `event-driven` / `on-publish` → **never** time-due; these fire from activity-log
      triggers (`phase-transition`, `milestone-completion`, `documents/published/`),
      not from the tick. Skip them here.

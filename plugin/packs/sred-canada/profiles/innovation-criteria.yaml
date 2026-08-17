@@ -1,0 +1,52 @@
+# sred-canada — innovation-criteria profile (Layer 1 — company)
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ CAPTURE LENS, NOT ELIGIBILITY ARGUMENT. CRA's standard-practice test is      │
+# │ field-level; "new to us" is ineligible. This layer calibrates what the       │
+# │ company records and investigates. See capability schema/eligibility-         │
+# │ baseline.yaml (Layer 0, not editable) for the invariant test.               │
+# └──────────────────────────────────────────────────────────────────────────────┘
+# Single-company deployments fill this in place. Multi-company: fork the pack
+# (sred-canada → sred-<co>) so each company carries its own criteria profile —
+# packs are the portable org-level unit (CAPABILITY-PLUGINS.md §2).
+profile_id: "sred-canada.innovation-criteria"
+layer: 1
+
+company: "Atomic 47 Labs"
+
+fields_of_science:
+  # CRA codes this company claims under
+  - code: "2.02.09"
+    label: "Software engineering"
+
+technology_baseline:
+  # Established practice FOR THIS COMPANY'S DOMAINS — work built entirely on these
+  # is presumed routine unless a project's Layer 2 declares a specific frontier.
+  - "Standard web application development (Next.js/React CRUD, REST APIs)"
+  - "Conventional CI/CD, git workflows, and release engineering"
+  - "Routine use of vendor LLM APIs (prompt engineering against documented behavior)"
+  - "Standard connector/API integration (Slack, Gmail, Jira, calendar) per vendor docs"
+  - "Static site generation, template rendering, document formatting"
+
+exemplars:
+  # Positive/negative examples from past claims — the reviewer critiques new TUs
+  # against these. Empty until the first claim cycle completes.
+  accepted: []
+  withdrawn_or_rejected: []
+
+house_language:
+  # Company additions to the pack's risky_language_patterns (funder-reporting profile)
+  additional_risky_patterns:
+    - "we integrated"
+    - "we adopted"
+    - "our team had never"       # company-relative framing — reframe field-relative
+    - "we didn't have a way to"  # company-relative framing — reframe field-relative
+
+advisor_guidance: |
+  [House guidance from the engaged SR&ED advisor — filled when engaged. E.g. preferred
+   narrative depth, cost-allocation conventions, documentation thresholds.]
+
+project_layer:
+  # Where each project's Layer 2 lives and how it's authored.
+  file: "sred/criteria.yaml"
+  authored_by: "project-sred-tracker define_criteria (guided interview; advisor recommended)"
+  refresh: "nudged by the quarterly log review; changes logged as sred.criteria.updated"

@@ -1,0 +1,30 @@
+schema_version: 1
+entity: "technological_uncertainty"
+id: "TU-NN"
+slug: "<slug>"
+
+# CRA Section E language
+uncertainty_statement: |
+  It was uncertain whether ...
+standard_practice_gap: |
+  No established method was identified for ...
+
+uncertainty_type: "software_engineering"   # or: materials, process, other
+field_of_science: "2.02.09"                # CRA code
+
+linked_experiments: []      # EX-NN ids — populated as experiments are created
+linked_milestones: []
+
+# Timing (critical for CRA — identify BEFORE work begins)
+identified_date: "YYYY-MM-DD"
+work_start_date: "YYYY-MM-DD"
+work_end_date: ~
+fiscal_year: "YYYY"
+claim_fy: "FYYYYY"
+
+status: "active"    # active | resolved | removed
+resolution: ~
+
+review_notes: []    # written back by project-sred-reviewer
+created_by: "TODO"
+last_modified: "YYYY-MM-DDThh:mm:ssZ"

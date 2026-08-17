@@ -1,0 +1,69 @@
+# sred capability — schema extension (entity kinds + directories)
+# Registered with the memory layer at enable. Normative source: docs/SRED-CAPABILITY-SPEC.md §4.
+schema_version: 1
+capability: sred
+
+directories:
+  - path: "sred/uncertainties/"
+    entity_kind: "sred.technological_uncertainty"
+    naming: "TU-NN-<slug>.yaml"
+    t661_section: "E [242]"
+  - path: "sred/experiments/"
+    entity_kind: "sred.experiment"
+    naming: "EX-NN-<slug>.yaml"
+    t661_section: "F [244]"
+  - path: "sred/advancements/"
+    entity_kind: "sred.technological_advancement"
+    naming: "ADV-NN-<slug>.yaml"
+    t661_section: "G [246]"
+  - path: "sred/cost-tracking/"
+    entity_kind: "sred.cost_tracking"
+    naming: "<FY>-costs.yaml"
+  - path: "sred/inbox/"
+    purpose: "harvester-proposed candidate evidence entries awaiting confirmation; never auto-promoted"
+
+files:
+  - path: "sred/evidence-log.ndjson"
+    kind: append-only-log
+    entry_schema:
+      required: [date, description, people, logged_at]
+      one_of_required: [tu_id, ex_id]
+      fields:
+        date: "date of the work (not of entry)"
+        timestamp: "ISO8601"
+        entry_type: "experiment|test|failure|iteration|advancement|meeting|publication|harvested"
+        tu_id: "TU-NN or null"
+        ex_id: "EX-NN or null"
+        adv_id: "ADV-NN or null"
+        description: "contemporaneous description of what was done/found"
+        people: "[names]"
+        milestone_id: "host milestone link"
+        record_type: "code_commit|meeting_note|test_output|email|design_doc"
+        record_reference: "commit hash / path / meeting date"
+        backfilled: "REQUIRED true when logged_at - date > 7 days"
+        source: "for entry_type: harvested — {surface, ref} provenance"
+        logged_by: "name"
+        logged_at: "ISO8601"
+  - path: "state/sred.json"
+    kind: capability-runtime-state
+    schema: "schema/state.schema.json"
+  - path: "sred/criteria.yaml"
+    kind: project-config
+    purpose: |
+      Layer 2 innovation criteria — the project's capture lens (candidate uncertainty
+      areas, declared-routine boundary, harvester hints). Extends the company layer
+      (pack profile innovation-criteria.yaml) which extends the non-editable Layer 0
+      baseline (schema/eligibility-baseline.yaml). A capture lens, never an
+      eligibility argument — the standard-practice test is field-level.
+    template: "templates/criteria.yaml"
+
+# Entity field schemas are defined in skills/project-sred-tracker/SKILL.md (adopted v1.0)
+# with these capability-level additions to all three entity kinds:
+entity_field_additions:
+  all: [review_notes, claim_fy]
+
+invariants:
+  - "every ADV references >=1 TU and >=1 EX (tracker refuses; validator fails)"
+  - "every EX references exactly 1 TU"
+  - "evidence-log is append-only; corrections are new entries"
+  - "an EX belongs to exactly one claim_fy; work spanning FY boundaries splits into per-FY EX records under the same TU"

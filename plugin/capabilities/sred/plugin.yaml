@@ -1,0 +1,33 @@
+plugin:
+  id: "sred"
+  name: "SR&ED — Scientific Research & Experimental Development capability"
+  version: "1.0.0"
+  type: capability
+  description: |
+    Teaches a project to capture SR&ED-eligible work as it happens — technological
+    uncertainties (TU), experiments (EX), advancements (ADV), and a contemporaneous
+    evidence log — so the annual CRA T661 claim package is a byproduct of normal work:
+    drafted from the entities, reviewed for audit risk, and handed to a human advisor.
+    The system drafts only; it never files and never asserts eligibility.
+  authors:
+    - "David Olsson <david@atomic47.co>"
+  spec: "docs/SRED-CAPABILITY-SPEC.md"
+  released: "2026-08-17"
+
+compatibility:
+  substrate: ">=4.1"
+
+namespace:
+  prefix: "sred"           # directories, entity kinds, events, state file
+  skills:                  # suite-convention names mapped to this capability
+    - project-sred-tracker
+    - project-sred-reviewer
+
+payload:
+  schema: "schema/"
+  skills: "skills/"
+  templates: "templates/"
+  validator: "validator/validate-sred.md"
+  views: "views/"          # V1.1 — specified, not yet mounted
+  packs:
+    bundled: [sred-canada] # default behavior pack; swappable per project

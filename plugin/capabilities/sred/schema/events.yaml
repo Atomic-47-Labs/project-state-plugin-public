@@ -1,0 +1,38 @@
+# sred capability — event vocabulary
+# Appended to logs/activity.ndjson like all events; matchable by automation event hooks.
+schema_version: 1
+capability: sred
+
+events:
+  - id: "sred.tu.created"
+    emitted: "TU recorded"
+  - id: "sred.tu.resolved"
+    emitted: "TU resolved"
+  - id: "sred.ex.created"
+    emitted: "EX recorded"
+  - id: "sred.ex.completed"
+    emitted: "EX completed"
+  - id: "sred.adv.created"
+    emitted: "ADV recorded"
+  - id: "sred.evidence.logged"
+    emitted: "evidence entry appended"
+  - id: "sred.evidence.proposed"
+    emitted: "harvester drops a candidate into sred/inbox/"
+  - id: "sred.review.completed"
+    emitted: "reviewer verdict produced"
+    payload: [verdict, fy]
+  - id: "sred.criteria.updated"
+    emitted: "innovation criteria authored or refreshed (drift is audit-relevant)"
+    payload: [layer, status, areas_added, areas_removed]
+  - id: "sred.claim.status-changed"
+    emitted: "per-FY claim status transition (human-driven for filed/waived)"
+    payload: [fy, from, to]
+  - id: "sred.deadline.warning"
+    emitted: "escalation tier crossed (180d default)"
+    payload: [fy, days_to_hard_deadline]
+  - id: "sred.deadline.alert"
+    emitted: "escalation tier crossed (90d default)"
+    payload: [fy, days_to_hard_deadline]
+  - id: "sred.deadline.critical"
+    emitted: "escalation tier crossed (30d default)"
+    payload: [fy, days_to_hard_deadline]

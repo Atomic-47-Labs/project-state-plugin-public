@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "state/sred.json — sred capability runtime state",
+  "type": "object",
+  "required": ["schema_version", "fiscal_year_end", "counters", "fiscal_years"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "fiscal_year_end": {
+      "type": "string",
+      "description": "Recurring FY end as --MM-DD (mirrors manifest capabilities.sred.fiscal_year_end)",
+      "pattern": "^--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "counters": {
+      "type": "object",
+      "required": ["tu", "ex", "adv"],
+      "properties": {
+        "tu": { "type": "integer", "minimum": 0 },
+        "ex": { "type": "integer", "minimum": 0 },
+        "adv": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "fiscal_years": {
+      "type": "object",
+      "description": "One entry per fiscal year; overlapping open claims across FYs are normal",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["fy_end", "hard_deadline", "target_date", "claim_status"],
+        "properties": {
+          "fy_end": { "type": "string", "format": "date" },
+          "hard_deadline": { "type": "string", "format": "date", "description": "fy_end + 18 months (CRA; missing it forfeits the claim)" },
+          "target_date": { "type": "string", "format": "date", "description": "fy_end + 15 months (3-month buffer)" },
+          "claim_status": {
+            "enum": ["capturing", "costing", "drafting", "in-review", "advisor-handoff", "filed", "waived", "forfeited"],
+            "description": "filed/waived recorded by a human only; forfeited recorded loudly when hard_deadline passes unfiled"
+          },
+          "last_quarterly_review": { "type": ["string", "null"], "format": "date" },
+          "escalation_tiers_fired": { "type": "array", "items": { "type": "integer" }, "description": "days-out tiers already emitted, so each fires once" },
+          "advisor_engaged": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

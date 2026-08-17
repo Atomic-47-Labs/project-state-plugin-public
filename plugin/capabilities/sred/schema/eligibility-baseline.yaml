@@ -1,0 +1,33 @@
+# sred capability — Layer 0 eligibility baseline (NOT EDITABLE)
+# The invariant CRA test every criteria layer sits beneath. Company packs (Layer 1)
+# and project criteria (Layer 2) may narrow or annotate — never contradict.
+# Source: CRA Guidelines on the eligibility of work for SR&ED tax incentives.
+schema_version: 1
+capability: sred
+layer: 0
+
+five_questions:
+  - id: uncertainty
+    question: "Was there a scientific or technological uncertainty — a gap that could not be resolved by standard practice?"
+  - id: hypothesis
+    question: "Did the effort involve formulating hypotheses specifically aimed at reducing or eliminating that uncertainty?"
+  - id: systematic
+    question: "Was the overall approach a systematic investigation or search — experiment, analysis, iteration — rather than trial-and-error tinkering or routine engineering?"
+  - id: advancement
+    question: "Was the overall approach undertaken for the purpose of achieving a scientific or technological advancement (new knowledge, not just a new product)?"
+  - id: records
+    question: "Were records of the hypotheses tested and results kept as the work progressed (contemporaneous)?"
+
+field_level_rule: |
+  THE STANDARD-PRACTICE TEST IS FIELD-LEVEL, NOT COMPANY-LEVEL.
+  "New to us" is explicitly ineligible. Company and project criteria are a CAPTURE
+  LENS — they decide what gets recorded and investigated — never an eligibility
+  argument. Any TU whose standard_practice_gap reads company-relative ("our team
+  had never...", "we didn't have a way to...") must be reframed field-relative or
+  flagged by project-sred-reviewer.
+
+not_eligible_regardless_of_criteria:
+  - "market research, sales promotion, style/aesthetic changes"
+  - "routine data collection, routine testing, quality control"
+  - "commercial production of a new/improved product or process"
+  - "adopting or integrating known tools where behavior was knowable from documentation or standard practice"

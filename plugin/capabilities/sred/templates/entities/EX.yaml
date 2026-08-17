@@ -1,0 +1,44 @@
+schema_version: 1
+entity: "experiment"
+id: "EX-NN"
+slug: "<slug>"
+
+# CRA Section F language
+linked_tu: "TU-NN"          # exactly one
+hypothesis: |
+  Whether [specific technical outcome] could be achieved by [approach] under [constraints].
+method_and_trials: |
+  [What was done: implementations attempted, tests run, architectures tried — including
+   failures, iterations, and what changed between attempts.]
+observations_and_results: |
+  [What was observed: measured results, failure modes, unexpected constraints. Must include
+   at least one of: failure, limitation, unexpected finding, iteration, refinement.]
+limitations: |
+  [What remained unresolved]
+
+evidence_records:
+  - type: "code_commit"     # code_commit | meeting_note | test_output | email | design_doc | other
+    reference: "TODO"
+    date: "YYYY-MM-DD"
+    description: "TODO"
+
+# Cost roll-up source (aggregated into sred/cost-tracking/<FY>-costs.yaml)
+people_involved:
+  - name: "TODO"
+    role: "TODO"
+    eligible_days: 0
+
+linked_advancements: []
+linked_milestones: []
+
+start_date: "YYYY-MM-DD"
+end_date: ~
+fiscal_year: "YYYY"
+claim_fy: "FYYYYY"          # an EX belongs to exactly one claim FY; split at FY boundaries
+
+status: "in_progress"       # in_progress | complete | abandoned
+abandonment_reason: ~
+
+review_notes: []
+created_by: "TODO"
+last_modified: "YYYY-MM-DDThh:mm:ssZ"

@@ -1,0 +1,40 @@
+# sred — Layer 2 project innovation criteria (sred/criteria.yaml)
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ CAPTURE LENS, NOT ELIGIBILITY ARGUMENT. CRA's standard-practice test is      │
+# │ field-level; "new to us" is ineligible. These criteria decide what gets      │
+# │ RECORDED and INVESTIGATED for this project. Eligibility is the advisor's     │
+# │ call. See schema/eligibility-baseline.yaml (Layer 0).                        │
+# └──────────────────────────────────────────────────────────────────────────────┘
+# Authored via project-sred-tracker define_criteria (guided interview, ideally with
+# the advisor). Extends the company layer (pack profile innovation-criteria.yaml).
+# Changes are logged (sred.criteria.updated) — criteria drift is audit-relevant.
+schema_version: 1
+layer: 2
+status: draft                # draft | reviewed — reviewed requires PL sign-off (record who/when)
+reviewed_by: ~
+reviewed_date: ~
+
+candidate_uncertainty_areas:
+  # Named areas of this project's technology frontier where uncertainties are likely.
+  # Work landing here WITHOUT a TU on file is a gap-analysis warning.
+  - id: "<slug>"
+    label: "<short name>"
+    description: |
+      [What is genuinely unknown here, framed field-relative: what does the field's
+       standard practice not establish?]
+    linked_milestones: []    # milestones/workstreams whose work falls in this area
+    linked_tus: []           # populated as TUs are declared
+
+declared_routine:
+  # Explicitly NOT candidates for this project — keeps capture honest and focused.
+  - "<e.g. CRUD views, template rendering, standard connector integration>"
+
+harvester_hints:
+  # Layer 2 matching config for harvester-proposed evidence candidates.
+  keywords: []               # e.g. [concurrency, idempotent, race]
+  paths: []                  # repo paths where frontier work lives
+  people: []                 # people whose work is likely eligible
+
+review:
+  refresh_cadence: quarterly # the quarterly log review nudges a criteria refresh
+  last_refreshed: ~

@@ -1,0 +1,14 @@
+# The `capabilities: sred:` block that `enable` writes into project-state/manifest.yaml.
+# fiscal_year_end is REQUIRED — enable refuses without it.
+capabilities:
+  sred:
+    enabled: true
+    version: "1.0.0"                 # plugin version at enable time; validator checks drift
+    pack: sred-canada                # bundled default; swappable
+    fiscal_year_end: "--12-31"       # REQUIRED — recurring FY end (--MM-DD); everything anchors to this
+    claimant_org: "{{claimant_org}}"
+    claimant_bn: "TODO"              # Business Number — needed for the T661 project summary
+    field_of_science_default: "2.02.09"   # CRA code; software engineering
+    advisor:
+      engaged: false
+      contact: ~                     # filled when a qualified SR&ED advisor is engaged

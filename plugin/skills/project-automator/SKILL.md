@@ -69,6 +69,7 @@ Normalize the matrix's rich cadence into the registry shape
 | `quarterly` | `{kind: quarterly, dom, hour}` — fires day `dom` of Jan/Apr/Jul/Oct |
 | `annual` | `{kind: annual, month: <due_month>, dom: 1, hour}` |
 | `sprint-aligned` | `{kind: sprint-aligned, hour}` — fires last day of sprint; inert until `state.json:sprint_calendar` (`{length_days, anchor}`) exists. If absent, note it in the output: "sprint-aligned tasks compiled but dormant — set sprint_calendar". |
+| `deadline` | One dated task **per anchor instance** (per fiscal year for `recur: annual`): `{kind: deadline, due, hard?, escalation?, lead_days, hour}` + top-level `fy` — id `auto-<entry.id>-<FY>`. Resolve `anchor` (manifest path / state pointer / literal); `due = instance + offset_months`; `hard = instance + hard_offset_months`. New instances added on `update` when a new FY opens; tasks for FYs with terminal claim status (`filed \| waived \| forfeited`) are marked retired, never deleted — **except** FYs registered as an archive tail, which stay live post-archive. The `hard` date is not operator-editable — reschedules apply to fire timing only. Copy `after`/`review_gate` from the entry onto the task verbatim. |
 
 **Window placement:** assign each task an `hour` spread across the window (deadline-bound
 first, then weekly, monthly, quarterly, annual) so jobs don't stack on one hour.

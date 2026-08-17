@@ -1,0 +1,18 @@
+schema_version: 1
+entity: "sred_cost_tracking"
+fiscal_year: "FYYYYY"
+fy_end: "YYYY-MM-DD"
+
+# Manual worksheet — the human's document. Three categories per the pack profile.
+eligible_experimental: []          # {person, role, days, amount?, linked_ex: [], basis}
+partially_eligible_support: []     # {person, role, days, amount?, linked_ex: [], basis, eligible_fraction}
+non_eligible_routine: []           # {person, role, days, note}
+
+# Computed by project-sred-tracker rollup_costs(fy). NEVER overwrites the lines above;
+# written alongside for reconciliation, with per-EX provenance.
+rollup:
+  generated_at: ~
+  per_person: []                   # {person, eligible_days_total, by_experiment: {EX-NN: days}}
+  discrepancies: []                # people on EXs but absent above; claims exceeding rolled-up days; EXs with 0 days but claimed costs
+
+last_modified: "YYYY-MM-DDThh:mm:ssZ"

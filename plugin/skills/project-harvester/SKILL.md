@@ -460,6 +460,21 @@ Dedup is **load-bearing across harvesters**, not just re-run safety: two users w
 
 ---
 
+## SR&ED evidence proposals (when the `sred` capability is enabled)
+
+If `manifest.yaml → capabilities.sred.enabled` is true, the sweep additionally matches
+harvested signals — commit digests, Slack messages, meeting notes — against the project's
+SR&ED capture lens (`sred/criteria.yaml → harvester_hints`: keywords, repo paths, people)
+and against active EX records (linked milestones, people). Matches are dropped into
+`sred/inbox/` as candidate evidence stubs (`{date, source: {surface, ref}, suggested_ex,
+description_draft, people}`) and `sred.evidence.proposed` is emitted.
+
+Discipline: candidates are **never** auto-appended to the evidence log —
+`project-sred-tracker confirm_evidence` promotes them, a human decision at a time. The
+`description_draft` is the source's own words (e.g. the commit subject line), never an
+interpretation. If no `sred/criteria.yaml` exists, skip SR&ED matching entirely and note it
+once in the harvest summary ("sred enabled but no criteria — run define_criteria").
+
 ## Integration with project-orchestrator
 
 `project-orchestrator` calls this skill as the **first step** of its daily routine (before checking milestones, deadlines, etc.) so that the inbox is populated before curator recommendations are made.

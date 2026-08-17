@@ -1,0 +1,18 @@
+# sred-traceability — TU → EX → ADV chain board (V1.1; declarative, rendered by the generic view engine)
+view:
+  id: sred-traceability
+  title: "SR&ED Traceability"
+  requires: "capability=sred"
+  kind: board
+  columns:
+    - { id: uncertainties, source: "sred/uncertainties/*.yaml", card_title: "id + slug", badge: "status" }
+    - { id: experiments, source: "sred/experiments/*.yaml", card_title: "id + slug", badge: "status",
+        indicator: { id: evidence-freshness, rule: "days since last confirmed evidence-log entry for this EX", tiers: { green: "<=14", amber: "<=30", red: ">30" } } }
+    - { id: advancements, source: "sred/advancements/*.yaml", card_title: "id + slug" }
+  edges:
+    - { from: uncertainties, to: experiments, via: "linked_experiments" }
+    - { from: experiments, to: advancements, via: "linked_advancements" }
+  row_state:
+    complete: "TU has >=1 EX and every EX chain reaches an ADV"
+    broken: "any gap-analysis fail/warn on the chain — color by severity"
+  filters: [claim_fy]
