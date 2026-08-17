@@ -132,7 +132,26 @@ Flag any costs claimed as eligible that appear to be routine engineering based o
 If any Section F narrative contains a specific percentage, metric, or quantified result:
 - Flag it for verification
 - Ask: is there a retained test protocol, source data, date, and version context?
-- If not: recommend removing the figure (a specific number without evidence is an audit target)
+- Prefer anchoring the figure to a tier-1 artifact in the experiment's evidence cluster
+  (a `ci_build` result, a `test_output`, a Jira-attached report)
+- If no anchor exists: recommend removing the figure (a specific number without evidence
+  is an audit target)
+
+### Step 8 — Cross-source corroboration check
+
+For each EX, read its evidence as a cohort, not a list:
+- **Corroboration count**: how many distinct tier-1 source types evidence this
+  experiment (commits, builds, Jira, Confluence)? One is thin; flag and recommend
+  joining the linked records while they exist. Multiple independent sources agreeing
+  on the same work in the same window is the strongest contemporaneity defense
+  available.
+- **Timeline consistency**: earliest evidence timestamp vs. the TU's `identified_date`
+  and EX's `start_date` — a server-timestamped record predating the declared
+  uncertainty is either a date to correct or a framing problem to face before CRA
+  finds it.
+- **Failure corroboration**: if Section F narrates failed trials, is at least one
+  failure machine-evidenced (`ci_build` failure, failing `test_output`)? Narrated
+  failure with no artifact is credible; evidenced failure is unassailable.
 
 ## Output patterns
 
@@ -228,6 +247,7 @@ Common CRA objections to simulate:
 10. Would a skeptical CRA reviewer read this as research-oriented rather than routine software development?
 11. Is any uncertainty framed company-relative ("new to us") rather than field-relative?
 12. Does any claim rest on work the project's own criteria (`sred/criteria.yaml`) declare routine?
+13. Is any experiment evidenced solely by tier-2 records (Slack, Docs, meeting notes)? Flag as weak — recommend tier-1 anchoring (Jira, Confluence version, commit, test output) while the records still exist.
 
 ## Integration
 

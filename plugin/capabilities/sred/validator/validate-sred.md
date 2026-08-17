@@ -26,6 +26,12 @@ capability is enabled, and may only fail records in the `sred` namespace. Normat
 | 16 | Criteria contradicting Layer 0 (`schema/eligibility-baseline.yaml`) — e.g. a candidate area matching `not_eligible_regardless_of_criteria` | fail |
 | 17 | Criteria `status: draft` older than 90 days, or `last_refreshed` older than 2 quarters | warn |
 | 18 | TU whose `linked_milestones` fall in a `declared_routine` area (criteria and capture disagree — one of them is wrong) | warn |
+| 19 | Tier-2 evidence entry (`slack_message`, `gdoc`, `meeting_note`, `email`) without a verbatim `excerpt` + permalink reference | fail |
+| 20 | `sred/inbox/` proposal pre-linked via a `sred-ex-NN`/`sred-tu-NN` source label referencing an entity that doesn't exist | fail |
+| 21 | EX whose `evidence_records` are entirely tier-2 | warn |
+| 22 | `corroborated_by` reference that doesn't parse as `{record_type, reference}` or names an unknown record_type | fail |
+| 23 | Evidence timestamp earlier than the linked TU `identified_date` / EX `start_date` (server-timestamped source predates the declared uncertainty) | warn |
+| 24 | EX with ≥3 evidence records but corroboration from only one source type | warn |
 
 ## Output
 

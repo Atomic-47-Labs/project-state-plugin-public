@@ -1,6 +1,6 @@
 ---
 name: project-sred-tracker
-description: "Continuous SR&ED work capture for Canadian T661 claims. Records technological uncertainties (TUs), experiments (EXs), technological advancements (ADVs), and contemporaneous evidence entries into sred/ substrate. Enforces TU→EX→ADV traceability. Runs gap analysis, weekly progress digests, quarterly completeness reviews, cost roll-ups, and the innovation-criteria interview. Active when the sred capability is enabled. Use whenever the user says 'record a technical uncertainty', 'log SR&ED work', 'add an experiment', 'capture an advancement', 'SR&ED evidence', 'what's our SR&ED status', 'weekly SR&ED update', 'SR&ED digest', 'quarterly SR&ED review', 'gap analysis', 'define innovation criteria', 'what counts as innovation here', or any request to track experimental development work for CRA."
+description: "Continuous SR&ED work capture for Canadian T661 claims. Records technological uncertainties (TUs), experiments (EXs), technological advancements (ADVs), and contemporaneous evidence entries into sred/ substrate. Enforces TU→EX→ADV traceability. Runs gap analysis, weekly progress digests, quarterly completeness reviews, cost roll-ups, and the innovation-criteria interview. Active when the sred capability is enabled. Use whenever the user says 'record a technical uncertainty', 'log SR&ED work', 'add an experiment', 'capture an advancement', 'SR&ED evidence', 'what's our SR&ED status', 'weekly SR&ED update', 'SR&ED digest', 'quarterly SR&ED review', 'gap analysis', 'define innovation criteria', 'what counts as innovation here', 'is this SR&ED', 'evaluate this SR&ED opportunity', 'screen this for SR&ED', or any request to track or screen experimental development work for CRA."
 ---
 
 # Project SR&ED Tracker
@@ -223,6 +223,25 @@ Append one entry to `sred/evidence-log.ndjson`. This is the lightweight daily ca
 
 Minimal required fields: `date`, `tu_id` or `ex_id`, `description`, `people`.
 
+**Evidence source tiers** (schema `evidence_source_tiers`): tier-1 records (commits,
+test outputs, Jira issues/worklogs, Confluence page versions, repo-versioned design
+docs) stand as primary evidence — cite the durable reference (issue key,
+`<page-id>@<version>`). Tier-2 records (Slack, Google Docs, meeting notes, email)
+corroborate only and MUST carry a verbatim `excerpt` plus permalink captured at log
+time — the source may be edited or deleted later; the excerpt is what survives.
+When an EX's evidence is entirely tier-2, say so at capture time and suggest a
+tier-1 anchor (file the finding as a Jira comment, commit the note to the repo).
+
+**Cluster confirmation:** when a `sred/inbox/` proposal is a correlation cluster
+(one thread of work joined across Jira/GitHub/Confluence — see the harvester's
+correlation pass), `confirm_evidence` writes one evidence entry per record with
+`corroborated_by` cross-references to the rest of the cluster, and records the
+cluster's earliest source timestamp. One human decision, N cross-referenced
+receipts. **Date corroboration:** if a cluster's earliest timestamp predates the
+linked TU's `identified_date` or EX's `start_date`, surface it — either the dates
+need correcting toward the (defensible, server-timestamped) source record, or the
+work predates the declared uncertainty and the framing needs an honest look.
+
 ### `gap_analysis()`
 
 Scan all TU/EX/ADV records and evidence log for completeness gaps:
@@ -239,6 +258,9 @@ Scan all TU/EX/ADV records and evidence log for completeness gaps:
 | Evidence log entry gap >30 days for active EX | Medium — stale capture |
 | Milestone with experimental description and no linked TU | Medium — potential SR&ED work uncaptured |
 | Work landed in a declared candidate uncertainty area (sred/criteria.yaml) with no TU on file | High — the criteria say this is frontier work and nothing was captured |
+| High-activity correlation cluster (Jira/GitHub/Confluence joined) with no linked EX | High — the cohort found a work thread nothing claims |
+| EX evidenced by a single source type | Low — suggest corroborating from the cohort (linked issue, build, page) while records are fresh |
+| Cluster's earliest source timestamp predates linked TU identified_date / EX start_date | Medium — dates need correcting toward the server-timestamped record, or the framing needs review |
 | Criteria status still `draft`, or last_refreshed older than 2 quarters | Low — capture lens going stale |
 
 Return a prioritized gap list with recommended actions and deadlines.
@@ -276,6 +298,37 @@ Fired via the `sred.evidence-capture` matrix entry on `milestone.completed`. Ask
   presumed to need a TU; one squarely in declared-routine is presumed not to, and says so.
 - If yes: are TU/EX records current?
 - If no TU exists for this milestone: suggest creating one or confirming SR&ED non-applicability
+
+### `evaluate_opportunity(subject)`
+
+Screen any piece of work — a milestone, a Jira epic or issue, a Confluence design page,
+a proposal, an idea in chat — through the evaluation ladder. Four rungs, in order, each
+capable of ending the evaluation:
+
+1. **Routine check** (project criteria). Is the subject squarely inside
+   `declared_routine`? → verdict **routine**: say so, offer to record a one-line
+   non-applicability note, stop. No CRA framing wasted on CRUD.
+2. **Frontier check** (project + company criteria). Does it land in a
+   `candidate_uncertainty_areas` entry, or fall outside the company
+   `technology_baseline`? Landing in a declared area = strong candidate; outside both
+   lists = evaluate on the merits at rung 3.
+3. **The five questions** (Layer 0, `schema/eligibility-baseline.yaml`). Walk each:
+   uncertainty, hypothesis, systematic investigation, advancement sought, records kept.
+   Apply the **field-level rule** hard: "no one on our team knew how" is rung-3 failure
+   unless it can be honestly reframed as a gap in the field's established practice.
+4. **Capture decision.** Verdicts:
+   - **capture-now** — knowledge gap is live and work is starting: create the TU
+     (`record_uncertainty`) immediately, before the work; link the source (Jira epic,
+     Confluence page) as the first evidence record.
+   - **watch** — plausibly frontier but not yet concrete: add/extend a candidate area in
+     `sred/criteria.yaml` so the harvester and milestone hook watch for it (emits
+     `sred.criteria.updated`).
+   - **routine** — record the non-applicability decision so the question isn't re-litigated.
+   - **borderline** — capture as if eligible (a TU costs one file; a missed TU costs the
+     claim) and flag for the advisor. Never resolve borderline toward "skip".
+
+Output: a short screening note (subject, rung reached, verdict, reasoning, action taken).
+Verdicts are capture decisions, not eligibility determinations — say so in the note.
 
 ### `weekly_digest()`
 

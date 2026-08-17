@@ -38,8 +38,10 @@ files:
         description: "contemporaneous description of what was done/found"
         people: "[names]"
         milestone_id: "host milestone link"
-        record_type: "code_commit|meeting_note|test_output|email|design_doc"
-        record_reference: "commit hash / path / meeting date"
+        record_type: "code_commit|pull_request|github_issue|ci_build|test_output|jira_issue|jira_worklog|confluence_page|design_doc|meeting_note|email|slack_message|gdoc"
+        record_reference: "commit hash / PR number / issue key / build id / page id@version / permalink"
+        excerpt: "REQUIRED for tier-2 record types — verbatim quote captured at harvest/log time"
+        corroborated_by: "optional [{record_type, reference}] — records from OTHER sources evidencing the same work"
         backfilled: "REQUIRED true when logged_at - date > 7 days"
         source: "for entry_type: harvested — {surface, ref} provenance"
         logged_by: "name"
@@ -61,6 +63,53 @@ files:
 # with these capability-level additions to all three entity kinds:
 entity_field_additions:
   all: [review_notes, claim_fy]
+
+# Evidence source tiers — graded by audit durability, not convenience.
+# Tier 1 sources carry server-side, third-party timestamps and version history:
+# they stand as primary evidence on EX records. Tier 2 sources are editable or
+# deletable by the author: they corroborate, and MUST carry a verbatim `excerpt`
+# captured at log time plus a permalink, because the source may not survive
+# retention policies. The reviewer weights claims resting solely on tier 2 as weak.
+evidence_source_tiers:
+  tier_1_primary:
+    - code_commit          # immutable hash, hosted history
+    - pull_request         # review trail, linked issues, merge timestamps
+    - github_issue         # server-side timestamps, cross-linked to commits/PRs
+    - ci_build             # machine-timestamped pass/fail — failure evidence gold
+    - test_output          # retained artifact
+    - jira_issue           # server-side created/updated timestamps, changelog
+    - jira_worklog         # dated time records against issues
+    - confluence_page      # version history; cite as <page-id>@<version>
+    - design_doc           # when versioned in the repo
+  tier_2_corroborating:
+    - slack_message        # editable/deletable; permalink + excerpt required
+    - gdoc                 # editable; cite doc id + revision if available, excerpt required
+    - meeting_note         # unless filed in the repo (then design_doc)
+    - email
+
+# Source-anchoring convention (first-class linking at the source):
+# a Jira issue labeled `sred-ex-01` or a Confluence page labeled `sred-tu-02`
+# is treated by the harvester as author-asserted linkage — the proposal arrives
+# pre-linked to that entity with high confidence. Labels never bypass the
+# confirm step; they only pre-fill it.
+
+# Evidence correlation — sources work as a cohort, not as independent streams.
+# The harvester joins records across sources on the links dev tooling already
+# creates, assembling CLUSTERS around one thread of work. Corroboration =
+# independent sources agreeing on the same work in the same window.
+evidence_correlation:
+  join_keys:
+    - "Jira issue key in commit messages, branch names, PR titles (ENG-123)"
+    - "PR ↔ issue links (GitHub closes/fixes refs; Jira dev panel)"
+    - "ci_build → commit sha → PR → issue"
+    - "Confluence page links to/from Jira epics; page refs in issue descriptions"
+    - "sred-ex-NN / sred-tu-NN labels on any source (author-asserted anchor)"
+  cluster_stub: "sred/inbox/ proposal of shape {suggested_ex|suggested_tu, records: [{record_type, reference, tier, date, excerpt?}], window: {from, to}, corroboration: <distinct source count>}"
+  uses:
+    - "date corroboration: TU identified_date / EX start_date checked against the cluster's earliest source timestamps"
+    - "failed-trial corroboration: ci_build failures on experiment branches are machine-timestamped Section F evidence"
+    - "quantified-results anchoring: metrics in the narrative trace to a build/test artifact in the cluster"
+    - "gap detection: a high-activity cluster with no linked EX is an uncaptured candidate; a single-source EX gets a corroboration suggestion"
 
 invariants:
   - "every ADV references >=1 TU and >=1 EX (tracker refuses; validator fails)"

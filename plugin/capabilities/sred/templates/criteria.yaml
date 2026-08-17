@@ -34,6 +34,22 @@ harvester_hints:
   keywords: []               # e.g. [concurrency, idempotent, race]
   paths: []                  # repo paths where frontier work lives
   people: []                 # people whose work is likely eligible
+  # Tier-1 sources (primary evidence — server-side timestamps/version history):
+  github:
+    repos: []                # watched repos (defaults to manifest surfaces.github.repos)
+    include: [commits, pulls, issues, builds]   # ci_build failures = failed-trial evidence
+  jira:
+    projects: []             # project keys to sweep, e.g. [ENG]
+    labels: ["sred"]         # issues so labeled always propose; sred-ex-NN / sred-tu-NN pre-link
+    jql: ~                   # optional explicit JQL override
+  confluence:
+    spaces: []               # space keys, e.g. [ENG, RND]
+    labels: ["sred"]         # pages so labeled always propose; sred-ex-NN / sred-tu-NN pre-link
+  # Tier-2 sources (corroborating — excerpt + permalink captured at propose time):
+  slack:
+    channels: []             # channels where frontier work is discussed
+  gdocs:
+    folders: []              # drive folders for working docs
 
 review:
   refresh_cadence: quarterly # the quarterly log review nudges a criteria refresh

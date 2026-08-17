@@ -463,11 +463,49 @@ Dedup is **load-bearing across harvesters**, not just re-run safety: two users w
 ## SR&ED evidence proposals (when the `sred` capability is enabled)
 
 If `manifest.yaml → capabilities.sred.enabled` is true, the sweep additionally matches
-harvested signals — commit digests, Slack messages, meeting notes — against the project's
-SR&ED capture lens (`sred/criteria.yaml → harvester_hints`: keywords, repo paths, people)
-and against active EX records (linked milestones, people). Matches are dropped into
-`sred/inbox/` as candidate evidence stubs (`{date, source: {surface, ref}, suggested_ex,
-description_draft, people}`) and `sred.evidence.proposed` is emitted.
+harvested signals against the project's SR&ED capture lens (`sred/criteria.yaml →
+harvester_hints`) and against active EX records (linked milestones, people). Matches are
+dropped into `sred/inbox/` as candidate evidence stubs (`{date, source: {surface, ref},
+suggested_ex, tier, description_draft, excerpt?, people}`) and `sred.evidence.proposed`
+is emitted.
+
+Sources are swept by evidence tier (schema `evidence_source_tiers`):
+
+- **Tier 1 — Jira** (`hints.jira`): issues/comments/worklogs in the configured projects
+  matching frontier keywords, plus anything labeled per `hints.jira.labels`. Reference is
+  the issue key (durable, server-timestamped). An issue labeled `sred-ex-NN` /
+  `sred-tu-NN` is author-asserted linkage: the proposal arrives pre-linked to that entity
+  with high confidence — still confirmed by a human, never auto-logged.
+- **Tier 1 — Confluence** (`hints.confluence`): pages in the configured spaces matching
+  keywords or carrying the labels. Reference is `<page-id>@<version>` so the citation
+  survives later edits. Same `sred-*` label pre-linking convention.
+- **Tier 1 — GitHub** (`hints.github`): commits, PRs, issues, and CI build results for the
+  watched repos (the existing Step 5e sweep, filtered through the frontier keywords/paths).
+  `ci_build` failures on experiment branches are machine-timestamped failed-trial
+  evidence — propose them, don't skip them.
+- **Tier 2 — Slack** (`hints.slack.channels`) and **Google Docs** (`hints.gdocs.folders`):
+  matched the same way, but the stub MUST capture a verbatim `excerpt` and permalink at
+  propose time — these sources are editable/deletable, and the excerpt is what survives
+  retention. Proposals are marked `tier: 2` so the tracker records them as corroborating.
+
+**Correlation pass (after the per-source sweep) — sources are a cohort, not streams.**
+Join matched records across sources on the links dev tooling already creates: Jira issue
+keys in commit messages / branch names / PR titles; PR↔issue references; `ci_build` →
+commit sha; Confluence↔epic links; `sred-*` labels anywhere. When records join, propose
+ONE cluster stub (`{suggested_ex, records: [...], window, corroboration: <distinct source
+count>}`) instead of N singles — a Jira issue plus its commits plus a failed build is one
+thread of work, and one confirm decision. Rules:
+
+- **Follow links one hop from a match** — a matched Jira issue pulls its linked commits,
+  PRs, and builds even if those didn't independently match the keywords; that is the
+  cohort finding evidence the keyword sweep would miss.
+- **Corroboration is counted, not asserted**: distinct source *types* in the cluster.
+  Tier-2 records join clusters as corroborating members but never raise the count on
+  their own.
+- **Singles still propose** — an unjoinable match is a normal single-record stub. Never
+  hold evidence hostage to correlation.
+- Confirming a cluster writes each record to the evidence log with `corroborated_by`
+  cross-references — the human still confirms; correlation only assembles.
 
 Discipline: candidates are **never** auto-appended to the evidence log —
 `project-sred-tracker confirm_evidence` promotes them, a human decision at a time. The
