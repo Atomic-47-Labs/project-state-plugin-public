@@ -75,7 +75,7 @@ Before every write, verify the document has all common frontmatter. Refuse to wr
 
 **Count entities.** Return counters from `state.json`.
 
-**Validate.** Walk every YAML/JSON in `project-state/`; confirm it parses and has required frontmatter. Report deviations; do not auto-fix.
+**Validate.** Walk every YAML/JSON in `project-state/`; confirm it parses **under a duplicate-key-strict loader** and has required frontmatter. Report deviations; do not auto-fix. Full check list under "Validate the state" below.
 
 ### Write operations (with locking + logging)
 
@@ -189,14 +189,80 @@ An open decision is a normal decision record in the `open` state — same `decis
 Tail `logs/activity.ndjson`. Default to last 50 events. Pretty-print with timestamp + actor + event + any `id`/`summary`.
 
 ### "Validate the state"
+
 Walk every YAML/JSON, parse, check frontmatter completeness. Report:
+
 - Files that don't parse
+- **Duplicate keys within a file** — see below
 - Entities missing `id`, `kind`, or timestamps
 - Filename-id mismatches
+- **Duplicate ids across files of the same kind** — two milestones both claiming `M10` is the
+  across-file form of the same collision, and it shows up as `counters.milestones` (file count)
+  disagreeing with `health.milestones_total` (unique ids)
 - Orphan references (e.g., a decision pointing to a nonexistent change-order)
 - Stale lockfiles (older than TTL)
+- Phase manifests against the phase-manifest schema in `SCHEMA.md`
+- Lifecycle consistency — see below
 
 Return a summary; never auto-fix.
+
+#### Duplicate keys must fail the parse
+
+**Load every YAML with a duplicate-key-strict loader.** A default `yaml.safe_load` accepts a repeated
+key at any mapping level and silently keeps the last one — so the file parses, the earlier value is
+gone, and nothing ever reports it. This is not hypothetical: a phase manifest carried a duplicate
+`ended:` key and the phase read as undated while the file plainly stated a date (`FB-005`).
+
+```python
+import yaml
+
+
+class StrictLoader(yaml.SafeLoader):
+    """SafeLoader that refuses duplicate mapping keys instead of silently keeping the last."""
+
+
+def _no_duplicate_keys(loader, node, deep=False):
+    seen = {}
+    for key_node, _ in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in seen:
+            raise yaml.constructor.ConstructorError(
+                None, None,
+                f"duplicate key {key!r} (first seen on line {seen[key]})",
+                key_node.start_mark,
+            )
+        seen[key] = key_node.start_mark.line + 1
+    return yaml.constructor.SafeConstructor.construct_mapping(loader, node, deep=deep)
+
+
+StrictLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _no_duplicate_keys
+)
+```
+
+Report duplicates as **errors**, naming the file and both line numbers. This applies to *every* YAML
+in the facility, not only phase manifests — a duplicate key in a milestone or a decision loses data
+exactly as quietly. JSON gets the equivalent treatment via `object_pairs_hook`.
+
+**Never auto-fix a duplicate key.** Which value the author meant is unrecoverable from the file. Report
+and stop.
+
+#### Lifecycle consistency
+
+- `lifecycle`, where present, is `terminal` or `continuous`. **Absence is valid and is never
+  reported** — not as an error, not as a warning, not as a suggestion. A facility that never declares
+  a lifecycle is a supported facility, permanently.
+- `manifest.yaml:phases.lifecycle` and `state.json:lifecycle` agree, where both are present.
+- `lifecycle: continuous` requires the active preset's terminal phase to declare `cycles_back_to`,
+  naming a phase id in the same preset. Declaring `continuous` against a terminal-only preset
+  (`grant-default`) is an **error**, not a warning.
+- `current_increment`, where present, names an existing increment whose `status` is `open`.
+- Every increment at `status: closed` or `cancelled` has `closed`, `phase_at_close`, `closed_what`, a
+  frozen `phases/`, and a `gates.json`.
+- `increment` references on milestones name existing increments.
+- `cycles_back_to` on any phase manifest names a phase id in the active preset.
+
+Spec: `docs/CONTINUOUS-LIFECYCLE-SPEC.md`.
 
 ## Reference files
 

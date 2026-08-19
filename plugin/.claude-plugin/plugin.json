@@ -1,8 +1,8 @@
 {
   "name": "project-state",
   "displayName": "Project State",
-  "version": "4.6.0",
-  "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 41 skills for milestones, objectives/KPIs, phase gates, document curation, status reports, defect/feedback registration to GitHub issues, funder/grant compliance, and a local kanban \u2014 driven by swappable compliance packs (PIC, SR&ED, grant-Canada, board/investor, client-services, agile, open-source).",
+  "version": "4.6.1",
+  "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 41 skills for milestones, objectives/KPIs, phase gates, document curation, status reports, defect/feedback registration to GitHub issues, funder/grant compliance, and a local kanban — driven by swappable compliance packs (PIC, SR&ED, grant-Canada, board/investor, client-services, agile, open-source).",
   "author": {
     "name": "Atomic 47 Labs",
     "url": "https://atomic47.co"
