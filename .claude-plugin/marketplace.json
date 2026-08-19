@@ -5,19 +5,24 @@
     "name": "Atomic 47 Labs",
     "url": "https://atomic47.co"
   },
-  "description": "The project-state marketplace \u2014 project ops, compliance, and grant-management skills for Claude Code.",
+  "description": "The project-state marketplace — project ops, compliance, and grant-management skills for Claude Code.",
   "plugins": [
     {
       "name": "project-state",
       "source": "./plugin",
-      "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 34 skills + 7 swappable compliance packs.",
+      "version": "4.6.2",
+      "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 41 skills + 8 swappable compliance packs.",
+      "author": {
+        "name": "Atomic 47 Labs",
+        "url": "https://atomic47.co"
+      },
       "category": "productivity"
     },
     {
       "name": "demo-forge",
       "source": "./demo-forge",
       "version": "0.1.0",
-      "description": "Build and maintain project-state's self-driving demo decks and their narration. demo-audio re-bakes deck voiceover with OpenAI TTS (gpt-4o-mini-tts / nova) \u2014 archive-first, key-safe, deploy + verify; demo-deck scaffolds a route-validated, share-wired feature / clip / flow and renders its audio.",
+      "description": "Build and maintain project-state's self-driving demo decks and their narration. demo-audio re-bakes deck voiceover with OpenAI TTS (gpt-4o-mini-tts / nova) — archive-first, key-safe, deploy + verify; demo-deck scaffolds a route-validated, share-wired feature / clip / flow and renders its audio.",
       "author": {
         "name": "David Olsson",
         "url": "https://atomic47.co"
