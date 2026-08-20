@@ -67,6 +67,16 @@ phases:
   custom_path: ~                         # if preset == "custom", path to your custom preset yaml
   current_phase: ~                       # set by project-phase-gate
 
+  # Does this project have an end date after which no further work is planned?
+  #   terminal   — yes. One pass through the ladder, ending in closeout and archive. The default.
+  #   continuous — no. Work arrives in increments (v1, v1.1, next retainer); each gets its own
+  #                closure, and closing one opens the next instead of reopening a phase.
+  # LEAVE THIS UNSET IF UNSURE. Absent means terminal, is permanently valid, and is never warned
+  # about. Only presets that declare cycles_back_to on a phase can be continuous; grant-default
+  # cannot, by design. Written by project-phase-gate / project-onboarding, not by hand.
+  # Spec: docs/CONTINUOUS-LIFECYCLE-SPEC.md
+  lifecycle: ~                           # terminal | continuous | ~ (absent == terminal)
+
 # ----------------------------------------------------------------------------
 # Surfaces — last-mile delivery channels (unchanged from v1.1)
 # ----------------------------------------------------------------------------

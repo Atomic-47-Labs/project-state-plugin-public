@@ -3,6 +3,13 @@ description: |
   Engineering team running Scrum/Kanban with release trains.
   The "Build-loops" phase recurs — sprints are not phase transitions; releases are.
 
+  Continuous-capable, and the reference case: 04-release already declared cycles_back_to before the
+  continuous lifecycle existed. That key is now load-bearing — it marks the increment boundary, so a
+  release closes an increment and opens the next rather than reopening a phase and clobbering the
+  first pass's gate evidence. Continuous behaviour is inert unless the facility declares
+  phases.lifecycle: continuous, so a team using this preset terminally is unaffected.
+  See docs/CONTINUOUS-LIFECYCLE-SPEC.md.
+
 phases:
   - id: "01-discovery"
     label: "Discovery"

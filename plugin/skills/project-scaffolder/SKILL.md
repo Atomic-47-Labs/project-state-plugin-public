@@ -158,6 +158,27 @@ Which compliance pack(s) fit your project? Select one or more.
 
 **Purpose:** Set the starting phase. The phase determines which gate criteria are active and which phase manifests are marked CURRENT.
 
+**`phases.lifecycle` — write only what the pack settles, and never ask here.** Scaffolding is not the
+moment to raise a question the operator cannot yet answer; `project-onboarding` Q1.7 asks it properly,
+pre-filled from the same pack data.
+
+Read `defaults.lifecycle` from the manifest of each pack selected in Step 1. Then:
+
+- **Any selected pack declares `terminal`** → write `phases.lifecycle: terminal`. Nothing is being
+  guessed: the pack is asserting that projects of its kind end, and for grant packs the preset makes
+  `continuous` structurally impossible anyway.
+- **Packs declare `continuous`, or disagree, or declare nothing** → **leave it unset.** A `continuous`
+  pack default is a *suggestion*, and scaffold time is the point of least information — writing it here
+  would create `increments/` on a facility nobody has confirmed continues.
+- **No pack selected** → leave it unset.
+
+Do not hardcode a pack-to-lifecycle table in this skill. The mapping lives in pack manifests, per the
+packs-configure-not-code principle; `FB-003` is what happens when pack knowledge is encoded in a skill
+instead. Unset means terminal, is permanently valid, and is never warned about, so leaving it is always
+the safe answer — and the post-closeout diagnostic asks at the moment the answer is actually knowable.
+
+Spec: `docs/CONTINUOUS-LIFECYCLE-SPEC.md` §4.1.
+
 **HTML artifact:**
 - ProgressBar (2 of 6 active)
 - Mermaid diagram of the 6-phase lifecycle with the default phase highlighted:

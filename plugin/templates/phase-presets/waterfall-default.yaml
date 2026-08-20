@@ -2,6 +2,12 @@ preset_id: waterfall-default
 description: |
   Traditional waterfall lifecycle.
 
+  Continuous-capable: 06-maintain declares cycles_back_to, because a maintenance release genuinely
+  re-enters build and is a new increment rather than a second pass through the same one. A waterfall
+  project that ships once and is handed off simply never declares a lifecycle and behaves exactly as
+  before. Continuous behaviour is inert unless the facility declares phases.lifecycle: continuous.
+  See docs/CONTINUOUS-LIFECYCLE-SPEC.md.
+
 phases:
   - id: "01-requirements"
     label: "Requirements"
@@ -26,3 +32,4 @@ phases:
     label: "Maintain"
     gate_in: "Deployed to production"
     gate_out: ~
+    cycles_back_to: "03-build"   # increment boundary: a maintenance release re-enters build

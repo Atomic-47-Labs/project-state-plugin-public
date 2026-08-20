@@ -95,6 +95,51 @@ Return:
 
 Store the result under `state.json:health` via `project-state`, which logs `health.assessed`.
 
+#### `overall_percent` is all-time, and now says so
+
+`overall_percent` is a mean over **every milestone ever declared**, which is the right number for a
+project with one ending and a misleading one for a facility that keeps going. Six complete milestones
+read 100; adding a seventh for the next increment reads 85. But 85 of *what*? The number has quietly
+stopped meaning "how much of this project is done" and started meaning "how much of everything ever
+conceived is done". After several increments a facility that ships perfectly every time converges on
+100 and never once reports that the increment in front of it is finished.
+
+Two changes, both additive:
+
+- **Always write `health.scope: "all-time"`.** `overall_percent` keeps its exact computation and its
+  exact meaning — the existing consumers of the rollup read the same field and get the same value.
+  What changes is that the field now states what it measures. This is disclosure, not a fix, and spec
+  §5.3 says so plainly.
+- **When `state.json:lifecycle` is `continuous`, also write `health.increment`,** scoped to
+  `current_increment`: `{id, percent, milestones_total, by_status}`. Membership is
+  `milestone.increment == current_increment`, else the increment manifest's `milestones` list. This is
+  the number that answers *are we done with what we are doing now.*
+
+Never write `health.increment` on a terminal facility — its absence is how a reader knows there is only
+one pass.
+
+Also report `milestones_total` as a count of **unique** ids. A facility with two files claiming the
+same id (this repo's own facility has two `M10`s) otherwise makes `counters.milestones` and
+`milestones_total` disagree with nothing explaining why. `project-state`'s validator reports the
+collision; this operation must not paper over it.
+
+#### Which number to show
+
+Readers prefer `health.increment.percent` where present and fall back to `overall_percent`. When
+reporting to a human on a continuous facility, lead with the increment number and name the increment:
+*"v1.1 is 40% complete (all-time across 45 milestones: 6%)."* A bare percentage on a continuous
+facility is ambiguous, and that ambiguity is the defect.
+
+Deprecating `overall_percent` in favour of a scoped-by-default rollup is a v5 conversation — spec §9,
+open question 1 — not something this operation decides.
+
+#### `increment` on a milestone
+
+Optional. Absent on every existing milestone and never backfilled. A milestone with no `increment` on a
+continuous facility counts toward `overall_percent` and not toward `health.increment` unless the
+increment manifest lists it — the conservative reading: unassigned work is real work, but it is not
+evidence that *this* increment is done.
+
 ### `regenerate_tracker()`
 
 Build/refresh `tracking/milestones.xlsx` from the YAML source:

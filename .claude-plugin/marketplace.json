@@ -10,7 +10,7 @@
     {
       "name": "project-state",
       "source": "./plugin",
-      "version": "4.6.2",
+      "version": "4.7.0",
       "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 41 skills + 8 swappable compliance packs.",
       "author": {
         "name": "Atomic 47 Labs",

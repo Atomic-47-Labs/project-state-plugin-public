@@ -290,6 +290,45 @@ Chapters with pre-filled data should:
 - No → skip.
 - Unsure → Present: "SR&ED eligibility can be tricky. If any of your project's technical work involved genuine uncertainty — you couldn't look up the answer, had to experiment — it might qualify. You can add the sred-canada pack now and nothing forces you to file; it just starts capturing. Want to add it provisionally?"
 
+**Q1.7 — Does this project end?**
+
+**Pre-fill from the pack before asking.** Read `defaults.lifecycle` from the manifests of the packs
+selected above. That value is a *suggestion*, and it turns this from a blank-slate interview into a
+confirmation pass — the same pattern as every other pre-filled chapter in this skill.
+
+- Pack suggests `terminal` → present: "The [pack] pack assumes projects of this kind end — a deadline,
+  a decision, a final report. Sound right?"
+- Pack suggests `continuous` → present: "The [pack] pack assumes this kind of work keeps going —
+  releases, renewals, or reporting that recurs. Sound right?"
+- Packs disagree, or none declares one → ask the open question below with no pre-fill.
+
+Then, whether confirming or asking cold:
+
+> Does this project have an end date after which no further work is planned?
+
+Ask in exactly those terms. Do **not** ask "is this terminal or continuous" — that is the model's
+vocabulary, not the operator's, and it invites a guess.
+
+- **Yes, it ends** → `phases.lifecycle: terminal`. Present: "Then the phase ladder fits as-is: one pass
+  through to closeout and archive."
+- **No, work continues** → `phases.lifecycle: continuous`, provided the chosen preset declares
+  `cycles_back_to` on a phase. Present: "Then work will arrive in increments — v1, v1.1, next quarter's
+  retainer. Each gets its own closure, and closing one opens the next instead of reopening a phase. The
+  practical difference: your progress number will say how far through *this* increment you are, and
+  closing an increment freezes its gate record instead of overwriting it."
+- **Unsure** → **leave it unset and move on.** Present: "Then leave it — the default assumes an ending,
+  and if work turns up after closeout the project will notice and ask you then." Do not press. An
+  unanswered lifecycle is a supported, permanent state and the post-closeout diagnostic exists precisely
+  so this question can be deferred at no cost.
+
+**Never ask this question of a facility that already has a value** — re-orientation confirms, it does
+not re-interview.
+
+If `project-scaffolder` already wrote `terminal` because a selected pack declares it, skip Q1.7 —
+re-asking a settled question implies it is open. `sred-canada` is a capability pack and declares no
+lifecycle default by design: it layers onto whatever shape the project already has, so it never
+pre-fills this question and never suppresses it.
+
 **Confirmation:**
 > Based on your answers, I recommend loading: [list]. Here's what each adds. Does this look right, or would you like to add or remove anything?
 

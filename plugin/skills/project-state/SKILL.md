@@ -119,6 +119,12 @@ For every write:
 | Hold SC meeting / distribute minutes | `sc.meeting.held` / `sc.minutes.distributed` | —    |
 | Draft claim / submit / paid         | `claim.drafted` / `claim.submitted` / `claim.paid` | `counters.quarterly_claims` on draft |
 | Phase transition                    | `phase.transition`          | —                      |
+| Declare the lifecycle               | `lifecycle.declared`        | —                      |
+| Convert terminal → continuous       | `lifecycle.converted`       | —                      |
+| Warn that work arrived after closeout | `lifecycle.mismatch.warned` | —                    |
+| Open an increment                   | `increment.opened`          | `counters.increments`  |
+| Close an increment                  | `increment.closed`          | —                      |
+| Cancel an increment                 | `increment.cancelled`       | —                      |
 | IP disclosure                       | `ip.disclosed`              | `counters.ip_disclosures` |
 | Publication proposed / approved     | `publication.proposed` / `publication.approved` | `counters.publications` on proposed |
 | Generate report                     | `report.generated`          | —                      |
@@ -131,6 +137,57 @@ For every write:
 | Broken entity reference detected    | `wiki.link.broken`          | —                      |
 
 Event names are lowercase, dot-separated, noun.verb.
+
+## The post-closeout diagnostic
+
+A facility can detect for itself that the terminal phase model has stopped holding, and the signal is
+unambiguous: **work is added after closeout.** A new milestone, a new workload, or a reopened gate on a
+facility at or past its closeout-equivalent phase is the moment the terminal assumption broke.
+
+Emit a warning when **all** of these hold:
+
+1. `current_phase` is at or past the active preset's closeout-equivalent phase (the last phase with a
+   `gate_out`, or a phase whose id or label contains `closeout` / `wrap` / `maintain` / `maintained`).
+2. `lifecycle` is absent or `terminal`.
+3. The write in hand creates a milestone, creates a workload, or sets a `gate_out.checklist[].done`
+   back to `false`.
+
+```
+This facility is at 05-closeout and just gained a milestone. The terminal phase model assumes no
+further work, so re-entering an earlier phase would overwrite that phase's gate record — including any
+criterion closed unmet.
+
+If this project continues, declare it:  project-phase-gate set-lifecycle continuous
+Nothing about conversion is destructive; see docs/CONTINUOUS-LIFECYCLE-SPEC.md section 6.
+```
+
+**Warn, never refuse.** A facility legitimately gains a milestone during closeout — a late deliverable
+is not a lifecycle mismatch, and blocking the write would make the diagnostic worse than the defect.
+The warning is a prompt, and its whole value is being asked at the moment the operator can still answer
+it cheaply.
+
+Rate-limited to once per facility per day, by reading back the last `lifecycle.mismatch.warned` entry in
+`logs/activity.ndjson` — which is also what makes the warning auditable rather than transient.
+
+This check is worth having whatever happens to the rest of the lifecycle work: it is independent of the
+increment layer, costs almost nothing, and would have surfaced the whole problem months earlier on the
+facility that eventually found it the hard way.
+
+## Increments
+
+Present only when `lifecycle: continuous`. `project-phase-gate` owns the verbs — `open_increment`,
+`close_increment`, `cancel_increment`, `convert_to_continuous` — and the writes land here. Entity shape
+is in `SCHEMA.md`; ids allocate from `state.json:counters.increments` under the advisory lock, like every
+other kind.
+
+Two rules this skill enforces regardless of what the caller asks:
+
+- **A closed increment is frozen.** Refuse any write to `increments/INC-*/` where the increment's
+  `status` is `closed` or `cancelled` — including its `phases/` and `gates.json`. Corrections are new
+  records, per the append-only discipline below. This refusal is the entire reason the increment layer
+  exists; without it the design has no teeth.
+- **`closed_what` cannot be empty.** Refuse a close whose `closed_what` is missing, blank, or
+  whitespace. It has no default and cannot be generated — only the operator knows what a closure closed.
 
 ## Concurrency discipline (from CONCURRENCY.md)
 

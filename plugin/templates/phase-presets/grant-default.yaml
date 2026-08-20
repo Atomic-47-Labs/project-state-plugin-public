@@ -6,6 +6,15 @@ description: |
   Standard grant-funded project lifecycle: LOI → Approval → Planning → Execution → Closeout → Archive.
   Pack profiles can augment gate-in / gate-out criteria with funder-specific requirements.
 
+  TERMINAL BY DESIGN. No phase declares cycles_back_to, and none should. A submission genuinely
+  ends: there is a deadline, a decision, and either an award or a rejection, and everything
+  downstream of 05-closeout exists to produce and preserve the artefacts of that ending. This is
+  arguably the purest case for the terminal ladder in the whole system.
+
+  Declaring phases.lifecycle: continuous against this preset is a validation ERROR, not a warning.
+  A grant project that continues is a new grant. See docs/CONTINUOUS-LIFECYCLE-SPEC.md sections 4.4
+  and 5.5 — the terminal model is joined by the continuous one, never generalised into it.
+
 phases:
   - id: "01-loi"
     label: "Letter of Intent"

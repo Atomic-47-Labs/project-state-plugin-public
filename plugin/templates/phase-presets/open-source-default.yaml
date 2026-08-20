@@ -2,6 +2,12 @@ preset_id: open-source-default
 description: |
   Community-governed open-source project lifecycle.
 
+  Continuous-capable: 03-maintained declares cycles_back_to, so a project that returns to active
+  development opens a new increment rather than reopening a phase. 04-archived stays a genuine
+  sunset — archiving an open-source project is a real ending, not an increment boundary.
+  Continuous behaviour is inert unless the facility declares phases.lifecycle: continuous.
+  See docs/CONTINUOUS-LIFECYCLE-SPEC.md.
+
 phases:
   - id: "01-incubation"
     label: "Incubation"
@@ -16,6 +22,7 @@ phases:
     label: "Maintenance mode"
     gate_in: "Active development paused; maintainers committed to bug-fix-only"
     gate_out: ~
+    cycles_back_to: "02-active"   # increment boundary: a revived project resumes active development
   - id: "04-archived"
     label: "Archived"
     gate_in: "Maintenance ended"

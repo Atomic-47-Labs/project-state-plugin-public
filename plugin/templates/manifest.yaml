@@ -105,6 +105,12 @@ pic_contacts:
 
 # The phase lifecycle. Order matters. Current phase is pointed to by state.json.
 # Phase manifests with gate checklists live under project-state/phases/<id>/manifest.yaml
+#
+# TERMINAL BY CONSTRUCTION. This v1.1 template inlines the six-phase grant ladder as a list, so
+# there is no phases.lifecycle key here and there should not be — a PIC/grant project genuinely ends.
+# If your project continues past closeout (a product, a retainer, an ops facility), you want the v2
+# template (templates/manifest-v2.yaml) with a preset that declares cycles_back_to, plus
+# phases.lifecycle: continuous. See docs/CONTINUOUS-LIFECYCLE-SPEC.md.
 phases:
   - id: "01-loi"
     label: "Letter of Intent"

@@ -13,6 +13,21 @@ compliance, and a local kanban dashboard. Behavior is configured by swappable
 /plugin install project-state@project-state-plugin
 ```
 
+Then turn on auto-update — **auto-update is off by default for every marketplace that isn't an
+official Anthropic one**, so without this your install stays frozen at this version forever, with no
+prompt:
+
+```
+/plugin  →  Marketplaces  →  project-state-plugin  →  Enable auto-update
+```
+
+To check what you have and update by hand:
+
+```
+claude plugin list
+claude plugin update project-state@project-state-plugin
+```
+
 Then start a project:
 
 ```

@@ -22,3 +22,17 @@ provides:
 requires:
   packages:
     - tender-intelligence
+
+# ----------------------------------------------------------------------------
+# Defaults this pack suggests to a facility that loads it
+# ----------------------------------------------------------------------------
+# lifecycle is a SUGGESTION, not a setting. project-onboarding uses it to pre-fill its
+# "does this project end?" question as a confirmation rather than a blank interview, and the
+# facility's own manifest.yaml:phases.lifecycle always wins. Nothing is ever written blind, and
+# a facility that leaves its lifecycle unset stays permanently valid.
+# Resolution order: facility > pack default > terminal.
+# Spec: docs/CONTINUOUS-LIFECYCLE-SPEC.md section 4.1
+defaults:
+  # A pursuit ends when the tender is awarded or lost. The delivery project that may follow
+  # is a different facility, not a later increment of the bid.
+  lifecycle: terminal
