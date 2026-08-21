@@ -1,0 +1,113 @@
+# sred — capability routine
+#
+# What this capability contributes to `project-orchestrator`'s read phase. The orchestrator
+# composes the `checks:` of every ENABLED capability into its own decision loop, ranks the
+# results alongside core items, and renders one digest. There is no second orchestrator.
+#
+# Scheduling is NOT here — that lives in the reporting matrix and compiles into
+# automation/tasks.yaml via project-automator. This file answers a different question:
+# "when the operator asks what to do today, what does SR&ED want looked at?"
+#
+# Spec: docs/CAPABILITY-PLUGINS.md §5, docs/SRED-CAPABILITY-SPEC.md §12.1.
+schema_version: 1
+capability: sred
+version: "1.0.0"
+
+# Read once at the top of the loop; every check below may reference these.
+state:
+  runtime: "state/sred.json"
+  manifest_block: "capabilities.sred"
+  criteria: "sred/criteria.yaml"
+
+# Shown on EVERY digest while any fiscal year is open — the deadline strip.
+# Not a check; it is standing context, because the 18-month window is unforgiving.
+always_surface:
+  id: "sred.deadline-strip"
+  description: |
+    One line per fiscal year in state/sred.json whose claim_status is not in
+    {filed, waived, forfeited}: "FY<year> — <claim_status> — <n> days to hard deadline
+    (<date>)". A long project normally shows several: one capturing, one in review,
+    one filed. Suppress entirely when no FY is open.
+  suppress_when: "no open fiscal years"
+
+checks:
+  # ── Blocking / urgent ────────────────────────────────────────────────────────
+  - id: "sred.not-initialized"
+    when: "capability enabled AND (state/sred.json missing OR no TU records exist)"
+    severity: urgent
+    message: "SR&ED is enabled but nothing is captured yet — no uncertainties on file."
+    action: "Run /sred-onboarding to declare the capture lens and record the first TU."
+    handler: sred-onboarding
+
+  - id: "sred.deadline-forfeit-risk"
+    when: "any open FY where days_to_hard_deadline <= 30"
+    severity: urgent
+    message: "FY{fy} claim window closes {date} — {n} days. Unfiled after that date is forfeited."
+    action: "Advisor handoff now, or record claim_status waived to stop the alarm deliberately."
+    handler: project-funder-reporting
+
+  - id: "sred.review-verdict-weak"
+    when: "any FY with a sred.review.completed event whose verdict is weak"
+    severity: urgent
+    message: "FY{fy} T661 review came back weak — the advisor-handoff chain is blocked."
+    action: "Address the reviewer's findings, then re-review."
+    handler: project-sred-reviewer
+
+  # ── This week ────────────────────────────────────────────────────────────────
+  - id: "sred.no-criteria"
+    when: "capability enabled AND sred/criteria.yaml missing"
+    severity: soon
+    message: |
+      No capture lens declared for this project. Without it the weekly digest cannot
+      compute its uncaptured-but-candidate section, gap analysis cannot warn about work
+      in a candidate area with no TU, and the harvester has no SR&ED matching config.
+    action: "Run define_criteria — the guided interview, ideally with the advisor present."
+    handler: project-sred-tracker
+
+  - id: "sred.criteria-draft"
+    when: "sred/criteria.yaml exists AND status == draft AND age > 30 days"
+    severity: soon
+    message: "Capture criteria have been draft for {n} days — they need PL sign-off."
+    action: "Review and flip status to reviewed, recording who signed off and when."
+    handler: project-sred-tracker
+
+  - id: "sred.stale-experiments"
+    when: "any EX with status active AND no evidence-log entry in 14+ days"
+    severity: soon
+    message: "{n} active experiment(s) with no evidence logged in 14+ days."
+    action: "Log what happened — including failed trials. Silence reads as inactivity to CRA."
+    handler: project-sred-tracker
+
+  - id: "sred.unconfirmed-candidates"
+    when: "sred/inbox/ contains candidate stubs"
+    severity: soon
+    message: "{n} harvested evidence candidate(s) awaiting confirmation."
+    action: "Confirm or reject each. A pile of unconfirmed candidates is itself a capture gap."
+    handler: project-sred-tracker
+
+  # ── On deck ──────────────────────────────────────────────────────────────────
+  - id: "sred.quarterly-review-due"
+    when: "last_quarterly_review is null OR older than 1 quarter"
+    severity: ondeck
+    message: "Quarterly SR&ED completeness review is due (last: {date})."
+    action: "Run quarterly_review — gap analysis, deadline countdown, cost-allocation staleness."
+    handler: project-sred-tracker
+
+  - id: "sred.candidate-area-uncovered"
+    when: "any criteria candidate_uncertainty_area with linked milestones in progress and no linked TU"
+    severity: ondeck
+    message: "Work is running in '{area}' — a declared frontier area — with no TU on file."
+    action: "Record the uncertainty now, before the work concludes. Contemporaneity is the claim."
+    handler: project-sred-tracker
+
+  - id: "sred.advisor-not-engaged"
+    when: "capabilities.sred.advisor.engaged is false AND any open FY within 6 months of hard deadline"
+    severity: ondeck
+    message: "No SR&ED advisor recorded, and FY{fy} closes in under 6 months."
+    action: "Engage a qualified advisor. This system drafts; it never files and never asserts eligibility."
+    handler: project-state
+
+# What a quiet SR&ED week looks like — so the digest can say so honestly rather than
+# manufacturing an item. Reported under 💤.
+quiet_when: "no check fires AND every open FY is more than 180 days from its hard deadline"
+quiet_message: "SR&ED capture is current — {n} TU / {n} EX / {n} ADV, nothing stale."

@@ -50,8 +50,9 @@ On invocation:
 3. **Check at-risk milestones.** Via `project-milestone-manager`. Any with `status in {at_risk, blocked}` or behind-schedule rules get flagged.
 4. **Check gate.** Via `project-phase-gate`. If the current phase has unblocked items (e.g., MPA landed → planning.mpa_signed autoclose), surface the transition option.
 5. **Check inbox.** If `documents/inbox/` is non-empty, flag "classify N new docs".
-6. **Prioritize.** Order: URGENT deadlines → gate-blocking items → pending reports → at-risk milestones → routine work → opportunities.
-7. **Return a ranked list** with, for each item: the reason, the skill that handles it, and what the user needs to do.
+6. **Compose enabled capabilities' routines.** See "Capability routines" below.
+7. **Prioritize.** Order: URGENT deadlines → gate-blocking items → pending reports → at-risk milestones → routine work → opportunities. Capability items rank by their declared `severity` alongside core items — they are not a separate section and never get their own digest.
+8. **Return a ranked list** with, for each item: the reason, the skill that handles it, and what the user needs to do.
 
 ## Output format
 
@@ -75,6 +76,43 @@ What would you like to do first?
 ```
 
 Every line links to the skill that handles it, so the user can say "yes, do the weekly report" and the orchestrator delegates to `project-status-reporter`.
+
+## Capability routines
+
+A capability plugin (`sred`, `tender-intelligence`) knows a rhythm the core orchestrator does not.
+Rather than shipping its own orchestrator — which would duplicate this calendar logic and give the
+operator two competing answers to "what should I do today" — a capability ships
+`capabilities/<id>/routine.yaml`, and this skill composes it.
+
+**Step 6 of the decision loop:**
+
+1. Read `manifest.yaml → capabilities`. For each entry with `enabled: true`, load
+   `capabilities/<id>/routine.yaml`. A capability that is disabled, or has no routine file,
+   contributes nothing — skip it silently.
+2. Read the capability's runtime state (`routine.state.runtime`, e.g. `state/sred.json`) once.
+3. Evaluate each `checks[]` entry's `when:` condition against that state and the substrate.
+   A check whose condition does not hold produces nothing. Conditions are read-only — evaluating
+   the routine must never write.
+4. Emit each firing check as a digest item at its declared `severity`
+   (`urgent` → 🔴, `soon` → 🟡, `ondeck` → 🟢), interpolating `{...}` placeholders from state,
+   carrying its `action:` and its `handler:` skill.
+5. If the routine declares `always_surface:`, render it as standing context at the top of the
+   digest whenever its `suppress_when:` does not hold. This exists for hard external deadlines —
+   an SR&ED filing window is unforgiving and must be visible on a day when nothing else fires.
+6. If no check fired and `quiet_when:` holds, report `quiet_message` under 💤. **Do not
+   manufacture an item.** A capability with nothing to say is a healthy result, and inventing
+   busywork to fill the section trains the operator to skip the digest.
+
+**Ordering discipline.** Capability items interleave with core items by severity. A 🔴 SR&ED
+deadline outranks a 🟡 weekly report; a 🟢 SR&ED quarterly nudge sits below an at-risk milestone.
+The operator reads one prioritized list, not a core list plus per-capability appendices.
+
+**Scheduling is not here.** Capability *scheduling* lives in the reporting matrix, seeded from the
+capability's bundled pack at enable and compiled by `project-automator` into
+`automation/tasks.yaml` — the `tick` routine below dispatches it like any other entry, and the
+generic `deadline` cadence already handles per-capability escalation tiers via
+`state/<capability>.json:escalation_tiers_fired`. `routine.yaml` answers the *conversational*
+question ("what does this capability want looked at right now"), which the tick does not.
 
 ## Routines
 

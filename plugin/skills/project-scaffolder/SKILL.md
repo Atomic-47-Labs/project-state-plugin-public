@@ -122,14 +122,13 @@ Run steps 1–6 in sequence, one at a time. Wait for the user's response before 
   |------|----------|-------|
   | `pic-pcais` | Protein Industries Canada PCAIS consortium | production |
   | `grant-canada` | Canadian grants — NSERC, IRAP, SIF, CFI, Mitacs + 13 more | starter |
-  | `sred-canada` | Canadian SR&ED tax credit claims | starter |
   | `client-services` | Client engagement with QBR cadence | starter |
   | `board-investor` | Board and investor reporting | starter |
   | `agile-default` | Engineering team, sprint cadence | starter |
   | `open-source-community` | Community-governed open-source | starter |
   | None / custom | Bare presets — configure manually | — |
 
-- Note below cards: "Tip: grant-canada + sred-canada covers both submissions and SR&ED claims. grant-canada + pic-pcais covers the full PIC lifecycle."
+- Note below cards: "Tip: grant-canada + pic-pcais covers the full PIC lifecycle. **SR&ED is not in this list** — it is a capability, not a pack. It brings its own entity kinds, validator and bundled pack, and needs a fiscal year end this step doesn't ask for. Finish here, then run `/sred-onboarding`."
 - NavRow: no Back | Continue →
 
 **Markdown output:**
@@ -142,7 +141,6 @@ Which compliance pack(s) fit your project? Select one or more.
 |---|-------------------|--------------------------------------------|------------|
 | 1 | pic-pcais         | Protein Industries Canada PCAIS consortium | 🟢 Prod    |
 | 2 | grant-canada      | Canadian grants (NSERC, IRAP, SIF + 12)    | 🟡 Starter |
-| 3 | sred-canada       | Canadian SR&ED tax credit claims           | 🟡 Starter |
 | 4 | client-services   | Client engagement, QBR cadence             | 🟡 Starter |
 | 5 | board-investor    | Board and investor reporting               | 🟡 Starter |
 | 6 | agile-default     | Engineering team, sprint cadence           | 🟡 Starter |

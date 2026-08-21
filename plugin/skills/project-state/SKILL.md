@@ -1,6 +1,6 @@
 ---
 name: project-state
-description: "The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Works for any `project-state/` found by walking up from cwd."
+description: "The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Also owns the capability lifecycle — enable, disable, and validate a capability plugin (sred, tender-intelligence) for this project: 'enable SR&ED', 'turn on the sred capability', 'is SR&ED enabled', 'disable the capability'. Works for any `project-state/` found by walking up from cwd."
 ---
 
 # Project State — the memory layer
@@ -135,8 +135,96 @@ For every write:
 | Publish wiki page (after review)    | `wiki.page.published`       | —                      |
 | Rebuild the derived wiki index      | `wiki.graph.rebuilt`        | —                      |
 | Broken entity reference detected    | `wiki.link.broken`          | —                      |
+| Enable a capability                 | `capability.enabled`        | —                      |
+| Disable a capability                | `capability.disabled`       | —                      |
 
-Event names are lowercase, dot-separated, noun.verb.
+Event names are lowercase, dot-separated, noun.verb. A capability may register **additional**
+event names under its own namespace prefix (`sred.*`, `tender.*`) — see "Capability lifecycle" below.
+Those are owned by the capability's `schema/events.yaml`, not by this table.
+
+## Capability lifecycle
+
+A **capability** is a plugin that extends the substrate with new entity kinds, its own event
+vocabulary, its own validator, and a bundled default pack. `install` makes a capability *available*
+(it lands at the Claude / appliance layer). **`enable` makes it active for one project**, and that is
+a memory-layer verb — it writes the manifest, so it routes through here like every other write.
+
+Normative spec: `docs/CAPABILITY-PLUGINS.md` §5. Capabilities ship under `capabilities/<id>/` with a
+`plugin.yaml` declaring `namespace.prefix`, `payload.schema`, `payload.validator`, and
+`payload.packs.bundled`, plus a `templates/manifest-block.yaml` describing the config the block
+requires.
+
+### Discover
+
+**List capabilities.** Read every `capabilities/*/plugin.yaml` available to this install. Return
+`{id, version, description, bundled_pack, required_config}` where `required_config` is the set of
+keys in the capability's `templates/manifest-block.yaml` whose seeded value is `REQUIRED`.
+
+**Get capability status.** Read `manifest.yaml → capabilities.<id>`. Return `not-installed` (no
+plugin.yaml), `available` (plugin present, no manifest block), `enabled`, or `disabled`.
+
+### Enable `<capability-id>`
+
+A write operation — take the `manifest.yaml` lock for the whole sequence.
+
+1. **Resolve the template.** Read `capabilities/<id>/plugin.yaml` and
+   `capabilities/<id>/templates/manifest-block.yaml`.
+2. **Refuse on missing required config.** Any key the template marks `REQUIRED` must be supplied by
+   the caller. Do not invent a value, do not substitute a plausible default, and do not write a
+   partial block. Return the list of missing keys so the caller can ask for them. *(For `sred`,
+   `fiscal_year_end` is REQUIRED — every deadline in the capability is computed from it, so a guessed
+   value produces a confidently wrong filing date. See SRED-CAPABILITY-SPEC §5.)*
+3. **Refuse on version incompatibility.** `plugin.yaml → compatibility.substrate` must be satisfied by
+   the running substrate version.
+4. **Write the manifest block** under `capabilities.<id>`, stamping `enabled: true` and
+   `version:` = the plugin version at enable time (the validator checks drift later).
+5. **Scaffold the schema directories** named in the capability's `schema/entities.yaml`, each with a
+   `.gitkeep`. Enabling over an existing directory tree **adopts** it — never overwrite, never clear.
+6. **Create `state/<id>.json`** from the capability's runtime-state shape. Any dated fields the
+   capability computes at enable time (deadlines, cursors, current-period entries) are computed now,
+   from the config supplied in step 2.
+7. **Register the schema extension and event vocabulary** — `schema/entities.yaml` and
+   `schema/events.yaml` — so validation and the write path accept the new kinds and event names.
+8. **Seed the reporting matrix** from the bundled pack's `reporting-matrix-defaults.yaml`, merging
+   into `reporting-matrix.yaml`. Existing entries with the same id are left alone.
+9. **Arm the schedule.** Hand off to `project-automator update` so the seeded entries compile into
+   `automation/schedule.yaml` immediately. A capability that is enabled but unarmed is the failure
+   mode this step exists to prevent.
+10. **Log `capability.enabled`** with `{id, version, pack}`.
+
+Report back what was written: the block, the directories created, the computed dates, the matrix
+entries seeded, and the next scheduled task. The caller shows the operator a real date, not a promise.
+
+### Disable `<capability-id>`
+
+Flip `enabled: false`. **Data stays** — files are the record, and removing them is a separate,
+curated, logged operation that is never part of disable. Skills refuse writes for a disabled
+capability; views unmount; seeded matrix entries are **marked disabled, not deleted**.
+
+Before flipping, check the capability's runtime state for open obligations. If any exist, **show the
+operator the specific dates and require explicit confirmation** — disabling must never silently walk
+away from a live deadline. (For `sred`: any fiscal year whose `claim_status` is not in
+`{filed, waived, forfeited}`.)
+
+Log `capability.disabled`.
+
+### Validate
+
+The full validation pass is the core validator **composed with** every enabled capability's validator
+(`payload.validator`). Additionally check, for each enabled capability:
+
+- the manifest block still carries every `REQUIRED` key
+- `capabilities.<id>.version` matches the installed plugin version (report drift; do not auto-bump)
+- `state/<id>.json` exists and parses
+- every matrix entry naming a profile from the capability's bundled pack resolves
+
+### Per-entry profile resolution
+
+A generator invoked from a matrix entry loads the profile named on that entry
+(`<pack-id>.<profile-slug>`), resolved from **any installed pack** — the active project pack *or* a
+pack bundled with an enabled capability. The `active_pack` chain remains the fallback for
+conversational invocations that arrive without a matrix entry. An entry naming a profile from a pack
+that is neither active nor capability-bundled is a validation error.
 
 ## The post-closeout diagnostic
 
@@ -202,6 +290,9 @@ Two rules this skill enforces regardless of what the caller asks:
 - **Does not generate reports.** Just returns data (that's `project-status-reporter`).
 - **Does not send notifications.** Just writes activity events (that's `project-notifier`).
 - **Does not classify documents.** Just reads/writes `documents/index.yaml` (that's `project-document-curator`).
+- **Does not run a capability's own work.** `enable` wires a capability in; capturing SR&ED
+  uncertainties or screening tenders belongs to that capability's skills. This skill owns the
+  manifest block, the directories, the runtime-state file, and the log line — nothing past that.
 
 ## Examples
 

@@ -72,7 +72,7 @@ Try to infer the pack from documents before asking:
 |--------------------|---------------|
 | "Protein Industries Canada", "PCAIS", "PIC" | `pic-pcais` |
 | "NSERC", "IRAP", "Mitacs", "CFI", "SIF" | `grant-canada` |
-| "SR&ED", "T661", "experimental development" | `sred-canada` |
+| "SR&ED", "T661", "experimental development" | *(not a pack)* → set `sred_interest: yes` and hand off to `sred-onboarding` after intake completes |
 | Sprint cadence, story points, backlog | `agile-default` |
 | "board of directors", "investors", "cap table" | `board-investor` |
 | SOW, "Statement of Work", "client deliverables" | `client-services` |
@@ -81,11 +81,17 @@ If a pack is inferred: present it as a one-line confirmation — "Detected: pic-
 
 If no pack is inferable and none was provided: show a compact pack list and ask for selection (not a wizard — a single prompt):
 ```
-Pack options: pic-pcais / grant-canada / sred-canada / client-services / board-investor / agile-default / open-source / none
-Which fits? (you can pick multiple, e.g. "grant-canada sred-canada"):
+Pack options: pic-pcais / grant-canada / client-services / board-investor / agile-default / open-source / none
+Which fits? (you can pick multiple, e.g. "grant-canada agile-default"):
 ```
 
 Multiple packs are additive — load all selected packs' reporting-matrix-defaults.yaml.
+
+**SR&ED is deliberately absent from the pack list.** `sred-canada` exists, but it is the *bundled*
+pack of the `sred` capability and is loaded by that capability's enable step, not selected here.
+Selecting it as a project pack produces a half-configured state: matrix entries with no `sred/`
+directory, no runtime state, and no filing deadline. When the SR&ED signal fires above, set
+`sred_interest: yes` on the intake record and offer `/sred-onboarding` once intake finishes.
 
 ### 1c. Extract silently
 

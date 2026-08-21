@@ -254,7 +254,7 @@ Chapters with pre-filled data should:
 
 - Yes → Q1.1a: Is it a Canadian federal program?
   - Yes → Q1.1b: Which funder program is it?
-    - Determine which funder pack applies (e.g., `pic-pcais` for PIC/PCAIS, `sred-canada` for SR&ED) and add it. Present a one-line description of what that pack configures.
+    - Determine which funder pack applies (e.g., `pic-pcais` for PIC/PCAIS) and add it. Present a one-line description of what that pack configures. SR&ED is not a funder pack — if it comes up here, set `sred_interest: yes` and let Q1.6 handle it.
     - If no matching pack exists: note the program name and continue. Present: "I don't have a production pack for that program yet, but the core skills still work. You can configure the funder-reporting profile manually."
   - No → note the program; similar guidance.
 - No → skip government funder packs.
@@ -286,9 +286,25 @@ Chapters with pre-filled data should:
 **Q1.6 — SR&ED (Canada only):**
 > Is your organization Canadian, and does this project involve work that might qualify as Scientific Research or Experimental Development — meaning technical work where the outcome was genuinely uncertain and required systematic investigation?
 
-- Yes → add `sred-canada`. Present: "The SR&ED pack will extend the substrate with technological uncertainty, experiment, and advancement records and help you build a T661 narrative continuously — so your claim is built from contemporaneous records rather than reconstructed at year-end."
-- No → skip.
-- Unsure → Present: "SR&ED eligibility can be tricky. If any of your project's technical work involved genuine uncertainty — you couldn't look up the answer, had to experiment — it might qualify. You can add the sred-canada pack now and nothing forces you to file; it just starts capturing. Want to add it provisionally?"
+**SR&ED is a capability, not a pack.** Do not add `sred-canada` to the pack list here — it is the
+capability's *bundled* pack and is loaded by the capability's own enable step. What this question
+decides is a single flag on the intake record, `sred_interest: yes | no | unsure`, which routes to
+a handoff after Chapter 9.
+
+- Yes → `sred_interest: yes`. Present: "Good — SR&ED gets its own short setup after this one,
+  because it needs things this session doesn't ask for: your fiscal year end, the claimant's legal
+  name, and a conversation about where your technical frontier actually is. It extends the
+  substrate with uncertainty, experiment, and advancement records so the T661 is built from
+  contemporaneous notes rather than reconstructed at year-end."
+- No → `sred_interest: no`. Skip.
+- Unsure → `sred_interest: unsure`. Present: "SR&ED eligibility is genuinely hard to call, and
+  nothing here decides it — that's your advisor's determination. But if any of your technical work
+  involved uncertainty you couldn't resolve by looking it up, it's worth capturing. Capturing
+  commits you to nothing; not capturing is what loses claims. We can run the SR&ED setup after
+  this and you can stop at any point."
+
+**Do not ask for the fiscal year end here.** It is required, it gates the whole capability, and it
+belongs to the session that can refuse without wasting this one.
 
 **Q1.7 — Does this project end?**
 
@@ -418,7 +434,7 @@ Collect for each person:
 1. Project Lead (internal)
 2. Finance Representative
 3. Funder/Customer contact (if applicable)
-4. Any pack-specific required roles (e.g., funder PM for pic-pcais, SR&ED advisor for sred-canada)
+4. Any pack-specific required roles (e.g., funder PM for pic-pcais). The SR&ED advisor is asked for by `sred-onboarding`, not here.
 
 After the main contacts: "Are there any other people or organizations who receive reports or need to be informed about this project?"
 
@@ -447,10 +463,17 @@ For each milestone mentioned, collect:
 
 After: "Here's the milestone list I've built. Does the sequence and ownership look right?"
 
-**If pack is `sred-canada`:** After milestone confirmation, ask:
-> For each of these milestones, does the work involved any genuine technical uncertainty — outcomes that weren't known in advance and required systematic investigation? These would be SR&ED-eligible.
+**If `sred_interest` is `yes` or `unsure`:** After milestone confirmation, ask:
+> For each of these milestones, did the work involve genuine technical uncertainty — outcomes that
+> weren't known in advance and required systematic investigation?
 
-Flag milestones with `sred_eligible: true` and note which ones to create TU records for in the tracker.
+Flag those milestones `sred_candidate: true` and carry the list forward on the intake record.
+`sred-onboarding` uses it as the raw material for its frontier walk (Chapter 4) and first
+uncertainty capture (Chapter 5).
+
+Name the flag `sred_candidate`, not `sred_eligible` — nothing in this session can determine
+eligibility, and a field named `eligible` will be read as a determination by the next person who
+opens the file.
 
 ---
 
@@ -613,6 +636,24 @@ Overall: Good starting point. Outputs will improve as grounding increases.
 **Closing:**
 > Setup complete. The system is oriented and ready. You can always improve orientation by adding documents, updating goals, or adding examples — run `project-onboarding re-orient` to revisit any chapter without starting over.
 
+### Capability handoff
+
+If the intake record carries `sred_interest: yes | unsure`, offer the handoff **after** the closing
+— not before. This session is complete on its own, and SR&ED setup is a separate decision the
+operator should be able to defer without feeling they left the project half-configured.
+
+> You flagged SR&ED earlier. That's a separate short setup — seven chapters, about fifteen minutes
+> — because it needs things this session didn't ask for: your fiscal year end, the claimant's legal
+> name, and a real conversation about where your technical frontier is. Run it now, or any time
+> with `/sred-onboarding`.
+
+If they say yes, invoke `sred-onboarding`, passing the intake record so it can pre-fill from the
+`sred_candidate` milestones instead of interviewing cold. If they defer, say so plainly and stop —
+`project-orchestrator` will not nag about a capability that was never enabled.
+
+The same pattern applies to any other capability flagged during pack selection. Onboard the
+project first; layer capabilities after.
+
 ---
 
 ## Re-orientation mode
@@ -710,7 +751,7 @@ On initialization (Chapter 8), write:
 - **project-scaffolder** — called in Chapter 8 with the intake record as input; handles directory creation and manifest writing
 - **project-state** — all substrate writes route through it; onboarding.completed logged to activity log
 - **project-milestone-manager** — milestone records created from Chapter 5 intake
-- **project-sred-tracker** — if sred-canada pack selected, milestone SR&ED flags from Chapter 5 are used to create initial TU stubs
+- **sred-onboarding** — handed off to after Chapter 9 when `sred_interest` is `yes` or `unsure`; consumes the `sred_candidate` milestone flags from Chapter 5
 - **project-orchestrator** — referenced in Chapter 9 suggested actions
 - **project-doc-suite** — benefits directly from references/examples/ in orientation quality
 
