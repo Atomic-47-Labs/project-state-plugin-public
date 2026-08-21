@@ -87,6 +87,62 @@ the manifest lock. Logs `lifecycle.declared`.
 This operation exists because a key with no writer is a defect: see `FB-003`, where five phase presets
 shipped and nothing ever wrote `phases.preset`, so selecting one meant hand-editing the manifest.
 
+## `set_preset(name)`
+
+Selects the phase ladder. `name` must be a preset that exists — one of the five shipped in
+`templates/phase-presets/` (`grant-default`, `agile-default`, `waterfall-default`,
+`open-source-default`, `client-engagement-default`) or a custom preset YAML the facility provides.
+Refuse on an unresolvable name; do not create a preset as a side effect of selecting one.
+
+**This operation is FB-003 itself.** The paragraph above under `set_lifecycle` cites that record as
+the cautionary precedent — five presets shipped and nothing ever wrote `phases.preset`, so selecting
+one meant hand-editing the manifest. It stayed open from 2026-08-11 to 2026-08-21 while being quoted
+as a lesson. Ruled in decision 2026-08-21-twelve-rulings-facility-contract item 11.
+
+Three behaviours, because a preset change is not one situation:
+
+**1. No phase has started — write freely.** Every phase in `phases/` is `pending` with no `started`
+timestamp, so there is no pass to lose. Write `manifest.yaml:phases.preset` and scaffold `phases/`
+from the new preset.
+
+**2. `continuous`, with phase history — refuse, and name the lossless path.** There IS an outgoing
+pass and it must be frozen rather than discarded:
+
+```
+This facility has phase history under preset <old>. Changing the ladder underneath it would
+discard the current increment's gate evidence.
+
+  close_increment("<what this increment delivered>")   freezes phases/ and state.json:gates
+  set_preset("<new>")                                   writes the new ladder, resets phases/
+  open_increment("<label>")                             starts the next pass under it
+
+Run those three and nothing is lost.
+```
+
+Refuse until `current_increment` is closed or absent. This is not an extra hoop: `close_increment`
+already freezes a copy of `phases/` and `state.json:gates` into `increments/INC-<NN>-<label>/` and
+resets `phases/` from the active preset, so the machinery for a lossless ladder change already exists
+and this operation only has to insist on using it.
+
+**3. `terminal`, with phase history — refuse.** There is nowhere to put the outgoing pass. Changing
+the ladder under a completed or in-flight pass either discards gate evidence or reports phases
+complete that never ran — which is FB-004's data loss re-created by a different route, on a facility
+that has no `increments/` directory to freeze into. Offer `convert_to_continuous()` as the path for a
+project that genuinely needs to keep going, and say plainly that the alternative is a new facility.
+
+**Also refuse** a preset declaring no `cycles_back_to` while `lifecycle: continuous` — the mirror of
+`set_lifecycle`'s refusal, and for the same reason: that key marks the increment boundary, and a
+continuous facility without one has nothing to close an increment *at*. Selecting `grant-default` on
+a continuous facility hits this.
+
+Writes `manifest.yaml:phases.preset` through `project-state`, under the manifest lock. Logs
+`preset.declared` with `{from, to, phases_scaffolded}`.
+
+`project-onboarding` asks which preset at creation and `project-scaffolder` writes it, so a new
+facility is born with a deliberate ladder rather than a default nobody chose. This operation is for
+changing it afterwards.
+
+
 ## Terminal facilities: nothing changes
 
 Everything below activates only at `lifecycle: continuous`. On a terminal facility `transition_phase`

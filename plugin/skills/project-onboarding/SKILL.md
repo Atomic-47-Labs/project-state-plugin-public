@@ -345,6 +345,50 @@ re-asking a settled question implies it is open. `sred-canada` is a capability p
 lifecycle default by design: it layers onto whatever shape the project already has, so it never
 pre-fills this question and never suppresses it.
 
+
+**Q1.8 — What timezone should scheduled work use?**
+
+> Automation fires in a nightly window — 23:00 to 05:00 by default. In which timezone?
+
+Ask for an IANA name (`America/Vancouver`, `Europe/Berlin`). Offer the machine's timezone as a
+*suggestion to confirm*, never as an answer written without being seen: the facility's timezone is a
+property of the PROJECT, not of whoever happens to run the command, and a facility worked on from two
+machines in two zones would otherwise silently reschedule itself.
+
+**Never skip this question and never substitute a default.** `manifest-v2.yaml` has marked
+`automation.timezone` as REQUIRED since it shipped, while shipping the value as `~`, and no skill ever
+collected it (FB-002). `project-automator` now refuses rather than guessing, so an unanswered question
+here becomes a blocked automation run later — which is the intended trade: a 23:00–05:00 window
+interpreted as UTC fires the nightly jobs at 4pm in Vancouver, and a schedule that is confidently
+wrong is worse than one that will not start.
+
+Write it to the working intake record as `automation.timezone`.
+
+**Q1.9 — Which phase ladder?**
+
+> Projects move through phases. Which shape fits this one?
+
+| Preset | Shape |
+| --- | --- |
+| `grant-default` | proposal → approval → planning → execution → closeout. Terminal by design. |
+| `agile-default` | discovery → build loops → release, cycling back to build. |
+| `waterfall-default` | requirements → design → build → test → deploy → maintain. |
+| `open-source-default` | inception → active → maintained, cycling back to active. |
+| `client-engagement-default` | pitch → scoping → engagement → wrap, cycling back to engagement. |
+
+Pre-fill from the pack answers where they settle it — Q1.1 (government funder) implies
+`grant-default`, Q1.4 (agile delivery) implies `agile-default` — and present it as a confirmation
+rather than an open question. Write the confirmed value to the intake record as `phases.preset`;
+`project-scaffolder` writes it to the manifest.
+
+This question exists because nothing wrote `phases.preset` for the first ten weeks the presets
+existed (FB-003). `project-phase-gate set_preset(name)` changes it afterwards.
+
+Q1.9 and Q1.7 interact: a preset that declares no `cycles_back_to` cannot host a `continuous`
+lifecycle. If Q1.7 answered "work continues" and Q1.9 lands on `grant-default`, say so and ask which
+of the two to change — do not silently resolve it.
+
+
 **Confirmation:**
 > Based on your answers, I recommend loading: [list]. Here's what each adds. Does this look right, or would you like to add or remove anything?
 

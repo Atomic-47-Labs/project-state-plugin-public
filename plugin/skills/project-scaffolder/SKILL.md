@@ -177,6 +177,35 @@ the safe answer — and the post-closeout diagnostic asks at the moment the answ
 
 Spec: `docs/CONTINUOUS-LIFECYCLE-SPEC.md` §4.1.
 
+**`phases.preset` — write it, always.** This is the key FB-003 is about: five presets shipped in
+`templates/phase-presets/` and nothing ever wrote the manifest key that selects one, so choosing a
+ladder meant hand-editing YAML for ten weeks. Resolution order:
+
+1. The intake record's `phases.preset`, when called from `project-onboarding` Q1.9.
+2. The selected pack's declared default preset.
+3. Otherwise ASK. This is the interactive front door and a one-line question is cheap; a facility with
+   no ladder is not.
+
+Never leave it unset. Unlike `phases.lifecycle`, where unset is a permanently valid answer meaning
+terminal, an unset preset means there is no phase ladder to be in.
+
+**`automation.timezone` — write it, and never invent it.** `templates/manifest-v2.yaml` has marked
+this REQUIRED since it shipped while shipping the value as `~`, and no skill collected it (FB-002).
+Resolution order:
+
+1. The intake record's `automation.timezone`, from `project-onboarding` Q1.8.
+2. Otherwise ASK for an IANA name. The host machine's zone may be offered as a suggestion to confirm,
+   never written unseen — the facility's timezone is a property of the PROJECT, not of whoever ran the
+   command, and a project worked on from two machines in two zones would silently reschedule itself.
+
+Do not write `~`, do not default to UTC. `project-automator` now refuses to compile a schedule without
+it, because the window above is local time and a guessed zone fires the nightly jobs at the wrong hour
+— confidently wrong beats not starting, which is why the refusal is the correct behaviour and this
+question is the thing that stops anyone meeting it.
+
+Both keys are ruled in decision `2026-08-21-twelve-rulings-facility-contract`, items 10 and 11.
+
+
 **HTML artifact:**
 - ProgressBar (2 of 6 active)
 - Mermaid diagram of the 6-phase lifecycle with the default phase highlighted:
@@ -415,6 +444,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
     | ✅ | Git repo | Initial commit: "project-state: facility scaffolded — [slug]" |
     | ⬜ | `project-state/milestones/` | Empty — seed with `/project-milestone-manager` |
     | ⬜ | `project-state/people/` | Empty — add via `/project-state` |
+    | ⬜ | `project-state/lessons-learned/` | Empty — capture with `/project-lessons`; shape in `templates/lesson-learned.md` |
 
   - SectionTitle: "What would you like to do next?"
   - 4 OptionCards as next-step buttons:
@@ -441,6 +471,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
 | ✅     | Git repo initialized                        | Initial commit made            |
 | ⬜     | project-state/milestones/                   | Empty — seed later             |
 | ⬜     | project-state/people/                       | Empty — add later              |
+| ⬜     | project-state/lessons-learned/               | Empty — capture later          |
 
 Next steps:
   **1** Seed milestones from proposal    → /project-milestone-manager
@@ -472,11 +503,44 @@ If shared-drive model: skip git entirely. Note in Step 7 output: "Git checkpoint
 ## Discipline
 
 - **Never write files before Step 6 confirmation.** The entire wizard is read-only until the user confirms.
-- **Idempotent.** If `project-state/` already exists in the target directory, abort before Step 1 with a warning. Offer `project-state validate` instead.
+- **Idempotent, CONDITIONALLY.** Invoked directly with no intake record: if `project-state/` already
+  exists, abort before Step 1 with a warning and offer `project-state validate` instead. Called WITH
+  an intake record (see "Parameterised invocation" below): **adopt** the existing tree — never
+  overwrite, never clear — because re-orientation is a supported path where an existing facility is
+  the premise, not a mistake. Same rule and same word as capability `enable` step 5. A blanket abort
+  broke `project-onboarding`'s re-orientation flow, which calls this skill in Chapter 8 against a
+  facility that already exists (FB-001).
 - **Never overwrite existing files.**
 - **Atomic failure.** If scaffolding aborts mid-way, clean up anything partially created.
 - **Surface-aware.** Detect HTML vs. markdown mode before Step 1 and stay consistent throughout all steps.
 - **One step at a time.** Generate one artifact or one markdown step, wait for response, then generate the next. Do not bundle multiple steps.
+
+---
+
+## Parameterised invocation
+
+This skill has two front doors, and only one of them is the wizard.
+
+**Interactive.** A person runs it directly; Steps 1–6 interview them; nothing is written before
+confirmation. If `project-state/` exists, it aborts (see Discipline).
+
+**From an intake record.** `project-onboarding` Chapter 8 calls this skill with its captured intake
+record as structured input: *"Call `project-scaffolder` with all captured inputs, passing the working
+intake record as structured input. Do not re-ask questions that have already been answered."* In this
+mode the wizard does not run — every value it would have asked for is supplied — and an existing
+`project-state/` is **adopted** rather than refused, because onboarding also serves re-orientation of
+a live facility.
+
+This contract existed and worked for months while documented only in the caller. It is written here
+because a callee that refuses its own documented caller is not discoverable from either side alone
+(FB-001).
+
+### `seed-matrix`
+
+`project-onboarding` also invokes `project-scaffolder seed-matrix` to seed
+`project-state/reporting-matrix.yaml` from the selected packs. Merge semantics: entries whose `id`
+already exists are left alone — an operator's edit outranks a pack default. Also undocumented until
+2026-08-21, and for the same reason.
 
 ---
 

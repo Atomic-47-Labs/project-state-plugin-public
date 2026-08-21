@@ -32,7 +32,11 @@ All documents live under `project-state/documents/`:
 | `published/`      | Versions delivered to PIC/Consortium (frozen)                           |
 | `pic-templates/`  | PIC-provided blank templates                                            |
 
-The index is at `documents/index.yaml` — top-level key `docs:` (canonical; readers tolerate `documents:`/`entries:` but always WRITE `docs:`). Its schema is in `project-state/SCHEMA.md` (see entry "Document registry").
+The index is at `documents/index.yaml`. Two top-level lists: `docs:` for published-document entries
+(canonical; readers tolerate `documents:`/`entries:` but always WRITE `docs:`) and `classified:` for
+one entry per ingested document. Its schema is in `docs/SCHEMA.md` → "Document index
+(`documents/index.yaml`)". *(Before 2026-08-21 this line pointed at `project-state/SCHEMA.md` entry
+"Document registry" — wrong path, and no such section existed. The shape was undocumented.)*
 
 ## Provenance & lineage fields (v4.2 — every entry SHOULD carry these)
 
@@ -119,6 +123,10 @@ PRE-CHECK: Has project-inbox already triaged this document?
    a. Move the file to the appropriate folder (source-of-truth / working / published / pic-templates).
    b. Assign an id: "doc-<kind>-<yyyy-mm-dd>-<slug>" OR preserve an existing id pattern.
    c. Append a new entry to documents/index.yaml (or update the existing entry if pre-triaged).
+      `classified_by` is single-valued and this skill is AUTHORITATIVE over `project-inbox`'s triage
+      pre-pass: REPLACE the key, never add a second one. Two skills appending it produced a duplicate
+      YAML key on 34 of 198 entries, and a normal loader silently discarded the first (FB-006). The
+      inbox's pass is not lost by overwriting — it is already in `logs/activity.ndjson`.
    d. If SoT and supersedes an older entry, update supersedes/superseded_by links.
    e. Update manifest.yaml cross-references where applicable (dates, governing_document_status, phase evidence).
    f. Call project-state to log document.registered (and document.sot.promoted if applicable).

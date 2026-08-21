@@ -55,7 +55,13 @@ Run the full classification pass on all documents with `triage_state: unprocesse
 
    **Triage confidence**: `high` | `medium` | `low` based on document readability and classification certainty.
 
-3. **Write enriched metadata** to `documents/index.yaml`. For documents already indexed: extend in place, preserving all existing fields. For documents not yet indexed: create a new entry. New fields added:
+3. **Write enriched metadata** to `documents/index.yaml`. For documents already indexed: extend in
+   place, preserving all existing fields — but REPLACE any key you are writing rather than adding a
+   second copy of it. "Preserving all existing fields" previously read as append-only and produced a
+   duplicate `classified_by` on 34 entries, which a normal YAML loader silently discards (FB-006).
+   `classified_by` is single-valued and `project-document-curator` is authoritative over it: write it
+   only when no curator pass has classified the document, and never overwrite the curator's value.
+   For documents not yet indexed: create a new entry. New fields added:
 
    ```yaml
    triage_state: processed

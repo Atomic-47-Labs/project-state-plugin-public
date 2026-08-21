@@ -49,6 +49,31 @@ cards on the calendar, which this skill **must never overwrite** (see `update`).
 3. Read `project-state/automation/tasks.yaml` if present → existing `tasks[]`.
 4. Read `project-state/state.json` → phase, milestone pointers, `sprint_calendar`.
 5. Window: args, then `manifest.yaml:automation.window`, then default `23:00–05:00`.
+6. Timezone: `manifest.yaml:automation.timezone`. **REFUSE if absent** — report the missing key and
+   stop. Do not default to UTC, do not read the host machine's timezone, and do not compile a partial
+   schedule.
+
+   The window at step 5 is expressed in LOCAL time, so a guessed timezone does not produce a slightly
+   wrong schedule, it produces a confidently wrong one: `23:00–05:00` interpreted as UTC fires the
+   nightly jobs at 4pm in Vancouver. And the host machine is the wrong source — the facility's
+   timezone is a property of the project, not of whoever runs the command, so inferring it makes the
+   schedule depend on who last touched it.
+
+   This is the same rule capability `enable` step 2 applies to `fiscal_year_end`: *"do not invent a
+   value, do not substitute a plausible default, and do not write a partial block"*, because a guessed
+   value produces a confidently wrong filing date. Same shape, same answer.
+
+   `manifest-v2.yaml` has marked this key REQUIRED since it shipped while shipping it as `~`, and
+   nothing collected it (FB-002). `project-onboarding` Q1.8 now asks and `project-scaffolder` writes
+   it, so absence should be rare — but rare is not never, and an existing facility predating that
+   question will hit this refusal. Report it as a missing answer, not as a broken facility:
+
+   ```
+   automation.timezone is not set in manifest.yaml. Scheduling needs it — the 23:00–05:00 window is
+   local time, and guessing would fire the nightly jobs at the wrong hour.
+   Set it to an IANA name (e.g. America/Vancouver) and re-run.
+   ```
+
 
 ## Step 1 — Classify and normalize
 

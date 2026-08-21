@@ -88,7 +88,11 @@ For every write:
 5. **Apply the change.** Update `last_modified`, `last_modified_by`, fields under change. Preserve all other fields.
 6. **Write the file.**
 7. **Release lock.** Delete `<target>.lock`.
-8. **Append to activity log.** One NDJSON line with `ts, actor, event, id, summary`.
+8. **Append to activity log.** One NDJSON line: `ts, actor, event, id, summary`. `summary` is
+   canonical; `detail` and `note` are read-only aliases a reader must accept, in that order, and a
+   line whose structured fields say everything needs none of the three. Never rewrite existing lines
+   to match. Full vocabulary and validator severity: `docs/SCHEMA.md` → Activity log → "The
+   descriptive field".
 9. **Update state.json counters** if creating a new entity (also under the lock).
 
 ### Canonical write events
@@ -119,6 +123,8 @@ For every write:
 | Hold SC meeting / distribute minutes | `sc.meeting.held` / `sc.minutes.distributed` | —    |
 | Draft claim / submit / paid         | `claim.drafted` / `claim.submitted` / `claim.paid` | `counters.quarterly_claims` on draft |
 | Phase transition                    | `phase.transition`          | —                      |
+| Select the phase preset             | `preset.declared`           | —                      |
+| Warn that the log lags the repo     | `activity.lag.warned`       | —                      |
 | Declare the lifecycle               | `lifecycle.declared`        | —                      |
 | Convert terminal → continuous       | `lifecycle.converted`       | —                      |
 | Warn that work arrived after closeout | `lifecycle.mismatch.warned` | —                    |
