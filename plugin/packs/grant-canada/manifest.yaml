@@ -36,6 +36,7 @@ pack:
     - "IRAP Technical Review Guide"
     - "PIC PM Guide"
   released: "2026-05-18"
+  maturity: "starter"
 
 provides:
   facility_kinds:

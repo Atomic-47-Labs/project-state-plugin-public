@@ -10,6 +10,10 @@ pack:
     any other pack — tender pursuit composes with grant, client, or agile packs.
   authors:
     - "David Olsson <david@atomic47.co>"
+  governing_documents:
+    - "capabilities/tender/README.md (hosting shape: a tender is watched by a project, not a facility)"
+    - "capabilities/tender/surfaces.yaml (the capability's declared surfaces — its spec: reference)"
+    - "docs/TENDER-ONEPAGER.md"
   released: "2026-07-21"
   maturity: "stable"
 

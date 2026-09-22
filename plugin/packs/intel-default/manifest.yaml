@@ -1,13 +1,28 @@
-id: intel-default
-kind: pack
-version: "1.1.0"
-maturity: starter
-description: >
-  Bundled default pack of the intel capability. Carries the reporting-matrix defaults
-  that absorb the standalone suite's intel-runner scheduling — the overnight longlist
-  and the monthly landscape report as matrix entries compiled to cron by
-  project-automator — plus, from 1.1, the weekly claim refresh and the monthly competitive
-  brief of the competitive layer. Swappable per project like any pack; ships no schema and
-  no skills (packs configure, capabilities extend).
+pack:
+  id: "intel-default"
+  name: "Intel Default — ecosystem and competitive intelligence cadences"
+  version: "1.1.0"
+  compatible_core: ">=4.9"
+  description: |
+    Bundled default pack of the `intel` capability. Carries the reporting-matrix defaults
+    that absorb the standalone suite's intel-runner scheduling — the overnight longlist and
+    the monthly landscape report as matrix entries compiled to the cadence registry by
+    project-automator — plus, from 1.1, the weekly claim refresh and the monthly competitive
+    brief of the competitive layer (OCI v0.1 at L1 Grounded).
+
+    Behavior only. Entities, skills, templates and the validator ship with the `intel`
+    capability plugin (capabilities/intel/) — this pack contains no substrate extensions and
+    no skills, per CAPABILITY-PLUGINS.md §6.
+
+    Swappable per project like any pack; coexists with any active project pack, resolution
+    being per-matrix-entry via the `profile:` field.
+  authors:
+    - "David Olsson <david@atomic47.co>"
+  governing_documents:
+    - "docs/INTEL-CAPABILITY-SPEC.md"
+    - "docs/INTEL-CI-SPEC.md (Open Competitive Intelligence v0.1, conformance level L1 Grounded)"
+  released: "2026-08-28"
+  maturity: "starter"
+
 provides:
   reporting_matrix_defaults: reporting-matrix-defaults.yaml

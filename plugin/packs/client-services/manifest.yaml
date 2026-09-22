@@ -2,7 +2,7 @@ pack:
   id: "client-services"
   name: "Client Services Engagement"
   version: "0.1.0-starter"
-  compatible_core: ">=2.0,<3.0"
+  compatible_core: ">=4.0,<5.0"
   description: |
     Pack for consulting/client-engagement projects. Configures the suite to handle
     Statements of Work, milestone-based customer billing, customer change orders
@@ -10,6 +10,9 @@ pack:
     deliverables, monthly invoicing cadence, post-engagement support windows.
   authors:
     - "David Olsson <david@atomic47.co>"
+  governing_documents:
+    - "Statement of Work / Master Services Agreement (generic consulting contract shape)"
+    - "templates/phase-presets/client-engagement.yaml — the engagement phase model this pack assumes"
   released: "2026-04-27"
   maturity: "starter — proven shape, adapt to your client contract"
 
