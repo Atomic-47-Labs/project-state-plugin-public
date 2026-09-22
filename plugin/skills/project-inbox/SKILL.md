@@ -1,6 +1,13 @@
 ---
 name: project-inbox
 description: "Smart inbox triage for project-state. Scans documents/inbox/, classifies each file with an LLM-driven pass (doc type, use designation, relevance score, action flags, extraction summary), writes enriched metadata to documents/index.yaml, copies imprint-flagged documents to references/imprint/, and generates references/inbox-orientation.yaml as onboarding pre-context. Use when the user says 'audit the inbox', 'triage documents', 'what's in the inbox', 'orient before onboarding', 'flag this doc', 'smart inbox', or any request to assess, sort, or extract context from dropped documents. Also automatically suggested at the start of project-onboarding when documents are present."
+map:
+  tier: P1
+  stage: ingest
+  inputs: [files]
+  reads: [documents, references]
+  writes: [documents, references, log]
+  calls: [project-document-curator]
 ---
 
 # Project Inbox

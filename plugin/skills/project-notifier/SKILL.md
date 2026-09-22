@@ -1,6 +1,14 @@
 ---
 name: project-notifier
 description: "Route project artifacts to the right surface — Slack (post), Gmail (always as draft for human review), Google Calendar (events + holds), or scsiwyg (via project-blog-publisher). Use whenever the user says 'post this to Slack', 'send to the channel', 'email to PIC', 'draft an email to the consortium', 'put this on the calendar', 'schedule the SC meeting', 'ping finance rep about the claim', 'alert the team about the at-risk milestone', 'notify', or any request to push a report, reminder, or update from project-state/ out to a surface. Never sends Gmail messages — only drafts them. Respects the surfaces config in manifest.yaml. Logs every delivery as an activity event via project-state. Used by orchestrator, status-reporter, sc-meeting, claim-prep, phase-gate whenever they produce output that needs to reach humans."
+map:
+  tier: P2
+  stage: generate
+  reads: [reports]
+  writes: [log]
+  produces: [team-update]
+  delivers: [slack, gmail-draft, calendar]
+  profile_driven: true
 ---
 
 # Project Notifier

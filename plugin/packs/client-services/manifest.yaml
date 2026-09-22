@@ -17,12 +17,9 @@ provides:
   profiles:
     - funder-reporting   # customer plays the funder role here
     - review-meeting     # QBR
-    - external-comms     # customer-confidentiality review
-    - archive            # engagement wrap
-  templates:
-    - invoice-cover-email.md
-    - qbr-pack.md
-    - engagement-final-deliverable.md
+    # external-comms and archive were declared here with no profile files behind them, and a
+    # templates: block declared three files none of which ever shipped — all trimmed 2026-08-21
+    # (FB-014 / issue #17). Re-declare each in the same change that adds its file.
   reporting_matrix_defaults: true
 
 depends_on:

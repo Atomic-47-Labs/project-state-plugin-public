@@ -1,0 +1,13 @@
+id: intel-default
+kind: pack
+version: "1.1.0"
+maturity: starter
+description: >
+  Bundled default pack of the intel capability. Carries the reporting-matrix defaults
+  that absorb the standalone suite's intel-runner scheduling — the overnight longlist
+  and the monthly landscape report as matrix entries compiled to cron by
+  project-automator — plus, from 1.1, the weekly claim refresh and the monthly competitive
+  brief of the competitive layer. Swappable per project like any pack; ships no schema and
+  no skills (packs configure, capabilities extend).
+provides:
+  reporting_matrix_defaults: reporting-matrix-defaults.yaml

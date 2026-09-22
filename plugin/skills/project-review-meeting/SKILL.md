@@ -1,6 +1,14 @@
 ---
 name: project-review-meeting
 description: Generic recurring review-meeting lifecycle — schedule, agenda, pre-read pack, run/minutes, action-item filing. Reads name, attendees, cadence, agenda template, notice/minutes-distribution windows from a profile YAML in the active pack. The PIC pack ships a profile that reproduces v1.x Steering Committee behavior (Appendix A agenda, 5-business-day notice + 5-business-day minutes, four designate roles, quarterly minimum, PIC PM as non-voting). Other packs ship board-meeting, customer QBR, sprint-retro profiles. Use whenever the user says 'schedule the next [SC/board/QBR/retro]', 'review meeting', 'meeting pack', 'meeting agenda', 'distribute minutes', 'action items from the meeting', or any request to handle a recurring review meeting. Replaces v1.x project-sc-meeting; that name remains an alias if the PIC pack is loaded.
+map:
+  tier: P2
+  stage: generate
+  reads: [milestones, risks, decisions, changes, people]
+  writes: [decisions, reports]
+  calls: [project-notifier]
+  produces: [meeting-pack, meeting-minutes]
+  profile_driven: true
 ---
 
 # Project Review Meeting (v2.0 — was project-sc-meeting)

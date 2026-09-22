@@ -1,6 +1,13 @@
 ---
 name: project-tech-reports
 description: "Generate the Tech Reports intelligence suite — 11 evidence-based markdown reports about THIS project, merging a live codebase scan with the project-state/ substrate: project overview, technical specification, business benefits, innovation themes, features & capabilities, extensibility, work zones, technical readiness, Worksona leadership-runbook alignment, Worksona first-principles alignment, and an executive summary. Generate all or a selected subset; each report is written to a VERSIONED path project-state/reports/tech/<report-id>/<stamp>.md (history kept, never overwritten) and the run appended to manifest.json. The keep-state-app Intel 'Tech Reports' page reads these (view / download / regenerate / history). Use whenever the user says 'tech reports', 'generate the tech suite', 'regenerate a tech report', 'document the codebase', 'technical intelligence reports', or when the Tech Reports page triggers a generation run. Single-project only — no cross-portfolio synthesis."
+map:
+  tier: P2
+  stage: generate
+  inputs: [codebase]
+  reads: [manifest, milestones]
+  writes: [reports]
+  produces: [tech-reports]
 ---
 
 # Project Tech Reports

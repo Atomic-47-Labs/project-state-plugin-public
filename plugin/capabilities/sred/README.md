@@ -36,3 +36,11 @@ seeds the reporting matrix from the bundled pack, and arms `automation/tasks.yam
 
 Disable keeps all data and refuses silently walking away from a live filing window: any
 fiscal year not in `{filed, waived, forfeited}` requires explicit confirmation.
+
+## Dashboard (declared report)
+
+`node views/build-sred-dashboard.mjs <facility>/project-state` renders `reports/adhoc/sred-dashboard.html`,
+declared in `surfaces.yaml → reports:` (scripted; the app renders it in a trusted frame). `project-sred-tracker`
+re-runs it after every write. `samples/dashboard.html` is the same dashboard rendered from
+`examples/fixture/` (a fictional stream-join project; every fact invented) — the template the app previews
+before the capability is enabled. Regenerate with `python3 scripts/build-capability-samples.py --only sred`.

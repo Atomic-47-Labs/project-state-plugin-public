@@ -1,6 +1,13 @@
 ---
 name: project-ip-tracker
 description: Track IP arising from a project — disclosures to a configured recipient, abstracts on a configured registry, foreground vs. background distinction, annual reporting inputs. Generic in v2.0 — disclosure recipient, registry format, and definitions come from a profile loaded by the active pack. PIC pack profile routes to PIC Director of Data and IP, uses PIC IP Registry abstract format, feeds Annual Questionnaire. Other packs route to general counsel, internal IP committee, customer IP officer. Optional — projects without IP-bearing work don't load any profile and the skill is inert. Use whenever the user says 'log an IP disclosure', 'new IP', 'patent idea', 'trade secret', 'disclose to [recipient]', 'IP rationale update', 'foreground IP', 'background IP', 'IP commercialization', 'license granted', 'license received', 'annual IP update'.
+map:
+  tier: P3
+  stage: keep
+  reads: [ip]
+  writes: [ip]
+  produces: [ip-disclosure]
+  profile_driven: true
 ---
 
 # Project IP Tracker (v2.0 — generic recipient)

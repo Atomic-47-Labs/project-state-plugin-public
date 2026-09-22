@@ -1,6 +1,13 @@
 ---
 name: project-change-register
 description: "Register, classify, and route project changes per PIC PM Guide — distinguish material (Change Order, Schedule A amendment) from non-material (Change Log entry). Use whenever the user says 'log a change', 'we need to change X', 'swap vendor', 'add a subcontractor', 'shift funds', 'timeline slip', 'change order', 'CO-01', 'material change', 'non-material change', 'change the IP rationale', 'change of control', 'bring on ACME as subcontractor', 'update the change log', 'what's the difference between a CO and a change log', or any request about changes to the project scope, schedule, budget, vendors, subcontractors, or IP rationale. Drafts Change Orders but never submits — always stops at a draft for PIC + Steering Committee approval."
+map:
+  tier: P2
+  stage: keep
+  reads: [changes, milestones]
+  writes: [changes]
+  calls: [project-milestone-manager]
+  produces: [change-order]
 ---
 
 # Project Change Register

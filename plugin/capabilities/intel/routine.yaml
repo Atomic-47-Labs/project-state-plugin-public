@@ -1,0 +1,115 @@
+# intel — capability routine
+#
+# What this capability contributes to `project-orchestrator`'s read phase. Composed into
+# the one digest for every ENABLED capability; there is no second orchestrator (the old
+# intel-orchestrator briefing dissolves into these checks). Scheduling is NOT here — the
+# intel-default pack's reporting-matrix-defaults carry the old intel-runner cadences.
+#
+# Spec: docs/CAPABILITY-PLUGINS.md §5, docs/INTEL-CAPABILITY-SPEC.md §8.
+schema_version: 1
+capability: intel
+version: "1.1.0"
+
+state:
+  runtime: "state/intel.json"
+  manifest_block: "capabilities.intel"
+  agenda: "intel/agenda.yaml"
+
+checks:
+  # ── Blocking / urgent ────────────────────────────────────────────────────────
+  - id: "intel.not-initialized"
+    when: "capability enabled AND no intel-entity records exist"
+    severity: urgent
+    message: "Intel is enabled but the map is empty — no entities on file."
+    action: "Run /intel-onboarding to declare the focus and seed the first entities."
+    handler: intel-onboarding
+
+  - id: "intel.no-focus"
+    when: "capabilities.intel.focus missing or still REQUIRED"
+    severity: urgent
+    message: "No focus declared — the harvester has no relevance lens and must not run."
+    action: "Set capabilities.intel.focus (1-3 sentences) via /intel-onboarding."
+    handler: intel-onboarding
+
+  # ── This week ────────────────────────────────────────────────────────────────
+  - id: "intel.inbox-waiting"
+    when: "documents/inbox/ holds docs classified intel and not yet drained"
+    severity: soon
+    message: "{n} intel document(s) waiting in the inbox."
+    action: "Run /intel-ingest drain."
+    handler: intel-ingest
+
+  - id: "intel.p0-unanswered"
+    when: "any p0 agenda question with no answering signal"
+    severity: soon
+    message: "{n} P0 research question(s) unanswered."
+    action: "Run /intel-harvester agenda p0 — these decide strategy now."
+    handler: intel-harvester
+
+  - id: "intel.longlist-unreviewed"
+    when: "a longlist report exists newer than the last briefing review"
+    severity: soon
+    message: "Overnight longlist ran {date} — {n} signals awaiting review, incl. proposed entities."
+    action: "Review intel/reports/longlist-{date}.md; confirm or reject entity candidates."
+    handler: intel-harvester
+
+  # ── On deck ──────────────────────────────────────────────────────────────────
+  - id: "intel.stale-entities"
+    when: "any active_research or active_engagement entity with no signal in staleness_threshold_days"
+    severity: ondeck
+    message: "{n} entit(ies) past the {staleness_threshold_days}-day staleness threshold."
+    action: "Run /intel-harvester sweep, or retire entities that no longer matter."
+    handler: intel-harvester
+
+  - id: "intel.mandate-quiet"
+    when: "any active mandate with no signal referencing its entity in 30 days"
+    severity: ondeck
+    message: "Mandate {id} is active but its entity has been silent for 30+ days."
+    action: "Check in on the engagement or mark it stalled honestly."
+    handler: project-state
+
+  # ── Competitive layer (1.1, docs/INTEL-CI-SPEC.md §7) ─────────────────────────
+  - id: "intel.no-self"
+    when: "any intel-claim exists or competitive.competitors non-empty, AND competitive.self_entity unset or resolves to no entity of type self or has no claims"
+    severity: urgent
+    message: "No self entity with claims — battlecards cannot pass the three-part test (nothing about us is provable)."
+    action: "Run /intel-onboarding competitive to declare the self entity, then /intel-harvester competitor self."
+    handler: intel-onboarding
+
+  - id: "intel.stale-material"
+    when: "any material intel-claim on an in-scope competitor whose age exceeds 2× its category half-life"
+    severity: soon
+    message: "{n} material claim(s) stale across {m} competitor(s) — they render as stale wherever cited."
+    action: "Run /intel-harvester competitor all --stale-only (the weekly refresh does this unattended)."
+    handler: intel-harvester
+
+  - id: "intel.conflicts-open"
+    when: "any conflicts_with pair where neither claim is superseded"
+    severity: soon
+    message: "{n} contested claim pair(s) — {categories} on {entities}."
+    action: "Research the contested category; a new claim with supersedes: closes the conflict. Never resolve silently."
+    handler: intel-harvester
+
+  - id: "intel.battlecard-behind"
+    when: "any battlecard whose generated_at predates the newest material claim on its subject"
+    severity: soon
+    message: "Battlecard for {entity} is behind {n} newer material claim(s)."
+    action: "Run /intel-battlecard {entity} — projections are regenerated, never edited."
+    handler: intel-battlecard
+
+  - id: "intel.unknowns-open"
+    when: "any claim with epistemic_status unknown on a P0 competitor older than its category half-life"
+    severity: ondeck
+    message: "{n} open unknown(s) on P0 competitors — {categories}."
+    action: "Run /intel-harvester competitor <id> scoped to the unknown; an unknown re-searched and still unknown is re-logged, not smoothed over."
+    handler: intel-harvester
+
+  - id: "intel.projection-forked"
+    when: "validate reports a profile, battlecard, deal brief or brief whose content hash differs from state/intel.json projections"
+    severity: ondeck
+    message: "{path} was edited by hand after generation — it is a fork of the claim set."
+    action: "Put the correction in the claim set (new claim, supersession, confidence downgrade), then regenerate."
+    handler: intel-battlecard
+
+quiet_when: "no check fires"
+quiet_message: "Intel is current — {n} entities / {n} signals / {n} claims ({n} fresh), agenda clear, nothing stale, no open conflicts, battlecards current. A quiet desk means the map is good."

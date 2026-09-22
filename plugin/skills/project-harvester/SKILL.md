@@ -1,6 +1,12 @@
 ---
 name: project-harvester
 description: "Harvest external signals (Slack, Gmail, GDocs, scsiwyg, Jira, Confluence, Linear, GitHub) relevant to a specific project and write them as classified intel docs into `project-state/documents/inbox/`. Jira, Confluence, and Linear are pulled through their Claude MCP connectors (Atlassian + Linear); GitHub via its MCP connector or the gh CLI (commits digested per repo/day, plus PRs, releases, issues). Reads the project manifest to discover which channels, contacts, keywords, projects/boards, spaces, and surfaces to watch. Tracks per-user, per-surface cursors in `project-state/harvest/cursors/`. Persists through the substrate binding: local file writes by default, or the project-state.app deposit API when a cloud endpoint + personal token are configured (see HARVEST-CONNECTIVITY-ROADMAP.md). Designed to be called by `project-orchestrator` as part of the daily routine. Trigger: `/project-harvester` or invoked by project-orchestrator."
+map:
+  tier: P3
+  stage: ingest
+  inputs: [slack, gmail, gdocs, scsiwyg, jira, confluence, linear, github]
+  reads: [manifest, state]
+  writes: [documents, state, log]
 ---
 
 # project-harvester

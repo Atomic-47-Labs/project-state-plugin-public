@@ -2,7 +2,7 @@
 """Reference RSS/Atom poller for tender-harvester (CanadaBuys).
 
 Stateless helper: fetches one feed with conditional headers and prints new/changed
-entries as JSON lines. Cursor state stays in the facility's state/tender-intelligence.json — the agent
+entries as JSON lines. Cursor state stays in the facility's state/tender.json — the agent
 passes it in and persists what comes back. Stdlib only.
 
 Usage:

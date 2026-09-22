@@ -1,6 +1,12 @@
 ---
 name: grant-state
 description: "The shared memory layer for grant-submission facilities (grant-state/). Reads/writes all pre-award submission state: manifest, narrative sections, compliance gates, letters, budget lines, source documents, internal-review findings, program records, and award records. Enforces the grant-state write protocol (lock → read → write → release → log). Use when any grant-* skill needs to read or write grant submission state. Phrases: 'show grant state', 'validate grant facility', 'what phase is the submission', 'show gate status', 'list sections', 'show compliance gates'."
+map:
+  tier: grant
+  stage: keep
+  reads: [grant-state]
+  writes: [grant-state]
+  role: memory-layer
 ---
 
 # Grant State

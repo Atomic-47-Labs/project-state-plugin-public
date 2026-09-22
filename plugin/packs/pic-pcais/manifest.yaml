@@ -34,12 +34,23 @@ provides:
     - ip-tracker
     - archive
     - phase-gate
+    - onepager             # audience voice profiles for project-onepager — shipped since the
+                           # onepager skill landed but never declared here until 2026-08-21
   templates:
     - claim-cover-email.md
     - sc-agenda-appendix-a.md
-    - final-report.md
+    - sc-minutes.md
     - ip-disclosure.md
-    - publication-review-form.md
+    - pic-ip-registry-abstract.md
+    - pic-annual-questionnaire-ip-section.md
+    - lessons-learned-summary.md
+    - pic-ip-final-report.md
+    # final-report.md and publication-review-form.md were declared here with no files and no
+    # profile referencing either — trimmed 2026-08-21 (FB-014 / issue #17). The member final
+    # report is real but PIC distributes its template ~90 days before project close (PM Guide,
+    # "Project Closure and Final Reporting") — it is facility-supplied when issued, not
+    # pack-shipped. Publication review is governed by the PM Guide's 30-day/14-day SC review
+    # windows; author a form and re-declare it in the same change if one is wanted.
   reporting_matrix_defaults: true
 
 depends_on:

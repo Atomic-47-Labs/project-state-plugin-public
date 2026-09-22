@@ -1,6 +1,15 @@
 ---
 name: project-orchestrator
 description: "The conductor of the project-* skill suite. Decides what to do next based on current state + the calendar (day of week, proximity to quarterly claim deadlines, SC meeting cadence, phase gate status, overdue milestones, annual questionnaire). Use whenever the user says 'what should I do today', 'what should I do this week', 'run the project', 'what's pending', 'what needs attention', 'morning briefing for the project', 'are there any deadlines coming up', 'what's the orchestrator saying', 'run the weekly routine', 'run the daily routine', 'kickoff the day', or any request asking the project to tell itself what to do next. Invokes other project-* skills as needed and hands decisions back to the user for approval. Thin by design — this skill routes, it does not do the work itself."
+map:
+  tier: P2
+  stage: control
+  inputs: [gcal]
+  reads: [reporting-matrix, manifest, state, log]
+  dispatches: [project-harvester, project-inbox, project-status-reporter, project-funder-reporting, project-review-meeting,
+    project-ip-tracker, project-change-register, project-blog-publisher, project-website-publisher, project-notifier, project-phase-gate,
+    project-doc-suite, project-sred-tracker, tender-monitor, intel-harvester]
+  role: orchestrator
 ---
 
 # Project Orchestrator
@@ -79,7 +88,7 @@ Every line links to the skill that handles it, so the user can say "yes, do the 
 
 ## Capability routines
 
-A capability plugin (`sred`, `tender-intelligence`) knows a rhythm the core orchestrator does not.
+A capability plugin (`sred`, `tender`) knows a rhythm the core orchestrator does not.
 Rather than shipping its own orchestrator — which would duplicate this calendar logic and give the
 operator two competing answers to "what should I do today" — a capability ships
 `capabilities/<id>/routine.yaml`, and this skill composes it.
@@ -247,6 +256,29 @@ tick` on a chosen cadence (weekday-mornings preset, etc.). The cron command runs
 `claude -p` headless with `--permission-mode bypassPermissions --max-budget-usd 2`,
 logging to `logs/cron-tick.log`. The human clicks **Register** — the app does not
 register it silently. The Schedule view's "Last tick" reflects real runs once active.
+
+## Voice
+
+The daily read renders in the voice of the project's default audience profile
+(`manifest.default_audience` → `audiences/<id>.yaml`, read via `project-state`; falls back to
+`education/profile.yaml`; with neither, today's practitioner form — see `docs/VOICE-LAYER-SPEC.md`).
+The routing logic never changes with the voice — only the words do.
+
+At `newcomer` register, the ranked list follows the plain-language contract
+(`docs/INLINE-EDUCATION-SPEC.md` §3.1): open with a 1–2 line "since last time" recap of what was
+done, then each item as *what needs you → why it matters → how to do it*, spoken register,
+humanized numbers, names before codes, lexicon applied, forbidden vocabulary honored. Example:
+
+    Good morning. Since Friday: two decisions written down, the weekly report went out.
+
+    One thing needs you today: the funder report is due Thursday. It builds itself
+    from your record — you just look it over. Say "prepare the funder report" to start.
+
+    And one small habit item: two minutes on the oldest worry on your list.
+
+At `practicing` and `fluent`, the standard Urgent / This week / On deck form applies unchanged. An
+educator nudge (at most one, per the education spec's backend rail) joins the list as an ordinary
+ranked item — never a separate section.
 
 ## Discipline
 

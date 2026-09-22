@@ -1,6 +1,12 @@
 ---
 name: project-sred-tracker
 description: "Continuous SR&ED work capture for Canadian T661 claims. Records technological uncertainties (TUs), experiments (EXs), technological advancements (ADVs), and contemporaneous evidence entries into sred/ substrate. Enforces TU→EX→ADV traceability. Runs gap analysis, weekly progress digests, quarterly completeness reviews, cost roll-ups, and the innovation-criteria interview. Active when the sred capability is enabled. Use whenever the user says 'record a technical uncertainty', 'log SR&ED work', 'add an experiment', 'capture an advancement', 'SR&ED evidence', 'what's our SR&ED status', 'weekly SR&ED update', 'SR&ED digest', 'quarterly SR&ED review', 'gap analysis', 'define innovation criteria', 'what counts as innovation here', 'is this SR&ED', 'evaluate this SR&ED opportunity', 'screen this for SR&ED', or any request to track or screen experimental development work for CRA."
+map:
+  tier: capability
+  stage: keep
+  reads: [sred, log]
+  writes: [sred]
+  produces: [t661-narrative]
 ---
 
 # Project SR&ED Tracker
@@ -368,6 +374,24 @@ Write the file from `templates/criteria.yaml`, `status: draft` until PL sign-off
 to `reviewed`. Emit `sred.criteria.updated` with areas added/removed — criteria drift is
 audit-relevant and must be visible in the activity log. The quarterly review nudges a
 refresh when `last_refreshed` ages past a quarter.
+
+### `render_dashboard()` — the declared report
+
+The SR&ED dashboard is a **declared report** (`capabilities/sred/surfaces.yaml → reports:`): the
+app's SR&ED page renders `reports/adhoc/sred-dashboard.html` in place, so it must be fresh
+whenever state changes. Run it after every operation above that writes a TU/EX/ADV, appends
+evidence, or moves a claim status — and at the end of the weekly and quarterly reviews:
+
+```bash
+node capabilities/sred/views/build-sred-dashboard.mjs <facility>/project-state
+```
+
+It reads the manifest block, `sred/criteria.yaml`, the three entity directories, the evidence
+log and `state/sred.json`; it writes ONE file and nothing else — a lens, never a writer. If Node
+is unavailable, say so in the run report instead of leaving a stale page: the app shows the
+last render's timestamp, and a stale timestamp is an honest signal. Before the first render (or
+when the capability is merely installed) the app shows `samples/dashboard.html`, a fixture
+render, banded "Template" — never mistake it for this project's data.
 
 ## Discipline rules
 

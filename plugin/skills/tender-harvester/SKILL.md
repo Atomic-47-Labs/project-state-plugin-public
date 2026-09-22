@@ -1,6 +1,12 @@
 ---
 name: tender-harvester
-description: "The collection layer of the tender-intelligence package. Harvest public-sector tender opportunities from CanadaBuys (RSS/Atom + email), MERX (email), SaskTenders/GEM (email + conservative public listing polling) and bids&tenders (email + approved public search) into tender entities inside the enabling project-state/ facility. Tracks per-connector cursors and health in state/tender-intelligence.json (the capability's own state file), quarantines unrecognized notification templates, honors a global per-domain politeness ledger, and writes every record through the project-state memory layer. Trigger on 'harvest tenders', 'check the tender feeds', 'what came in from CanadaBuys', 'drain the tender mailbox', 'poll SaskTenders', 'run the tender harvest', 'any new tenders', or when project-orchestrator finds a connector past its expected interval. Designed to run in scheduled sessions between interactive use."
+description: "The collection layer of the tender package. Harvest public-sector tender opportunities from CanadaBuys (RSS/Atom + email), MERX (email), SaskTenders/GEM (email + conservative public listing polling) and bids&tenders (email + approved public search) into tender entities inside the enabling project-state/ facility. Tracks per-connector cursors and health in state/tender.json (the capability's own state file), quarantines unrecognized notification templates, honors a global per-domain politeness ledger, and writes every record through the project-state memory layer. Trigger on 'harvest tenders', 'check the tender feeds', 'what came in from CanadaBuys', 'drain the tender mailbox', 'poll SaskTenders', 'run the tender harvest', 'any new tenders', or when project-orchestrator finds a connector past its expected interval. Designed to run in scheduled sessions between interactive use."
+map:
+  tier: capability
+  stage: ingest
+  inputs: [web, gmail]
+  reads: [manifest]
+  writes: [tenders, state]
 ---
 
 # tender-harvester
@@ -10,9 +16,9 @@ Pull tender opportunities from configured sources and deposit them as `kind: ten
 ## Preconditions
 
 1. Locate the facility: walk up from cwd to `project-state/manifest.yaml` (standard project-state discovery).
-2. Confirm `manifest.yaml:packages.tender-intelligence.enabled: true`. If absent, stop: "Tender package not enabled in this facility — add the package block (templates/manifest-package-block.yaml) to manifest.yaml."
+2. Confirm `manifest.yaml:packages.tender.enabled: true`. If absent, stop: "Tender package not enabled in this facility — add the package block (templates/manifest-package-block.yaml) to manifest.yaml."
 3. Read the package block for sources, feeds, mailbox label, and intervals.
-4. Read `state/tender-intelligence.json:tender_connectors` for cursors and health. Initialize missing connector entries with the schema-extension defaults before first use.
+4. Read `state/tender.json:tender_connectors` for cursors and health. Initialize missing connector entries with the schema-extension defaults before first use.
 
 ## Philosophy
 
@@ -109,6 +115,22 @@ Tender harvest — <facility> — 2026-07-21 09:00 PT
 ```
 
 Always end by suggesting the follow-on: `tender-qualifier score` for new/changed tenders; flag amendments for `tender-monitor`.
+
+## The declared report
+
+After every run (including a run that found nothing — connector health changed) re-render the
+tender desk's **At a glance** page, declared in `capabilities/tender/surfaces.yaml → reports:`
+and shown in place on the app's Tender page:
+
+```bash
+python3 capabilities/tender/views/build-tender-glance.py <facility>/project-state
+```
+
+It reads `tenders/`, `state/tender.json` (connector health — the rows this skill just updated)
+and the tender events log, and writes only `tenders/reports/at-a-glance.html`. A lens, not a
+writer: nothing in it is state, and it is regenerated rather than edited. Until the first
+harvest the app shows the shipped sample (`samples/at-a-glance.html`, fixture data) banded
+"Template".
 
 ## What this skill must never do
 

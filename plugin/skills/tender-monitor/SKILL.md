@@ -1,6 +1,12 @@
 ---
 name: tender-monitor
-description: "The change-detection layer of the tender-intelligence package. Re-check followed tenders across their sources (CanadaBuys watch feeds, listing re-fetches, amendment emails flagged by tender-harvester), diff against stored state, and emit typed change events to tenders/events.ndjson and the activity log: tender.amended, tender.deadline.changed, tender.document.revised, tender.cancelled, tender.awarded. Trigger on 'check for amendments', 'any changes on the tenders we're watching', 'monitor t-2026-0041', 'follow this tender', 'did the closing date move', 'stop following', or when tender-harvester flags amendment notifications. Every material change carries previous value, new value, and an evidence URL."
+description: "The change-detection layer of the tender package. Re-check followed tenders across their sources (CanadaBuys watch feeds, listing re-fetches, amendment emails flagged by tender-harvester), diff against stored state, and emit typed change events to tenders/events.ndjson and the activity log: tender.amended, tender.deadline.changed, tender.document.revised, tender.cancelled, tender.awarded. Trigger on 'check for amendments', 'any changes on the tenders we're watching', 'monitor t-2026-0041', 'follow this tender', 'did the closing date move', 'stop following', or when tender-harvester flags amendment notifications. Every material change carries previous value, new value, and an evidence URL."
+map:
+  tier: capability
+  stage: ingest
+  inputs: [web, gmail]
+  reads: [tenders]
+  writes: [tenders, log]
 ---
 
 # tender-monitor

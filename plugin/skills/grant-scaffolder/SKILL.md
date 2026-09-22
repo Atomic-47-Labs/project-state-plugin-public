@@ -1,6 +1,12 @@
 ---
 name: grant-scaffolder
 description: "Initialize a new grant-submission facility (grant-state/). Matches the program against 19 Canadian playbooks (Tri-Council NSERC/SSHRC/CIHR, IRAP, SIF, PIC, CFI JELF, Mitacs, NGen, SCALE.AI, Genome Canada, PacifiCan, FedDev, FedNor, CED, ACOA, CanNor, SR&ED, agnostic-core), seeds narrative sections, compliance gates, budget scaffold, and phase manifests. On award: freezes submission, spawns sibling project-state/, carries forward people, IP, gates, milestones. Use for 'scaffold new NSERC submission', 'new grant facility', 'set up SIF submission', 'we won the grant, hand off to project-state'."
+map:
+  tier: grant
+  stage: ingest
+  inputs: [operator]
+  writes: [grant-state]
+  calls: [project-scaffolder]
 ---
 
 # Grant Scaffolder

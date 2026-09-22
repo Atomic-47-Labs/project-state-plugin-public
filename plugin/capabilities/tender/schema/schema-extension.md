@@ -1,4 +1,4 @@
-# Tender Intelligence — SCHEMA.md Extension
+# Tender — SCHEMA.md Extension
 
 Append this section to the enabling facility's `project-state/SCHEMA.md`. It follows the
 substrate's schema-extension mechanism: the canonical schema lives *in the project*, and the
@@ -8,14 +8,14 @@ substrate's schema-extension mechanism: the canonical schema lives *in the proje
 
 ## Tender package entity kinds
 
-The tender-intelligence package adds two entity kinds and one append-only event stream.
+The tender package adds two entity kinds and one append-only event stream.
 
 ### Directory layout additions
 
 ```text
 project-state/
-├── manifest.yaml                # + capabilities.tender-intelligence block (see templates/tender/manifest-capability-block.yaml)
-├── state/tender-intelligence.json  # tender counters + tender_connectors (per-capability state file)
+├── manifest.yaml                # + capabilities.tender block (see templates/tender/manifest-capability-block.yaml)
+├── state/tender.json  # tender counters + tender_connectors (per-capability state file)
 ├── tenders/
 │   ├── t-<year>-<seq>.yaml      # kind: tender (file-per-entity — never a fused tenders.yaml)
 │   ├── profiles/<slug>.yaml     # kind: tender-profile
@@ -67,7 +67,7 @@ One JSON object per line, append-only, never rewritten:
 
 Required: `ts`, `actor`, `event`, `id`, `source`, `parser_version`. `previous_value`/`new_value` required for change events. Raw payload reference (`raw_ref`) required when a raw capture exists.
 
-### `state/tender-intelligence.json` (per-capability state file)
+### `state/tender.json` (per-capability state file)
 
 ```json
 {

@@ -22,6 +22,8 @@ namespace:
   skills:                  # suite-convention names mapped to this capability
     - project-sred-tracker
     - project-sred-reviewer
+    - sred-onboarding        # moved inside 2026-08-28 — was at repo-root skills/, reaching
+                             # the published plugin only via the wholesale mirror, undeclared
 
 payload:
   schema: "schema/"

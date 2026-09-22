@@ -15,7 +15,8 @@ pack:
 provides:
   profiles:
     - review-meeting     # sprint retrospective
-    - phase-gate         # sprint phases
+    # phase-gate was declared here with no profile file behind it — trimmed 2026-08-21
+    # (FB-014 / issue #17). Re-declare it in the same change that adds profiles/phase-gate.yaml.
   reporting_matrix_defaults: true
 
 # ----------------------------------------------------------------------------

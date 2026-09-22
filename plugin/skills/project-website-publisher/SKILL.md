@@ -1,6 +1,14 @@
 ---
 name: project-website-publisher
 description: Build and deploy a full project website (Next.js 16 App Router on Vercel/Netlify) that surfaces every dimension of the project — dashboard, Gantt, milestones, risks, decisions, people, blog (scsiwyg), wiki (scsiwyg), calendar, reporting documents, and about pages. Reads project-state/ YAML/JSON/MD at runtime via server components with ISR revalidation. Use whenever the user says "publish to the site", "update the project website", "deploy", "regenerate the website", "rebuild and deploy", "init the project website", "what URL for [doc]", or any request to surface project state on the project URL.
+map:
+  tier: P2
+  stage: generate
+  inputs: [scsiwyg]
+  reads: [manifest, milestones, risks, decisions, people, documents, reports]
+  writes: [manifest, log]
+  calls: [project-notifier]
+  produces: [website]
 ---
 
 # Project Website Publisher

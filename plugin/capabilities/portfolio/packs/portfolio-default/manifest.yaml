@@ -1,0 +1,12 @@
+id: portfolio-default
+kind: pack
+version: "1.0.0"
+maturity: starter
+description: >
+  Bundled default pack of the portfolio capability. Carries one reporting-matrix default —
+  the weekly collect that snapshots members, compiles the cross-member index, regenerates
+  the understanding pages and writes the weekly change note — compiled to cron by
+  project-automator. Swappable per portfolio like any pack; ships no schema and no skills
+  (packs configure, capabilities extend).
+provides:
+  reporting_matrix_defaults: reporting-matrix-defaults.yaml

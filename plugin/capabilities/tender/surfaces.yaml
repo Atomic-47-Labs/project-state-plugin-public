@@ -1,5 +1,5 @@
-capability: tender-intelligence
-label: Tender Intelligence
+capability: tender
+label: Tender
 description: Public-sector tender discovery, qualification and pursuit.
 entities:
 - kind: tender
@@ -86,7 +86,16 @@ entities:
       protocol with a heading, a table of include/exclude terms, and ask follow-ups.
 
       '
-overview: '**Tender Intelligence gives this project a continuously operating tender desk.**
+# Generated report the app renders in place (the declared-report mechanism, PORTFOLIO-CAPABILITY-SPEC §10.1).
+# Built from state by views/build-tender-glance.py after each harvest; script-free and self-contained.
+reports:
+- id: at-a-glance
+  label: At a glance
+  latest: tenders/reports/at-a-glance.html
+  produced_by: tender-pipeline          # python3 capabilities/tender/views/build-tender-glance.py <facility>
+  default: true
+  sample: samples/at-a-glance.html      # fixture render — the template shown before the capability is enabled or has harvested
+overview: '**Tender gives this project a continuously operating tender desk.**
 
   It watches Canadian public-sector procurement portals — CanadaBuys, MERX, SaskTenders,
 

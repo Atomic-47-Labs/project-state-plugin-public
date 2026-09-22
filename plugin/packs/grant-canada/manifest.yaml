@@ -47,15 +47,10 @@ provides:
     - review-meeting
     - funder-reporting
     - external-comms
-  templates:
-    - grant-manifest.yaml
-    - compliance-gates-canada.yaml
-    - submission-phases/00-prospect.yaml
-    - submission-phases/01-pre-submission.yaml
-    - submission-phases/02-internal-review.yaml
-    - submission-phases/03-submitted.yaml
-    - submission-phases/04-awarded.yaml
-    - submission-phases/05-rejected.yaml
+  # A templates: block declared eight files here — grant-manifest.yaml,
+  # compliance-gates-canada.yaml, and a six-file submission-phases/ ladder. None ever shipped
+  # (there is no templates/ directory) — trimmed 2026-08-21 (FB-014 / issue #17). If the
+  # submission-phase ladder is built, re-declare each file in the change that adds it.
   reporting_matrix_defaults: true
 
 depends_on:

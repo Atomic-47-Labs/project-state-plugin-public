@@ -1,6 +1,12 @@
 ---
 name: tender-pipeline
-description: "The workflow layer of the tender-intelligence package. Move tenders through the pursuit lifecycle (discovered → preliminary_match → documents_required → under_review → qualified → bid_no_bid_pending → pursue/watch/partner_opportunity/dismissed → preparing_response → submitted → awarded/unsuccessful), open and record bid/no-bid decisions as ordinary facility decision entities, create pursuit tasks and deadline milestones, run the dismissal flow with reason codes, and on a win invoke project-scaffolder to spawn the delivery project. Trigger on 'move t-2026-0041 to under review', 'open a bid/no-bid on', 'record the decision', 'dismiss this tender', 'assign this tender to', 'we won', 'we lost', 'mark submitted', 'what's in the pipeline', 'set next action', or when tender-qualifier/tender-monitor suggest a transition."
+description: "The workflow layer of the tender package. Move tenders through the pursuit lifecycle (discovered → preliminary_match → documents_required → under_review → qualified → bid_no_bid_pending → pursue/watch/partner_opportunity/dismissed → preparing_response → submitted → awarded/unsuccessful), open and record bid/no-bid decisions as ordinary facility decision entities, create pursuit tasks and deadline milestones, run the dismissal flow with reason codes, and on a win invoke project-scaffolder to spawn the delivery project. Trigger on 'move t-2026-0041 to under review', 'open a bid/no-bid on', 'record the decision', 'dismiss this tender', 'assign this tender to', 'we won', 'we lost', 'mark submitted', 'what's in the pipeline', 'set next action', or when tender-qualifier/tender-monitor suggest a transition."
+map:
+  tier: capability
+  stage: keep
+  reads: [tenders]
+  writes: [tenders, log]
+  produces: [bid-record]
 ---
 
 # tender-pipeline
@@ -75,6 +81,14 @@ Summarize the facility's tenders grouped by lifecycle band (Discovery / Review /
 ## Kanban integration
 
 `project-kanban` renders lanes from `workflow.status` using the band grouping above. This skill is the only writer of that field, so the board is always a truthful projection of state — regenerate the view, never hand-edit it.
+
+The same is true of the desk's **At a glance** report (`tenders/reports/at-a-glance.html`, declared in `surfaces.yaml → reports:` and rendered in place by the app). Every transition this skill makes changes a lane, a countdown or the bid/no-bid queue on that page, so after each sub-action re-render it:
+
+```bash
+python3 capabilities/tender/views/build-tender-glance.py <facility>/project-state
+```
+
+`tender-harvester` does the same after each harvest (connector health lives on the page too). The renderer writes one file and reads everything else; never hand-edit its output.
 
 ## Output format
 

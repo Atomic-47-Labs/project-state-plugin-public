@@ -1,0 +1,40 @@
+# The `capabilities: intel:` block that `enable` writes into project-state/manifest.yaml.
+# `focus` is REQUIRED — enable refuses without it: it is the harvester's relevance lens,
+# and a harvest with no declared focus produces confidently irrelevant signals.
+capabilities:
+  intel:
+    enabled: true
+    version: "1.1.0"               # plugin version at enable time; validator checks drift
+    pack: intel-default            # bundled default; swappable
+    focus: REQUIRED                # 1-3 sentences: what ecosystem is being mapped, for what
+                                   # product or pursuit, and what "relevant" means here
+    entity_types: [vendor, competitor, regulator, partner, infrastructure, adjacent, self]   # self: us — the competitive skills need it
+    mandate_types: [integration-partnership, licensing, pilot, research-engagement]
+    staleness_threshold_days: 14   # days without a signal before an entity reads stale
+    competitive:                   # the competitive layer — docs/INTEL-CI-SPEC.md §4 (OCI v0.1, L1)
+      self_entity: ~               # INT-E-NNN of type self; REQUIRED by intel-battlecard / deal-coach, not by enable
+      competitors: []              # INT-E ids in scope; empty = every entity of type competitor
+      audiences: []                # - {id: cio-enterprise, persona: cio, segment: enterprise, geography: NA}
+      half_lives_days:             # OCI §3.3 defaults — freshness is DERIVED from these, never authored
+        pricing: 90
+        packaging: 90
+        product: 180
+        feature: 180
+        integration: 180
+        positioning: 180
+        messaging: 180
+        go-to-market: 180
+        security: 180
+        customer: 270
+        partnership: 270
+        compliance: 270
+        leadership: 365
+        funding: 365
+        market: 365
+        objection: 120
+        win-loss: 120
+        sales-tactic: 120
+        product-gap: 120
+      source_precedence: {}        # per-category overrides of the OCI §6.1 order, e.g. usability: [buyer-direct, review-platform, vendor-primary]
+      deal_context: [tender, deals-dir, inbox]   # where intel-deal-coach looks for deal context, in order
+      conformance_target: L1

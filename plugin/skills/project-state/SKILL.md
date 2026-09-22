@@ -1,6 +1,13 @@
 ---
 name: project-state
-description: "The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Also owns the capability lifecycle — enable, disable, and validate a capability plugin (sred, tender-intelligence) for this project: 'enable SR&ED', 'turn on the sred capability', 'is SR&ED enabled', 'disable the capability'. Works for any `project-state/` found by walking up from cwd."
+description: "The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Also owns the capability lifecycle — enable, disable, and validate a capability plugin (sred, tender) for this project: 'enable SR&ED', 'turn on the sred capability', 'is SR&ED enabled', 'disable the capability'. Works for any `project-state/` found by walking up from cwd."
+map:
+  tier: P0
+  stage: keep
+  reads: [manifest, state, log]
+  writes: [manifest, state, log]
+  delivers: [kanban]
+  role: memory-layer
 ---
 
 # Project State — the memory layer
@@ -158,7 +165,15 @@ a memory-layer verb — it writes the manifest, so it routes through here like e
 Normative spec: `docs/CAPABILITY-PLUGINS.md` §5. Capabilities ship under `capabilities/<id>/` with a
 `plugin.yaml` declaring `namespace.prefix`, `payload.schema`, `payload.validator`, and
 `payload.packs.bundled`, plus a `templates/manifest-block.yaml` describing the config the block
-requires.
+requires. Four ship today: `sred`, `tender`, `intel` (whose 1.1 competitive layer adds claims, change events and projections inside the same namespace — `docs/INTEL-CI-SPEC.md`), `portfolio`. A capability the **app** can
+see, enable and board also ships `surfaces.yaml` (boards, setup stages, enablement defaults,
+and `reports:` — the HTML pages its skills render into the substrate, each with a `sample:`
+fixture render the app previews before enablement); `docs/CAPABILITY-PLUGINS.md` §7 is
+normative. The app's one-click Enable performs exactly the steps under "Enable" below. Its setup actions
+write config in the shape the declaration names: `manifest_add` appends to a list (feed URLs),
+`manifest_set` writes a scalar (`workspace_root`, `focus`, `fiscal_year_end`). Manifests written
+before `manifest_set` existed may hold a one-element list where the template says scalar — a
+collector should still accept that shape.
 
 ### Discover
 

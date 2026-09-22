@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Validate the tender-intelligence schema extension inside a project-state facility.
+"""Validate the tender schema extension inside a project-state facility.
 
 Complements `project-state` validate: checks tender entities, profiles, the
-events stream, and state/tender-intelligence.json connector structure against the schema extension
+events stream, and state/tender.json connector structure against the schema extension
 (templates/schema-extension.md). Report-only — never auto-fixes.
 
 Usage: validate_tender_state.py [FACILITY_ROOT]
@@ -71,11 +71,11 @@ def main(argv):
     # capabilities: is canonical (CAPABILITY-PLUGINS.md); packages: read as legacy
     pkg = None
     if isinstance(manifest, dict):
-        pkg = (manifest.get("capabilities") or {}).get("tender-intelligence") or (
+        pkg = (manifest.get("capabilities") or {}).get("tender") or (
             manifest.get("packages") or {}
-        ).get("tender-intelligence")
+        ).get("tender")
     if not pkg or not pkg.get("enabled"):
-        print("tender-intelligence capability not enabled in manifest.yaml", file=sys.stderr)
+        print("tender capability not enabled in manifest.yaml", file=sys.stderr)
         return 2
 
     tdir = os.path.join(root, "tenders")
@@ -164,7 +164,7 @@ def main(argv):
                 warnings.append(f"events.ndjson:{n}: references unknown tender '{ev['id']}'")
 
     # per-capability state file (contract: state/<capability>.json; legacy state.json read as fallback)
-    spath = os.path.join(root, "state", "tender-intelligence.json")
+    spath = os.path.join(root, "state", "tender.json")
     if not os.path.exists(spath):
         spath = os.path.join(root, "state.json")
     if os.path.exists(spath):
@@ -184,7 +184,7 @@ def main(argv):
         print(f"  warn  {w}")
     for p in problems:
         print(f"  FAIL  {p}")
-    print(f"\ntender-intelligence validate: {len(problems)} problem(s), {len(warnings)} warning(s), {len(seen_ids)} tender(s)")
+    print(f"\ntender validate: {len(problems)} problem(s), {len(warnings)} warning(s), {len(seen_ids)} tender(s)")
     return 1 if problems else 0
 
 

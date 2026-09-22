@@ -6,6 +6,11 @@ description: >-
   studio in the browser, or returns a #vibe= share link. Trigger when the user
   says vibe mindmap, mind map from idea, mindmap studio, simple-minds, map this
   idea, brainstorm map, or wants a Cursor-generated map loaded into the desktop app.
+map:
+  tier: P3
+  stage: keep
+  reads: [manifest, milestones]
+  produces: [mindmap]
 ---
 
 # MindMap Vibe (Cursor → MindMap Studio)

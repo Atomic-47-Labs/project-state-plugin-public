@@ -1,6 +1,14 @@
 ---
 name: project-funder-reporting
 description: Generic funder/customer reporting engine. Reads funder-specific behavior from a profile YAML loaded by the active pack — claim form template, deadlines, format spec, cover-email template, signoff routing. The PIC pack ships a profile that reproduces v1.x quarterly claim behavior (Apr/Jul/Oct/Jan 20, MS & financial xlsx, percent_complete + technical_progress mapping). Other packs ship customer-invoicing profiles, board-pack profiles, and stage-gate profiles. Use whenever the user says 'draft the [stakeholder] report', 'quarterly claim', 'monthly invoice', 'board pack', 'funder report', 'customer billing', 'prepare the report', or any request to produce a stakeholder-bound recurring report. Also trigger when the orchestrator detects an upcoming reporting deadline from the stakeholder reporting matrix. Drafts only — never submits.
+map:
+  tier: P2
+  stage: generate
+  reads: [manifest, milestones, changes, people]
+  writes: [reports]
+  calls: [project-milestone-manager, project-notifier]
+  produces: [claim, deliverable-handover, stakeholder-update, closeout]
+  profile_driven: true
 ---
 
 # Project Funder Reporting (v2.0 — was project-claim-prep)

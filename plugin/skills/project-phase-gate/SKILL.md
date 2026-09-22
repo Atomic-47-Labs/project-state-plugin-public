@@ -1,6 +1,13 @@
 ---
 name: project-phase-gate
 description: Manage lifecycle phase transitions for any project. v2.0 supports user-defined phase sets via presets in templates/phase-presets/ — grant-default (LOI→Approval→Planning→Execution→Closeout→Archive), agile-default (Discovery→Build-loops→Hardening→Release), waterfall-default, client-engagement-default (Discovery→Proposal→Engagement→Wrap), open-source-default (Incubation→Active→Maintained→Archived), or custom. Active pack can override gate-in/gate-out criteria per phase. Enforces required artifacts; refuses to transition if gate artifacts missing. v2.1 adds the lifecycle declaration (terminal | continuous) and the increment layer for facilities that continue past closeout — opening, closing, and freezing increments so phase re-entry never clobbers a prior pass's gate evidence. Use whenever the user says 'what phase are we in', 'can we move to execution', 'what's blocking the gate', 'transition to the next phase', 'gate status', 'gate checklist', 'this project doesn't end', 'we shipped v1 but there's a v1.1', 'close the increment', 'start the next increment', 'what did this closeout close', 'make this continuous', 'the project continues after closeout'.
+map:
+  tier: P1
+  stage: keep
+  reads: [phases, state, milestones]
+  writes: [phases, state]
+  calls: [project-milestone-manager]
+  profile_driven: true
 ---
 
 # Project Phase Gate (v2.1 — user-defined phases, terminal or continuous)

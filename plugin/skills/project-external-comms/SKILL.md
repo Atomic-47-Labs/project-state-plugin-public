@@ -1,6 +1,13 @@
 ---
 name: project-external-comms
 description: Generic external-communication review pipeline — proposed publications, presentations, press releases, blog posts crossing the audience boundary. Reads review-window-by-content-class from a profile in the active pack. PIC pack ships profile that reproduces v1.x MPA-mandated 30-day full-publication and 14-day abstract review with PIC + ISED funding acknowledgement enforcement and patent-filing-delay coordination. Other packs ship corporate-PR profiles, customer-confidentiality profiles, etc. Use whenever the user says 'we want to publish', 'submit an abstract', 'press release', 'media interview', 'external talk', 'publication review', 'clear for external' — or any request to route external content through review. Replaces v1.x project-publications.
+map:
+  tier: P3
+  stage: generate
+  reads: [documents]
+  writes: [documents, log]
+  produces: [comms-review]
+  profile_driven: true
 ---
 
 # Project External Comms (v2.0 — was project-publications)

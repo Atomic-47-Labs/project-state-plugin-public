@@ -5,13 +5,13 @@
     "name": "Atomic 47 Labs",
     "url": "https://atomic47.co"
   },
-  "description": "The project-state marketplace — project ops, compliance, and grant-management skills for Claude Code.",
+  "description": "The project-state marketplace \u2014 project ops, compliance, and grant-management skills for Claude Code.",
   "plugins": [
     {
       "name": "project-state",
       "source": "./plugin",
       "version": "4.9.0",
-      "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 42 skills + 8 swappable compliance packs + 2 capability plugins (Canadian SR&ED, tender intelligence).",
+      "description": "Turn any multi-stakeholder project into a system where routine reporting is a byproduct of normal work. 54 skills + 10 swappable compliance packs + 4 capability plugins (Canadian SR&ED, Tender, Intel, Portfolio).",
       "author": {
         "name": "Atomic 47 Labs",
         "url": "https://atomic47.co"
@@ -22,18 +22,7 @@
       "name": "demo-forge",
       "source": "./demo-forge",
       "version": "0.1.0",
-      "description": "Build and maintain project-state's self-driving demo decks and their narration. demo-audio re-bakes deck voiceover with OpenAI TTS (gpt-4o-mini-tts / nova) — archive-first, key-safe, deploy + verify; demo-deck scaffolds a route-validated, share-wired feature / clip / flow and renders its audio.",
-      "author": {
-        "name": "David Olsson",
-        "url": "https://atomic47.co"
-      },
-      "category": "productivity"
-    },
-    {
-      "name": "voice-forge",
-      "source": "./voice-forge",
-      "version": "0.1.0",
-      "description": "Give any deck, page, or walkthrough a voice. voice-cast auditions voices before you pay for a render; voice-render bakes the script to canned audio with OpenAI TTS (manifest-driven, hash-skips unchanged segments); voice-embed wires an opt-in player that follows the slide; voice-caption ships WebVTT captions and a transcript. Canned rather than live, so it costs nothing at runtime and screen recorders capture it.",
+      "description": "Build and maintain project-state's self-driving demo decks and their narration. demo-audio re-bakes deck voiceover with OpenAI TTS (gpt-4o-mini-tts / nova) \u2014 archive-first, key-safe, deploy + verify; demo-deck scaffolds a route-validated, share-wired feature / clip / flow and renders its audio.",
       "author": {
         "name": "David Olsson",
         "url": "https://atomic47.co"

@@ -16,9 +16,11 @@ provides:
   profiles:
     - review-meeting
     - funder-reporting
-  templates:
-    - board-pack.md
-    - monthly-investor-update.md
+    - onepager            # audience voice profiles for project-onepager — shipped since the
+                          # onepager skill landed but never declared here until 2026-08-21
+  # A templates: block declared board-pack.md and monthly-investor-update.md here; neither file
+  # ever shipped (there is no templates/ directory) — trimmed 2026-08-21 (FB-014 / issue #17).
+  # Re-declare each in the same change that adds the file.
   reporting_matrix_defaults: true
 
 # ----------------------------------------------------------------------------

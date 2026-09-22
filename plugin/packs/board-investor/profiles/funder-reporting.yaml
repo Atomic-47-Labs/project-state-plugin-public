@@ -13,7 +13,9 @@ reports:
       lead_time_days: 3
     format:
       kind: md
-      template: "templates/monthly-investor-update.md"
+      # templates/monthly-investor-update.md was referenced but never shipped — trimmed
+      # 2026-08-21 (FB-014 / issue #17). The generator composes the update from state.
+      template: ~
       output_naming: "reports/investors/{YYYY}-{MM}-investor-update.md"
     field_mapping:
       highlights:
