@@ -37,6 +37,28 @@ pack:
     - "PIC PM Guide"
   released: "2026-05-18"
   maturity: "starter"
+  axis: accountability   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: true
+  label: "Canadian grant"
+  blurb: "Pre-award submission for NSERC, IRAP, SIF, CFI, Mitacs and 14 more Canadian programs."
+  signals:
+    - "NSERC"
+    - "IRAP"
+    - "Mitacs"
+    - "CFI"
+    - "SIF"
+    - "SSHRC"
+    - "CIHR"
+    - "NGen"
+    - "SCALE.AI"
+    - "Genome Canada"
+    - "grant application"
 
 provides:
   facility_kinds:
@@ -73,3 +95,6 @@ defaults:
   # A grant ends: a deadline, a decision, and either an award or a rejection.
   # A grant project that continues is a new grant, not a new increment.
   lifecycle: terminal
+  # preset is a suggestion too: it pre-fills the rhythm question and project-scaffolder Step 2
+  # resolution step 2. The facility\'s phases.preset always wins.
+  preset: grant-default

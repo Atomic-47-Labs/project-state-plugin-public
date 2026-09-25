@@ -1,6 +1,6 @@
 ---
 name: portfolio-reviewer
-description: "Query and synthesize across a portfolio's member projects from the compiled index and the member files, never from memory. `query \"<question>\"` reads the relevant index files first, drills into the cited member files second, and answers with evidence by member and path plus an explicit 'what this answer does not know'; answers worth citing are kept under portfolio/answers/. `synthesize \"<theme>\"` reads a theme across members and writes one append-only finding with evidence, asks as questions, and lineage — including emerging projects clustered from items members' own triage dismissed, which land in the hopper when acknowledged. Manages the findings ledger and the one human-gated crossing: `promote <PF-F-id> --to <member>` drops a proposal into that member's documents/inbox/. Trigger on 'ask the portfolio', 'who is over-committed', 'what do the members say about X', 'which projects touch Y', 'synthesize', 'promote this finding'. Never re-plans a member; never promotes unattended."
+description: "Answer questions across a portfolio of projects from its compiled index, with citations — 'how is the portfolio doing', 'which projects are at risk', 'summarise our portfolio'. Never from memory."
 map:
   tier: capability
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # portfolio-reviewer — query, synthesize, keep
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Query and synthesize across a portfolio's member projects from the compiled index and the member files, never from memory. `query "<question>"` reads the relevant index files first, drills into the cited member files second, and answers with evidence by member and path plus an explicit 'what this answer does not know'; answers worth citing are kept under portfolio/answers/. `synthesize "<theme>"` reads a theme across members and writes one append-only finding with evidence, asks as questions, and lineage — including emerging projects clustered from items members' own triage dismissed, which land in the hopper when acknowledged. Manages the findings ledger and the one human-gated crossing: `promote <PF-F-id> --to <member>` drops a proposal into that member's documents/inbox/. Trigger on 'ask the portfolio', 'who is over-committed', 'what do the members say about X', 'which projects touch Y', 'synthesize', 'promote this finding'. Never re-plans a member; never promotes unattended.
 
 The portfolio's reading of its members, answered from files and stated with evidence.
 Observes and asks; never re-plans.

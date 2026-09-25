@@ -1,6 +1,6 @@
 ---
 name: project-document-curator
-description: "Classify, index, and manage project documents — proposals, MPAs, signed Schedule A workbooks, PIC templates, quarterly claim forms, meeting minutes, publications, and any other file that lands in the project. Use this skill whenever the user says 'I just dropped a doc', 'classify this file', 'catalog the inbox', 'what docs do we have', 'where is the MPA', 'promote this to source of truth', 'update the document index', 'a PIC form arrived', 'archive the old proposal', 'the signed MPA is here', 'what is the source of truth for X', or any request to ingest, find, classify, or promote documents inside a `project-state/` project. Also trigger when any project-* skill needs to reference a specific document by canonical path, or when the user drops a file into `project-state/documents/inbox/`."
+description: "File, classify and index project documents — 'file this document', 'where's the signed agreement', 'index the documents', 'add this to the project docs'. Keeps documents/index.yaml current."
 map:
   tier: P1
   stage: ingest
@@ -10,6 +10,12 @@ map:
 ---
 
 # Project Document Curator
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Classify, index, and manage project documents — proposals, MPAs, signed Schedule A workbooks, PIC templates, quarterly claim forms, meeting minutes, publications, and any other file that lands in the project. Use this skill whenever the user says 'I just dropped a doc', 'classify this file', 'catalog the inbox', 'what docs do we have', 'where is the MPA', 'promote this to source of truth', 'update the document index', 'a PIC form arrived', 'archive the old proposal', 'the signed MPA is here', 'what is the source of truth for X', or any request to ingest, find, classify, or promote documents inside a `project-state/` project. Also trigger when any project-* skill needs to reference a specific document by canonical path, or when the user drops a file into `project-state/documents/inbox/`.
 
 ## Purpose
 

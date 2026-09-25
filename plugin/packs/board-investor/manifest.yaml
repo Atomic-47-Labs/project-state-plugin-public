@@ -14,6 +14,22 @@ pack:
     - "docs/REPORTING-MATRIX.md — the stakeholder/cadence contract this pack seeds"
   released: "2026-04-27"
   maturity: "starter"
+  axis: accountability   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: true
+  label: "Board or investors"
+  blurb: "Monthly investor updates with KPI snapshots, board meetings and board packs."
+  signals:
+    - "board of directors"
+    - "investors"
+    - "investor update"
+    - "cap table"
+    - "board pack"
 
 provides:
   profiles:

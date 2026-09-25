@@ -20,10 +20,15 @@ project:
   long_name: "TODO-LongProjectTitle"
   one_liner: |
     TODO — one-paragraph description of what the project does and why.
-  kind: "TODO-project-kind"              # generic | grant_consortium | client_engagement | startup | open_source | mixed
+  # kind: the PRIMARY WORK TYPE — the id of a loaded `axis: work` pack (work-general, work-campaign,
+  # work-event, work-ops-cycle, agile-default = Software product). The primary alone supplies the
+  # suggested phase preset. Legacy free-text values (grant_consortium, client_engagement, startup,
+  # open_source, generic, mixed) stay valid and change nothing. Spec: docs/PROJECT-TYPES-SPEC.md §4.
+  kind: "TODO-project-kind"
   start_date: ~                          # YYYY-MM-DD
   end_date: ~                            # YYYY-MM-DD
-  packs_loaded: []                       # e.g. ["pic-pcais"], ["client-services", "board-investor"], ["agile-default"]
+  packs_loaded: []                       # additive: one work pack + any accountability packs, e.g.
+                                         # ["work-event", "sponsor-internal"], ["agile-default", "pic-pcais"]
   reporting_matrix_path: "reporting-matrix.yaml"
 
 # ----------------------------------------------------------------------------
@@ -63,9 +68,15 @@ stakeholders:
 # ----------------------------------------------------------------------------
 
 phases:
-  preset: "TODO-preset"                  # grant-default | agile-default | waterfall-default | client-engagement-default | open-source-default | custom
+  preset: "TODO-preset"                  # agile-default | stage-gate-default | countdown-default | cycle-default
+                                         # | grant-default | client-engagement-default | waterfall-default
+                                         # | open-source-default | custom
   custom_path: ~                         # if preset == "custom", path to your custom preset yaml
   current_phase: ~                       # set by project-phase-gate
+  anchor_date: ~                         # YYYY-MM-DD. The fixed date a countdown preset plans back from
+                                         # (launch day, event day). Required only by presets declaring
+                                         # requires: [anchor_date]. Seeds dated anchor-Nd and matrix
+                                         # deadlines anchored here. PROJECT-TYPES-SPEC §4.
 
   # Does this project have an end date after which no further work is planned?
   #   terminal   — yes. One pass through the ladder, ending in closeout and archive. The default.

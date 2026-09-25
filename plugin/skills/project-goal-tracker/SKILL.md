@@ -1,14 +1,20 @@
 ---
 name: project-goal-tracker
-description: "Track objectives, goals, and KPIs — the outcome layer over milestones. Milestones track outputs (did we ship it); this skill tracks outcomes (did shipping it move the number). Use whenever the user says 'set a goal', 'add an objective', 'track a KPI', 'what are our goals', 'how are we tracking against target', 'add a reading for <metric>', 'update the cycle-time metric', 'are we on track for the annual objective', 'set a north-star', 'record this month's numbers', 'link this milestone to a goal', or any request to read or write objectives/KPIs. Objectives live in objectives/O<NN>-<slug>.yaml (the aim), KPIs in kpis/KPI-<NN>-<slug>.yaml (baseline → current → target with a dated history). Also trigger when project-funder-reporting (board/investor packs) needs the KPI snapshot for a metrics section, or project-status-reporter wants outcome progress. All writes route through project-state; attainment and trend are computed on read, never stored."
+description: "Set and track objectives and KPIs — 'set a goal', 'add a KPI', 'record this month's numbers', 'are we on track', 'what should we measure'. Offers the work type's common KPIs; always asks for baseline and target."
 map:
   tier: P1
   stage: keep
-  reads: [objectives, milestones]
+  reads: [objectives, milestones, manifest]
   writes: [objectives]
 ---
 
 # Project Goal Tracker
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Track objectives, goals, and KPIs — the outcome layer over milestones. Milestones track outputs (did we ship it); this skill tracks outcomes (did shipping it move the number). Use whenever the user says 'set a goal', 'add an objective', 'track a KPI', 'what are our goals', 'how are we tracking against target', 'add a reading for <metric>', 'update the cycle-time metric', 'are we on track for the annual objective', 'set a north-star', 'record this month's numbers', 'link this milestone to a goal', or any request to read or write objectives/KPIs. Objectives live in objectives/O<NN>-<slug>.yaml (the aim), KPIs in kpis/KPI-<NN>-<slug>.yaml (baseline → current → target with a dated history). Also trigger when project-funder-reporting (board/investor packs) needs the KPI snapshot for a metrics section, or project-status-reporter wants outcome progress. All writes route through project-state; attainment and trend are computed on read, never stored.
 
 ## Purpose
 
@@ -68,6 +74,14 @@ Emit an `objective.created` intent to `project-state` with `title`, `horizon`
 Emit a `kpi.created` intent with `metric`, `unit`, `baseline`, `target`, `current`
 (defaults to baseline), `direction` (up|down), `cadence`, and optional `delivers_to`. The
 id is `KPI-<NN>-<slug>`.
+
+### Suggest KPIs for this kind of work
+When the operator asks "what should we track?" — or a Goals-tab suggestion chip sends *Track "<title>"…* —
+read the **primary work pack's** `seeds/kpis.yaml` (`packs/<project.kind>/seeds/kpis.yaml`;
+`docs/PROJECT-TYPES-SPEC.md` §5.3.2). Offer the ones not already tracked, each with its unit and
+direction. A seed is a *metric shape*, never a number: **always ask for the baseline and target** before
+emitting `kpi.created`, and never invent them from the pack. Onboarding never writes these — goals are
+this skill's.
 
 ### Add a reading (the bread-and-butter op)
 Emit a `kpi.reading.added` intent with the KPI `id`, `value`, optional `date` (defaults to

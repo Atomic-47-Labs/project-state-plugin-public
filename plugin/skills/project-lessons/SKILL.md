@@ -1,6 +1,6 @@
 ---
 name: project-lessons
-description: "Capture Lessons Learned continuously from project kickoff through close, then summarize them at closeout. Use whenever the user says 'capture a lesson', 'lesson learned', 'what we learned about', 'retro note', 'that was tricky, let's remember', 'pitfall we hit', 'something that worked well', 'tip for future projects', 'lessons so far', 'summarize lessons', 'retrospective', 'what would we do differently', 'lessons for the final report', or any request to record or review project retrospective content. Per PIC PM Guide best practice: 'Begin to collect Lessons Learned at the start of the project to make it easier to reflect and remember how the project went.' Lessons show up in SC meetings under Open Discussion and in final reports at closeout."
+description: "Capture a lesson learned, or summarise lessons at close — 'capture a lesson', 'lesson learned', 'retro note', 'what did we learn'. Continuous capture, summarised at closeout."
 map:
   tier: P3
   stage: keep
@@ -10,6 +10,12 @@ map:
 ---
 
 # Project Lessons
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Capture Lessons Learned continuously from project kickoff through close, then summarize them at closeout. Use whenever the user says 'capture a lesson', 'lesson learned', 'what we learned about', 'retro note', 'that was tricky, let's remember', 'pitfall we hit', 'something that worked well', 'tip for future projects', 'lessons so far', 'summarize lessons', 'retrospective', 'what would we do differently', 'lessons for the final report', or any request to record or review project retrospective content. Per PIC PM Guide best practice: 'Begin to collect Lessons Learned at the start of the project to make it easier to reflect and remember how the project went.' Lessons show up in SC meetings under Open Discussion and in final reports at closeout.
 
 ## Purpose
 

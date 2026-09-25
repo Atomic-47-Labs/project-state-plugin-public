@@ -1,6 +1,6 @@
 ---
 name: project-change-register
-description: "Register, classify, and route project changes per PIC PM Guide — distinguish material (Change Order, Schedule A amendment) from non-material (Change Log entry). Use whenever the user says 'log a change', 'we need to change X', 'swap vendor', 'add a subcontractor', 'shift funds', 'timeline slip', 'change order', 'CO-01', 'material change', 'non-material change', 'change the IP rationale', 'change of control', 'bring on ACME as subcontractor', 'update the change log', 'what's the difference between a CO and a change log', or any request about changes to the project scope, schedule, budget, vendors, subcontractors, or IP rationale. Drafts Change Orders but never submits — always stops at a draft for PIC + Steering Committee approval."
+description: "Log and classify a project change — 'log a change', 'we need to change the scope', 'swap X for Y', 'is this a change order'. Separates material changes (change orders) from change-log entries."
 map:
   tier: P2
   stage: keep
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project Change Register
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Register, classify, and route project changes per PIC PM Guide — distinguish material (Change Order, Schedule A amendment) from non-material (Change Log entry). Use whenever the user says 'log a change', 'we need to change X', 'swap vendor', 'add a subcontractor', 'shift funds', 'timeline slip', 'change order', 'CO-01', 'material change', 'non-material change', 'change the IP rationale', 'change of control', 'bring on ACME as subcontractor', 'update the change log', 'what's the difference between a CO and a change log', or any request about changes to the project scope, schedule, budget, vendors, subcontractors, or IP rationale. Drafts Change Orders but never submits — always stops at a draft for PIC + Steering Committee approval.
 
 ## Purpose
 

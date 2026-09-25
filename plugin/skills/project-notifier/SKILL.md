@@ -1,6 +1,6 @@
 ---
 name: project-notifier
-description: "Route project artifacts to the right surface — Slack (post), Gmail (always as draft for human review), Google Calendar (events + holds), or scsiwyg (via project-blog-publisher). Use whenever the user says 'post this to Slack', 'send to the channel', 'email to PIC', 'draft an email to the consortium', 'put this on the calendar', 'schedule the SC meeting', 'ping finance rep about the claim', 'alert the team about the at-risk milestone', 'notify', or any request to push a report, reminder, or update from project-state/ out to a surface. Never sends Gmail messages — only drafts them. Respects the surfaces config in manifest.yaml. Logs every delivery as an activity event via project-state. Used by orchestrator, status-reporter, sc-meeting, claim-prep, phase-gate whenever they produce output that needs to reach humans."
+description: "Send a project artifact to the right surface — 'post this to Slack', 'draft an email to the funder', 'put a hold in the calendar'. Gmail is always a draft; calendar events are proposed holds."
 map:
   tier: P2
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # Project Notifier
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Route project artifacts to the right surface — Slack (post), Gmail (always as draft for human review), Google Calendar (events + holds), or scsiwyg (via project-blog-publisher). Use whenever the user says 'post this to Slack', 'send to the channel', 'email to PIC', 'draft an email to the consortium', 'put this on the calendar', 'schedule the SC meeting', 'ping finance rep about the claim', 'alert the team about the at-risk milestone', 'notify', or any request to push a report, reminder, or update from project-state/ out to a surface. Never sends Gmail messages — only drafts them. Respects the surfaces config in manifest.yaml. Logs every delivery as an activity event via project-state. Used by orchestrator, status-reporter, sc-meeting, claim-prep, phase-gate whenever they produce output that needs to reach humans.
 
 ## Purpose
 

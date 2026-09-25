@@ -1,11 +1,6 @@
 ---
 name: mindmap-vibe
-description: >-
-  Generate a mindmap-vibe JSON from a user's idea and load it into MindMap Studio
-  (~/Desktop/simple-minds.html). Writes to ~/Desktop/mindmap-inbox/, opens the
-  studio in the browser, or returns a #vibe= share link. Trigger when the user
-  says vibe mindmap, mind map from idea, mindmap studio, simple-minds, map this
-  idea, brainstorm map, or wants a Cursor-generated map loaded into the desktop app.
+description: "Turn an idea into a mindmap and open it in MindMap Studio — 'mindmap this', 'make a mind map of', 'map out my idea'. Writes the JSON and opens the studio or a share link."
 map:
   tier: P3
   stage: keep
@@ -14,6 +9,12 @@ map:
 ---
 
 # MindMap Vibe (Cursor → MindMap Studio)
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Generate a mindmap-vibe JSON from a user's idea and load it into MindMap Studio (~/Desktop/simple-minds.html). Writes to ~/Desktop/mindmap-inbox/, opens the studio in the browser, or returns a #vibe= share link. Trigger when the user says vibe mindmap, mind map from idea, mindmap studio, simple-minds, map this idea, brainstorm map, or wants a Cursor-generated map loaded into the desktop app.
 
 Generate structured mind maps from ideas inside Cursor and load them into **MindMap Studio** at `~/Desktop/simple-minds.html`.
 

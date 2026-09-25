@@ -12,9 +12,26 @@ pack:
     - "David Olsson <david@atomic47.co>"
   governing_documents:
     - "Statement of Work / Master Services Agreement (generic consulting contract shape)"
-    - "templates/phase-presets/client-engagement.yaml — the engagement phase model this pack assumes"
+    - "templates/phase-presets/client-engagement-default.yaml — the engagement phase model this pack assumes"
   released: "2026-04-27"
   maturity: "starter — proven shape, adapt to your client contract"
+  axis: accountability   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: true
+  label: "A client"
+  blurb: "A paying customer: SOW, milestone billing, change orders, QBRs, sign-off on deliverables."
+  signals:
+    - "Statement of Work"
+    - "SOW"
+    - "client deliverables"
+    - "customer sign-off"
+    - "master services agreement"
+    - "retainer"
 
 provides:
   profiles:
@@ -45,3 +62,6 @@ defaults:
   # and the same people. client-engagement-default cycles 04-wrap -> 03-engagement and keeps
   # 05-archive for when the relationship actually ends.
   lifecycle: continuous
+  # preset is a suggestion too: it pre-fills the rhythm question and project-scaffolder Step 2
+  # resolution step 2. The facility\'s phases.preset always wins.
+  preset: client-engagement-default

@@ -1,6 +1,6 @@
 ---
 name: portfolio-onboarding
-description: "Guided enablement of the portfolio capability on an org-level Project — the project whose subject is a set of other projects. Gathers the REQUIRED workspace_root (the collector's reach) and subject conversationally; calls the memory layer's `enable portfolio` (manifest block, portfolio/ directories, state/portfolio.json, the pack's weekly collect); then seeds the member registry from three merged sources — discovery of */project-state/ under the workspace, an imported master log (xlsx/csv/markdown table), and the kanban registry.json — proposed and confirmed before writing. Admits members one at a time by handing off to project-intake. Trigger on 'set up a portfolio', 'enable portfolio', 'import my master log', 'add a project to the portfolio', 'admit the pilot project', 'pause this member', or when the digest reports portfolio.not-initialized or portfolio.member-silent. Refuses without workspace_root and subject. Never scaffolds or writes into a member. Routes every write through project-state."
+description: "Set up portfolio oversight on an org-level project — 'set up the portfolio', 'enable portfolio', 'add member projects'. Asks for the workspace root and subject, then admits members one at a time."
 map:
   tier: capability
   stage: ingest
@@ -11,6 +11,12 @@ map:
 ---
 
 # portfolio-onboarding — the enable flow
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Guided enablement of the portfolio capability on an org-level Project — the project whose subject is a set of other projects. Gathers the REQUIRED workspace_root (the collector's reach) and subject conversationally; calls the memory layer's `enable portfolio` (manifest block, portfolio/ directories, state/portfolio.json, the pack's weekly collect); then seeds the member registry from three merged sources — discovery of */project-state/ under the workspace, an imported master log (xlsx/csv/markdown table), and the kanban registry.json — proposed and confirmed before writing. Admits members one at a time by handing off to project-intake. Trigger on 'set up a portfolio', 'enable portfolio', 'import my master log', 'add a project to the portfolio', 'admit the pilot project', 'pause this member', or when the digest reports portfolio.not-initialized or portfolio.member-silent. Refuses without workspace_root and subject. Never scaffolds or writes into a member. Routes every write through project-state.
 
 Make the portfolio capability active on one org-level Project, with a registry that reflects
 what exists on disk and what the operator's own master log says is in the hopper. Enable

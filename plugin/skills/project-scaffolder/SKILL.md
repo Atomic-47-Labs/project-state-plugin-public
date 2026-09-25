@@ -1,14 +1,20 @@
 ---
 name: project-scaffolder
-description: "One-shot initializer for a new project-state/ facility. Use this skill when starting a brand-new funded project — scaffolds the directory tree, manifest, phase manifests, logs, README/SCHEMA/CONCURRENCY/SKILLS docs — and when asked to 'set up a new project', 'create a new project-state', 'scaffold a project', 'initialize project-state', 'start a new funded project', 'bootstrap a grant project', 'new consortium project', 'create the state folder for [project]', 'init project-state in this folder'. Asks clarifying questions about the project, its funder, its consortium, and seeds a manifest that the team fills in. Follow-up work (milestone seeding from proposal, people seeding from MPA) is handed off to the other project-* skills."
+description: "Create a new project-state/ facility — 'set up a new project', 'scaffold a project', 'init project-state here'. Also seed-pack / adopt-seeds for a project's starting milestones and risks."
 map:
   tier: P0
   stage: ingest
   inputs: [operator]
-  writes: [manifest, phases, log]
+  writes: [manifest, phases, reporting-matrix, milestones, risks, log]
 ---
 
 # Project Scaffolder
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> One-shot initializer for a new project-state/ facility. Use this skill when starting a brand-new project of any kind — software, campaign, event, operating cycle, grant, client engagement — scaffolds the directory tree, manifest, phase manifests, logs, README/SCHEMA/CONCURRENCY/SKILLS docs — and when asked to 'set up a new project', 'create a new project-state', 'scaffold a project', 'initialize project-state', 'start a new funded project', 'bootstrap a grant project', 'new consortium project', 'create the state folder for [project]', 'init project-state in this folder'. Asks what kind of work it is, who hears about it and how the work moves, then seeds the manifest, reporting matrix and draft milestones/risks from the chosen packs (seed-pack, adopt-seeds). Follow-up work (milestone seeding from proposal, people seeding from MPA) is handed off to the other project-* skills.
 
 ## Purpose
 
@@ -112,48 +118,61 @@ Run steps 1–6 in sequence, one at a time. Wait for the user's response before 
 
 ---
 
-### Step 1: Pack Selection
+### Step 1: What kind of project, and who hears about it
 
-**Purpose:** Choose which compliance pack(s) to load. Packs seed the reporting matrix and configure the six profile-driven skills.
+**Purpose:** Answer two of the three project-type questions (`docs/PROJECT-TYPES-SPEC.md` §3): the
+**work type** (one primary `axis: work` pack) and **accountability** (zero or more
+`axis: accountability` packs). The third — rhythm — is Step 2's preset. Packs seed the reporting matrix,
+the draft milestones and risks, and configure the profile-driven skills.
+
+**Build the cards from pack manifests — never from a table in this file.** Read every
+`packs/*/manifest.yaml` and keep those with `picker.listed: true`. Group by `pack.axis`; show
+`picker.label` as the card title, `picker.blurb` beneath it and `pack.maturity` as the badge. Packs with
+`picker.listed: false` (e.g. `open-source-community`) appear only under a collapsed **Advanced** group,
+marked *thin*. `axis: capability` packs never appear. Every row of `PROJECT-TYPES-SPEC` §2.5 was a front
+door keeping its own copy of this list.
 
 **HTML artifact:**
 - ProgressBar (1 of 6 active)
 - StepLabel
-- SectionTitle: "Which compliance pack fits your project?"
-- SectionSubtitle: "Packs configure reporting cadence, phase gates, and stakeholder routing. You can select more than one — they compose cleanly."
-- 7 OptionCards (one per pack) + 1 for "None / custom":
-
-  | Pack | Subtitle | Badge |
-  |------|----------|-------|
-  | `pic-pcais` | Protein Industries Canada PCAIS consortium | production |
-  | `grant-canada` | Canadian grants — NSERC, IRAP, SIF, CFI, Mitacs + 13 more | starter |
-  | `client-services` | Client engagement with QBR cadence | starter |
-  | `board-investor` | Board and investor reporting | starter |
-  | `agile-default` | Engineering team, sprint cadence | starter |
-  | `open-source-community` | Community-governed open-source | starter |
-  | None / custom | Bare presets — configure manually | — |
-
-- Note below cards: "Tip: grant-canada + pic-pcais covers the full PIC lifecycle. **SR&ED is not in this list** — it is a capability, not a pack. It brings its own entity kinds, validator and bundled pack, and needs a fiscal year end this step doesn't ask for. Finish here, then run `/sred-onboarding`."
+- SectionTitle: "What is this project trying to make happen?"
+- One OptionCard per listed `axis: work` pack — single-select; this becomes `project.kind`. "General
+  project" (`work-general`) is a real choice, not a failure path.
+- SectionTitle: "Who needs to hear how it's going?"
+- One OptionCard per listed `axis: accountability` pack — multi-select. Cards whose manifest sets
+  `picker.preselected: true` (`sponsor-internal`, decision D3) start selected. Add a "Just me" card that
+  deselects all of them.
+- Collapsed **Advanced**: unlisted packs (badge *thin*), and a toggle to add *secondary* work packs —
+  they contribute matrix entries and seeds but never the preset (decision D4).
+- Note below cards: "**SR&ED is not in this list** — it is a capability, not a pack. It brings its own
+  entity kinds, validator and bundled pack, and needs a fiscal year end this step doesn't ask for.
+  Finish here, then run `/sred-onboarding`."
 - NavRow: no Back | Continue →
 
-**Markdown output:**
+**Markdown output** (rows generated from manifests; this is the shape, not the list):
 ```
-── Step 1 of 6: Pack Selection ──────────────────────────────────
+── Step 1 of 6: Project type ────────────────────────────────────
 
-Which compliance pack(s) fit your project? Select one or more.
+What is this project trying to make happen? (pick one)
 
-| # | Pack              | Best for                                   | Maturity   |
-|---|-------------------|--------------------------------------------|------------|
-| 1 | pic-pcais         | Protein Industries Canada PCAIS consortium | 🟢 Prod    |
-| 2 | grant-canada      | Canadian grants (NSERC, IRAP, SIF + 12)    | 🟡 Starter |
-| 4 | client-services   | Client engagement, QBR cadence             | 🟡 Starter |
-| 5 | board-investor    | Board and investor reporting               | 🟡 Starter |
-| 6 | agile-default     | Engineering team, sprint cadence           | 🟡 Starter |
-| 7 | open-source       | Community-governed open-source             | 🟡 Starter |
-| 8 | None / custom     | Bare presets — configure manually          | —          |
+| # | Work type          | Best for                                              |
+|---|--------------------|-------------------------------------------------------|
+| 1 | <picker.label>     | <picker.blurb>                                        |
+| … |                    |                                                       |
 
-> Type a number (e.g. 2 or 2 3 for multiple):
+Who needs to hear how it's going? (pick any; ✓ = pre-selected)
+
+| # | Accountability               | Best for                                   | Maturity |
+|---|------------------------------|--------------------------------------------|----------|
+| a | ✓ <picker.label>             | <picker.blurb>                             | <badge>  |
+| … |                              |                                            |          |
+| z | Just me                      | No one outside the team                    | —        |
+
+> Type a number and letters (e.g. "3 a c"), or "advanced" for more:
 ```
+
+Write the choices as `project.kind: <work pack id>` and `project.packs_loaded: [<work pack>,
+<accountability packs…>]` — the work pack first.
 
 ---
 
@@ -187,7 +206,9 @@ Spec: `docs/CONTINUOUS-LIFECYCLE-SPEC.md` §4.1.
 ladder meant hand-editing YAML for ten weeks. Resolution order:
 
 1. The intake record's `phases.preset`, when called from `project-onboarding` Q1.9.
-2. The selected pack's declared default preset.
+2. The **primary work pack's** `defaults.preset` (the pack `project.kind` names). With no work pack
+   loaded, an accountability pack's `defaults.preset` pre-fills instead (e.g. `pic-pcais` →
+   `grant-default`). Always presented as a confirmation, never written unseen.
 3. Otherwise ASK. This is the interactive front door and a one-line question is cheap; a facility with
    no ladder is not.
 
@@ -211,44 +232,54 @@ question is the thing that stops anyone meeting it.
 Both keys are ruled in decision `2026-08-21-twelve-rulings-facility-contract`, items 10 and 11.
 
 
+**The rhythm question, when nothing settled the preset.** If neither the intake record nor the primary
+work pack's `defaults.preset` settles it, ask in plain words (`PROJECT-TYPES-SPEC` §6.1):
+
+| Answer | Preset |
+|---|---|
+| "In sprints or iterations" | `agile-default` |
+| "Through stages, with sign-off between them" | `stage-gate-default` |
+| "Toward a fixed date" | `countdown-default` |
+| "In a repeating cycle" | `cycle-default` |
+| Advanced | `grant-default`, `client-engagement-default`, `waterfall-default`, `open-source-default`, custom |
+
+**`phases.anchor_date` — ask when the preset requires it.** A preset that declares `requires:
+[anchor_date]` (`countdown-default`) cannot be written without it: ask for the launch or event date and
+write it with the preset. Then ask each `asks:` entry declared by the loaded packs' manifests, writing
+each answer to its dotted `key`; skip an optional one the operator leaves blank. Never invent an answer.
+
+**Starting phase — the options are the preset's own phases.** Read `phases:` from
+`templates/phase-presets/<preset>.yaml` and offer each phase's `id` and `label`, defaulting to the
+first. (This step used to hardcode the grant ladder — LOI / Approval / Planning / Execution — for every
+project, whatever its preset.) For `grant-default` keep the old default of `03-planning` when the award
+is confirmed.
+
 **HTML artifact:**
 - ProgressBar (2 of 6 active)
-- Mermaid diagram of the 6-phase lifecycle with the default phase highlighted:
+- Mermaid diagram of the resolved preset's phases (`id` + `label`, joined in order; a `cycles_back_to`
+  edge drawn back), the default starting phase highlighted:
   ```mermaid
   graph LR
-    P1[01 LOI] --> P2[02 Approval] --> P3["03 Planning ◀"] --> P4[04 Execution] --> P5[05 Closeout] --> P6[06 Archive]
-    style P3 fill:#22c55e,color:#fff,stroke:#16a34a
+    P1["01 Plan ◀"] --> P2[02 Build-out] --> P3[03 Final countdown] --> P4[04 Live] --> P5[05 Wrap]
+    style P1 fill:#22c55e,color:#fff,stroke:#16a34a
   ```
 - SectionTitle: "Which phase are you starting in?"
-- 4 OptionCards:
-
-  | Phase | Title | When to choose |
-  |-------|-------|----------------|
-  | `01-loi` | LOI / Pre-proposal | Still writing the application |
-  | `02-approval` | Approval | Applied — waiting for funder decision |
-  | `03-planning` *(default)* | Planning | Award confirmed, MPA in progress |
-  | `04-execution` | Execution | Project already underway |
-
+- One OptionCard per phase of the preset, `gate_out` as the "done when" line.
 - NavRow: ← Back | Continue →
 
-**Markdown output:**
+**Markdown output** (generated from the preset; `countdown-default` shown):
 ```
 ── Step 2 of 6: Phase Selection ─────────────────────────────────
 
-```mermaid
-graph LR
-    P1[01 LOI] --> P2[02 Approval] --> P3["03 Planning ◀ default"] --> P4[04 Execution] --> P5[05 Closeout] --> P6[06 Archive]
-    style P3 fill:#22c55e,color:#fff,stroke:#16a34a
-```
+Preset: countdown-default (from work-event)     Anchor date: 2027-03-12
 
-| # | Phase           | When to choose                        |
-|---|-----------------|---------------------------------------|
-| 1 | 01 — LOI        | Still writing the application         |
-| 2 | 02 — Approval   | Applied, waiting for decision         |
-| 3 | 03 — Planning ✓ | Award confirmed, MPA in progress      |
-| 4 | 04 — Execution  | Project already underway              |
+| # | Phase                  | Done when                                               |
+|---|------------------------|---------------------------------------------------------|
+| 1 | 01 — Plan ✓            | Brief approved, date fixed, budget and owners agreed    |
+| 2 | 02 — Build-out         | Everything booked, made or confirmed                    |
+| 3 | 03 — Final countdown   | Readiness check passed; run of show locked              |
 
-> Type a number [default: 3]:
+> Type a number [default: 1]:
 ```
 
 ---
@@ -442,7 +473,8 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
     |------|------|------|
     | ✅ | `project-state/manifest.yaml` | 3 TODOs remain (MPA date, review designates, funder contacts) |
     | ✅ | `project-state/state.json` | Phase: [selected] |
-    | ✅ | `project-state/reporting-matrix.yaml` | Seeded from [pack] defaults |
+    | ✅ | `project-state/reporting-matrix.yaml` | Seeded from [pack] defaults (`seed-pack`) |
+    | ✅ | `project-state/outbox/queue/*-seed-*` | Draft milestones and risks from the work pack — review, then adopt |
     | ✅ | `project-state/automation/tasks.yaml` | Compiled from matrix by project-automator |
     | ✅ | `project-state/logs/activity.ndjson` | `project.scaffolded` event |
     | ✅ | `.gitattributes` | `merge=union` on logs (if git model) |
@@ -456,7 +488,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
 
     | # | Action | Skill |
     |---|--------|-------|
-    | 1 | Seed milestones from proposal document | `/project-milestone-manager` |
+    | 1 | Review the seeded milestones and risks (outbox) | `/project-scaffolder adopt-seeds` after approval |
     | 2 | Add team members | `/project-state` |
     | 3 | Checkpoint to git | `/project-git checkpoint` |
     | 4 | Done for now | — |
@@ -470,6 +502,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
 | ✅     | project-state/manifest.yaml                 | 3 TODOs remain                 |
 | ✅     | project-state/state.json                    | Phase: [selected]              |
 | ✅     | project-state/reporting-matrix.yaml         | Seeded from [pack] defaults    |
+| ✅     | project-state/outbox/queue/*-seed-*         | Draft milestones + risks       |
 | ✅     | project-state/automation/tasks.yaml         | Compiled from matrix           |
 | ✅     | project-state/logs/activity.ndjson          | project.scaffolded event       |
 | ✅     | .gitattributes                              | merge=union on logs            |
@@ -479,7 +512,7 @@ Triggered immediately after the user confirms in Step 6. Write all files now.
 | ⬜     | project-state/lessons-learned/               | Empty — capture later          |
 
 Next steps:
-  **1** Seed milestones from proposal    → /project-milestone-manager
+  **1** Review seeded milestones/risks   → approve in the outbox, then adopt-seeds
   **2** Add team members                 → /project-state
   **3** Checkpoint to git                → /project-git checkpoint
   **4** Done for now
@@ -540,12 +573,48 @@ This contract existed and worked for months while documented only in the caller.
 because a callee that refuses its own documented caller is not discoverable from either side alone
 (FB-001).
 
-### `seed-matrix`
+### `seed-pack` (supersedes `seed-matrix`)
 
-`project-onboarding` also invokes `project-scaffolder seed-matrix` to seed
-`project-state/reporting-matrix.yaml` from the selected packs. Merge semantics: entries whose `id`
-already exists are left alone — an operator's edit outranks a pack default. Also undocumented until
-2026-08-21, and for the same reason.
+`project-onboarding` Chapter 8 and Step 7 above call this after the manifest is written. It runs the
+deterministic helper shipped with this skill:
+
+```bash
+python3 <this skill>/scripts/seed_pack.py seed --state project-state --actor <operator email>
+```
+
+1. **Matrix.** Merges `reporting-matrix-defaults.yaml` from every loaded pack into
+   `project-state/reporting-matrix.yaml` — primary work pack first. An entry whose `id` already exists is
+   left alone: an operator's edit outranks a pack default. Comments and other keys survive.
+2. **Seeds.** For each loaded pack that ships `seeds/milestones.yaml` or `seeds/risks.yaml`, queues one
+   DRAFT card in `outbox/queue/` with every date expression already resolved against
+   `project.start_date`, `project.end_date` and `phases.anchor_date`. A seed whose date is missing is
+   queued *undated* and the card names the missing field — it is never dated by guess.
+3. **Never** writes a live milestone, risk or KPI (KPI seeds belong to the Goals tab, decision record
+   `2026-09-24-project-types-three-axes`), and never seeds a capability pack (its enable step does).
+
+Idempotent: a re-run adds only matrix ids and seed cards that do not exist yet. `--dry-run` prints the
+plan and writes nothing. `seed-matrix` remains as an alias for callers that predate seeds: it is
+`seed_pack.py seed --no-seeds` — the matrix step only.
+
+### `adopt-seeds <card-id>`
+
+After the operator approves a seed card (it moves to `outbox/approved/`), write what it proposes:
+
+```bash
+python3 <this skill>/scripts/seed_pack.py adopt --state project-state --card <card-id> --actor <operator email>
+```
+
+Reads the YAML block in the card's artifact — so an operator who edited a date, reworded a title or
+deleted a row gets exactly that — and writes `milestones/M<NN>-<slug>.yaml` / `risks/R-<NN>-<slug>.yaml`
+numbered after the highest existing id, skipping any slug already present. Refuses a card that is still
+queued or was dismissed (review-not-author). Logs `milestone.created` / `risk.created` per entity and
+`seeds.adopted` once; marks the card `adopted_at` so a second run writes nothing.
+
+Offer it whenever a seed card is approved: *"You approved the starting milestones — write them now?"*
+
+Each adopted milestone records `seed_due` (its expression) and `seed_basis` (the start, end and anchor
+dates it was resolved against). That is what lets `project-milestone-manager reanchor()` move the plan
+when an event or launch date slips without touching anything a person has re-dated.
 
 ---
 

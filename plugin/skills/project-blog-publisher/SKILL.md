@@ -1,6 +1,6 @@
 ---
 name: project-blog-publisher
-description: "Bridge project state to the scsiwyg blog — draft progress posts from milestone completions, monthly briefs, and ad-hoc stories. Respects the MPA 30/14-day Steering Committee publication review clock before anything goes public. Use whenever the user says 'blog post about M02 completion', 'draft a progress post', 'scsiwyg', 'post this to the blog', 'publish the milestone story', 'what should we blog about', 'update the project blog', 'announce M05 publicly', 'write up this quarter', 'public post about the project', 'share with the community', or any request to publish project content beyond team-internal channels. Team-internal posts ship directly; consortium posts require consortium review; public posts require full 30/14-day SC review."
+description: "Draft blog posts from project progress for the scsiwyg blog — 'write a progress post', 'blog about M03', 'monthly update post'. Respects any publication-review window before anything goes public."
 map:
   tier: P2
   stage: generate
@@ -10,6 +10,12 @@ map:
 ---
 
 # Project Blog Publisher
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Bridge project state to the scsiwyg blog — draft progress posts from milestone completions, monthly briefs, and ad-hoc stories. Respects the MPA 30/14-day Steering Committee publication review clock before anything goes public. Use whenever the user says 'blog post about M02 completion', 'draft a progress post', 'scsiwyg', 'post this to the blog', 'publish the milestone story', 'what should we blog about', 'update the project blog', 'announce M05 publicly', 'write up this quarter', 'public post about the project', 'share with the community', or any request to publish project content beyond team-internal channels. Team-internal posts ship directly; consortium posts require consortium review; public posts require full 30/14-day SC review.
 
 ## Purpose
 

@@ -1,6 +1,6 @@
 ---
 name: tender-harvester
-description: "The collection layer of the tender package. Harvest public-sector tender opportunities from CanadaBuys (RSS/Atom + email), MERX (email), SaskTenders/GEM (email + conservative public listing polling) and bids&tenders (email + approved public search) into tender entities inside the enabling project-state/ facility. Tracks per-connector cursors and health in state/tender.json (the capability's own state file), quarantines unrecognized notification templates, honors a global per-domain politeness ledger, and writes every record through the project-state memory layer. Trigger on 'harvest tenders', 'check the tender feeds', 'what came in from CanadaBuys', 'drain the tender mailbox', 'poll SaskTenders', 'run the tender harvest', 'any new tenders', or when project-orchestrator finds a connector past its expected interval. Designed to run in scheduled sessions between interactive use."
+description: "Harvest public-sector tenders (CanadaBuys, MERX, SaskTenders, bids&tenders) — 'find tenders', 'harvest tenders', 'any new RFPs for us'. Collects opportunities for the tender pipeline."
 map:
   tier: capability
   stage: ingest
@@ -10,6 +10,12 @@ map:
 ---
 
 # tender-harvester
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The collection layer of the tender package. Harvest public-sector tender opportunities from CanadaBuys (RSS/Atom + email), MERX (email), SaskTenders/GEM (email + conservative public listing polling) and bids&tenders (email + approved public search) into tender entities inside the enabling project-state/ facility. Tracks per-connector cursors and health in state/tender.json (the capability's own state file), quarantines unrecognized notification templates, honors a global per-domain politeness ledger, and writes every record through the project-state memory layer. Trigger on 'harvest tenders', 'check the tender feeds', 'what came in from CanadaBuys', 'drain the tender mailbox', 'poll SaskTenders', 'run the tender harvest', 'any new tenders', or when project-orchestrator finds a connector past its expected interval. Designed to run in scheduled sessions between interactive use.
 
 Pull tender opportunities from configured sources and deposit them as `kind: tender` entities in the enabling facility, via the `project-state` memory layer. This skill discovers and normalizes; it does not score (`tender-qualifier`), track changes on followed tenders (`tender-monitor`), or move workflow status (`tender-pipeline`).
 

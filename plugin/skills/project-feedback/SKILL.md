@@ -1,6 +1,6 @@
 ---
 name: project-feedback
-description: "Register defects and requests against the project-state product itself. Captures reports from any source — inline user report, seed-issue curation flags on harvested signals, or an opt-in skill-error log — as feedback/FB-NNN-<slug>.yaml substrate records, triages them (dedup, in-repo verification with file:line notes, type/component/severity), and projects them to GitHub issues idempotently: first filing writes github_issue back onto the record; re-runs update, never duplicate. Sync pulls issue status back (resolved/verified) via the harvester's GitHub sweep. Use whenever the user says 'file a bug', 'log this bug', 'report an issue', 'register this feedback', 'found a plugin bug', 'the skill misbehaved', 'capture feedback from signals', 'sync feedback', 'list open feedback', or when curation flags a doc with seed-issue. Spec: docs/FEEDBACK-AND-ISSUES-SPEC.md; adopted by decision 2026-08-11-adopt-feedback-issues-spec. Trigger: /project-feedback"
+description: "Report a bug or request against project-state itself — 'file feedback', 'this skill got it wrong', 'feature request for project-state'. Records FB-NNN entries."
 map:
   tier: P3
   stage: keep
@@ -9,6 +9,12 @@ map:
 ---
 
 # Project Feedback
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Register defects and requests against the project-state product itself. Captures reports from any source — inline user report, seed-issue curation flags on harvested signals, or an opt-in skill-error log — as feedback/FB-NNN-<slug>.yaml substrate records, triages them (dedup, in-repo verification with file:line notes, type/component/severity), and projects them to GitHub issues idempotently: first filing writes github_issue back onto the record; re-runs update, never duplicate. Sync pulls issue status back (resolved/verified) via the harvester's GitHub sweep. Use whenever the user says 'file a bug', 'log this bug', 'report an issue', 'register this feedback', 'found a plugin bug', 'the skill misbehaved', 'capture feedback from signals', 'sync feedback', 'list open feedback', or when curation flags a doc with seed-issue. Spec: docs/FEEDBACK-AND-ISSUES-SPEC.md; adopted by decision 2026-08-11-adopt-feedback-issues-spec. Trigger: /project-feedback
 
 ## Purpose
 

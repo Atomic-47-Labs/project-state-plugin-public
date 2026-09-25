@@ -1,6 +1,6 @@
 ---
 name: project-external-comms
-description: Generic external-communication review pipeline — proposed publications, presentations, press releases, blog posts crossing the audience boundary. Reads review-window-by-content-class from a profile in the active pack. PIC pack ships profile that reproduces v1.x MPA-mandated 30-day full-publication and 14-day abstract review with PIC + ISED funding acknowledgement enforcement and patent-filing-delay coordination. Other packs ship corporate-PR profiles, customer-confidentiality profiles, etc. Use whenever the user says 'we want to publish', 'submit an abstract', 'press release', 'media interview', 'external talk', 'publication review', 'clear for external' — or any request to route external content through review. Replaces v1.x project-publications.
+description: "Review outgoing publications, talks, press releases or posts before they go public — 'can we publish this', 'review this press release', 'publication review'. Review windows come from the pack."
 map:
   tier: P3
   stage: generate
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project External Comms (v2.0 — was project-publications)
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Generic external-communication review pipeline — proposed publications, presentations, press releases, blog posts crossing the audience boundary. Reads review-window-by-content-class from a profile in the active pack. PIC pack ships profile that reproduces v1.x MPA-mandated 30-day full-publication and 14-day abstract review with PIC + ISED funding acknowledgement enforcement and patent-filing-delay coordination. Other packs ship corporate-PR profiles, customer-confidentiality profiles, etc. Use whenever the user says 'we want to publish', 'submit an abstract', 'press release', 'media interview', 'external talk', 'publication review', 'clear for external' — or any request to route external content through review. Replaces v1.x project-publications.
 
 The publication-review-clock pattern, generalized. Anything that crosses the project's audience boundary — papers, abstracts, presentations, press releases, blog posts marked public, marketing-side announcements — runs through this skill's review pipeline. The clock window and review authority come from the profile loaded by the active pack.
 

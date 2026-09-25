@@ -26,6 +26,21 @@ pack:
     - "Master Project Agreement template"
   released: "2026-04-27"
   maturity: "production"
+  axis: accountability   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: true
+  label: "Protein Industries Canada (PCAIS)"
+  blurb: "PIC-funded consortium: quarterly claims, Steering Committee, publication and IP review."
+  signals:
+    - "Protein Industries Canada"
+    - "PCAIS"
+    - "PIC PM Guide"
+    - "Master Project Agreement"
 
 provides:
   profiles:
@@ -74,3 +89,6 @@ defaults:
   # An MPA has an end date, a final report, and a holdback release. Structurally barred
   # from continuous anyway: grant-default declares no cycles_back_to.
   lifecycle: terminal
+  # preset is a suggestion too: it pre-fills the rhythm question and project-scaffolder Step 2
+  # resolution step 2. The facility\'s phases.preset always wins.
+  preset: grant-default

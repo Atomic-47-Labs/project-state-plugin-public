@@ -1,6 +1,6 @@
 ---
 name: intel-battlecard
-description: "The intel capability's battlecard builder (OCI §7.2 battlecard-builder). Turns claims about one competitor AND about us (the self entity) into compact seller guidance: one-line positioning, when they win / when we win, differentiators that pass the three-part test (true ≥ medium confidence · relevant to this audience's criteria · provable by a doc, demo step or customer ref), discovery questions, traps, objection handling, proof points, a required avoid-saying list, and a talk track — every material line carrying claim ids, health.unsourced_lines == 0. Reads claims, never a profile's prose; refreshes only the stale claims it needs. Usage: 'intel-battlecard INT-E-NNN [--audience id]'. Trigger on 'build a battlecard for X', 'how do we position against X', 'what should reps say when X comes up', 'turn this profile into a battlecard', or the digest's intel.battlecard-behind. Refuses without a self entity with claims. Writes intel/battlecards/ through project-state; never edits a generated card."
+description: "Build or refresh a competitor battlecard — 'battlecard for X', 'how do we win against X', 'objection handling vs X'. Positioning, when they/we win, differentiators and traps, from cited claims."
 map:
   tier: capability
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # intel-battlecard — evidence into seller guidance
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The intel capability's battlecard builder (OCI §7.2 battlecard-builder). Turns claims about one competitor AND about us (the self entity) into compact seller guidance: one-line positioning, when they win / when we win, differentiators that pass the three-part test (true ≥ medium confidence · relevant to this audience's criteria · provable by a doc, demo step or customer ref), discovery questions, traps, objection handling, proof points, a required avoid-saying list, and a talk track — every material line carrying claim ids, health.unsourced_lines == 0. Reads claims, never a profile's prose; refreshes only the stale claims it needs. Usage: 'intel-battlecard INT-E-NNN [--audience id]'. Trigger on 'build a battlecard for X', 'how do we position against X', 'what should reps say when X comes up', 'turn this profile into a battlecard', or the digest's intel.battlecard-behind. Refuses without a self entity with claims. Writes intel/battlecards/ through project-state; never edits a generated card.
 
 A battlecard is a projection of claims, optimized for decisions, not completeness. It is
 regenerated, never edited; if a human disagrees with a line, the correction goes into the

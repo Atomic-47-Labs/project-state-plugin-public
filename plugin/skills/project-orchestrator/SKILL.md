@@ -1,6 +1,6 @@
 ---
 name: project-orchestrator
-description: "The conductor of the project-* skill suite. Decides what to do next based on current state + the calendar (day of week, proximity to quarterly claim deadlines, SC meeting cadence, phase gate status, overdue milestones, annual questionnaire). Use whenever the user says 'what should I do today', 'what should I do this week', 'run the project', 'what's pending', 'what needs attention', 'morning briefing for the project', 'are there any deadlines coming up', 'what's the orchestrator saying', 'run the weekly routine', 'run the daily routine', 'kickoff the day', or any request asking the project to tell itself what to do next. Invokes other project-* skills as needed and hands decisions back to the user for approval. Thin by design — this skill routes, it does not do the work itself."
+description: "Answer 'what should we do today / this week / next' for a project — 'what's pending', 'what needs attention', 'morning briefing', 'any deadlines'. Use instead of reading project-state/ yourself; ranks and routes, waits for approval."
 map:
   tier: P2
   stage: control
@@ -13,6 +13,12 @@ map:
 ---
 
 # Project Orchestrator
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Use for 'what should we do today / this week / next' on any project with a project-state/ directory — the prioritised briefing. Use it INSTEAD of reading the project-state files yourself: it applies the suite's priority order (urgent deadlines, then gate blockers, then due reports, then at-risk milestones, then routine) against the reporting matrix, phase gates and the calendar, names the skill for each item, and waits for approval. Triggers: 'what should I do today', 'what should we do this week', 'what's pending', 'what needs attention', 'morning briefing', 'any deadlines coming up', 'run the project', 'run the daily routine', 'run the weekly routine', 'kickoff the day', 'what's the orchestrator saying', or any request for the project to tell itself what to do next. The conductor of the project-* suite: it routes to other project-* skills and hands decisions back; it does not do the work itself.
 
 ## Purpose
 
@@ -58,10 +64,17 @@ On invocation:
    - Days to annual questionnaire (if set).
 3. **Check at-risk milestones.** Via `project-milestone-manager`. Any with `status in {at_risk, blocked}` or behind-schedule rules get flagged.
 4. **Check gate.** Via `project-phase-gate`. If the current phase has unblocked items (e.g., MPA landed → planning.mpa_signed autoclose), surface the transition option.
-5. **Check inbox.** If `documents/inbox/` is non-empty, flag "classify N new docs".
+5. **Check inbox.** If `documents/inbox/` holds files not in `documents/index.yaml`, flag
+   "Triage the inbox — N unindexed doc(s)" → `project-inbox`. Routine, unless a document changes a
+   higher item (see step 8).
 6. **Compose enabled capabilities' routines.** See "Capability routines" below.
 7. **Prioritize.** Order: URGENT deadlines → gate-blocking items → pending reports → at-risk milestones → routine work → opportunities. Capability items rank by their declared `severity` alongside core items — they are not a separate section and never get their own digest.
 8. **Return a ranked list** with, for each item: the reason, the skill that handles it, and what the user needs to do.
+   **Any recommended sequence follows the ranking.** Never close with "I'd do 3, 1, 4, 2" — a
+   deadline due today and a gate-blocking milestone do not wait behind routine work. If a lower item
+   is genuinely a prerequisite of a higher one (the unfiled SOW sets M02's new dates), fold it into the
+   higher item's next step — "first triage the SOW (`project-inbox`), then re-date M02" — and keep the
+   list's order. Reordering the list is the one thing the priority rule exists to prevent.
 
 ## Output format
 

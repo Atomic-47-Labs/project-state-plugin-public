@@ -1,6 +1,6 @@
 ---
 name: project-educator
-description: "Inline project education — the teaching concierge for audiences new to project management. Teaches through this project's own state: names what is working and what is quietly broken in plain language, explains any entity or practice in the audience's own vocabulary, and recommends the next single practice to adopt. Use when the user says 'how healthy is this project', 'explain this project to me', 'what is a risk register and why do we care', 'why does this matter', 'teach me as we go', 'what should we learn to do next', 'give me the literacy briefing', 'turn education mode on/off', 'stop explaining that', or '/project-educator'. Reads manifest, milestones, risks, decisions, objectives, changes, logs, reporting-matrix and education/profile.yaml; writes education/profile.yaml and education/log.ndjson. Do not use to generate status reports (project-status-reporter) or to capture retrospectives (project-lessons) — this skill teaches the practice, it does not do the reporting."
+description: "Explain project management through this project's own state — 'explain what a risk register is here', 'what's working and what's broken', 'teach me', 'why does this matter'. Plain language, for newcomers."
 plugin: "project-state-suite"
 tier: P2
 depends_on:
@@ -34,6 +34,12 @@ map:
 ---
 
 # Project Educator
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Inline project education — the teaching concierge for audiences new to project management. Teaches through this project's own state: names what is working and what is quietly broken in plain language, explains any entity or practice in the audience's own vocabulary, and recommends the next single practice to adopt. Use when the user says 'how healthy is this project', 'explain this project to me', 'what is a risk register and why do we care', 'why does this matter', 'teach me as we go', 'what should we learn to do next', 'give me the literacy briefing', 'turn education mode on/off', 'stop explaining that', or '/project-educator'. Reads manifest, milestones, risks, decisions, objectives, changes, logs, reporting-matrix and education/profile.yaml; writes education/profile.yaml and education/log.ndjson. Do not use to generate status reports (project-status-reporter) or to capture retrospectives (project-lessons) — this skill teaches the practice, it does not do the reporting.
 
 ## Purpose
 

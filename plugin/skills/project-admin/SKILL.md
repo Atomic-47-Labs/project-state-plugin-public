@@ -1,6 +1,6 @@
 ---
 name: project-admin
-description: "Manage project-state projects in the local-first + GitHub-hub model. Sub-actions: create (scaffold a new project-state substrate, create its private GitHub state repo, push, and register it in the Vercel viewer's GITHUB_STATE_REPOS map), pull (clone an existing project's state repo to a local working copy), list (show registered projects from the viewer registry). Use when the user says 'create a new project', 'new project-state', 'pull down project X', 'clone the state for X', 'check out a project', 'list projects', 'what projects exist', 'register a project with the dashboard', or any request to create, fetch, or enumerate project-state projects. Members and roles are managed via GitHub repo permissions, not here."
+description: "Create, pull or list project-state projects in the local-first + GitHub-hub model — 'create a new project repo', 'pull project X', 'list our projects', 'register this project'."
 map:
   tier: P3
   stage: keep
@@ -10,6 +10,12 @@ map:
 ---
 
 # Project Admin
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Manage project-state projects in the local-first + GitHub-hub model. Sub-actions: create (scaffold a new project-state substrate, create its private GitHub state repo, push, and register it in the Vercel viewer's GITHUB_STATE_REPOS map), pull (clone an existing project's state repo to a local working copy), list (show registered projects from the viewer registry). Use when the user says 'create a new project', 'new project-state', 'pull down project X', 'clone the state for X', 'check out a project', 'list projects', 'what projects exist', 'register a project with the dashboard', or any request to create, fetch, or enumerate project-state projects. Members and roles are managed via GitHub repo permissions, not here.
 
 Manage project-state **projects** in the local-first model: local substrate is
 authoritative, a per-project GitHub repo is the hub, and the Vercel viewer reads

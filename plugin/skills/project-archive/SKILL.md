@@ -1,6 +1,6 @@
 ---
 name: project-archive
-description: Project closeout and archival drive. Generic core handles final reports, lessons summary assembly, archive directory creation, audit-trail finalization. Funder/customer-specific closeout items (PIC final reports, FTE confirmation, holdback release, MPA close) come from the active pack's archive profile. PIC pack ships the v1.x closeout flow. Client-services pack ships customer-final-deliverable + sunset workflow. Use whenever the user says 'close the project', 'closeout', 'final report', 'wrap up', 'submit final reports', 'archive the project', 'ready to close', 'holdback release', 'project end', or any request related to the closeout phase.
+description: "Close out and archive a project — 'close the project', 'archive this project', 'final report', 'closeout checklist'. Assembles final reports and lessons, freezes the audit trail; funder specifics come from the pack."
 map:
   tier: P3
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # Project Archive (v2.0 — generic core + pack-driven closeout)
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Project closeout and archival drive. Generic core handles final reports, lessons summary assembly, archive directory creation, audit-trail finalization. Funder/customer-specific closeout items (PIC final reports, FTE confirmation, holdback release, MPA close) come from the active pack's archive profile. PIC pack ships the v1.x closeout flow. Client-services pack ships customer-final-deliverable + sunset workflow. Use whenever the user says 'close the project', 'closeout', 'final report', 'wrap up', 'submit final reports', 'archive the project', 'ready to close', 'holdback release', 'project end', or any request related to the closeout phase.
 
 Drives the closeout phase: final reports, lessons-learned summary, IP final reporting, financial reconciliation, archive directory creation, audit-trail finalization.
 

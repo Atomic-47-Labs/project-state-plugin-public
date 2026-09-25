@@ -26,6 +26,7 @@ pack:
     - "Income Tax Act s.37 (SR&ED expenditures)"
   released: "2026-08-17"
   maturity: "beta"
+  axis: capability   # bundled by a capability; never listed in a project pack picker (PROJECT-TYPES-SPEC section 3)
 
 provides:
   profiles:

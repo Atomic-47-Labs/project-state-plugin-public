@@ -23,6 +23,7 @@ pack:
     - "decision 2026-09-21-portfolio-capability (portfolio is a capability, not a facility)"
   released: "2026-09-21"
   maturity: "starter"
+  axis: capability   # bundled by a capability; never listed in a project pack picker (PROJECT-TYPES-SPEC section 3)
 
 provides:
   reporting_matrix_defaults: reporting-matrix-defaults.yaml

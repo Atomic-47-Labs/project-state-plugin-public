@@ -1,6 +1,6 @@
 ---
 name: intel-onboarding
-description: "Guided enablement of the intel capability for a project. Gathers the REQUIRED focus (the harvester's relevance lens), entity and mandate types, and staleness threshold conversationally; calls the memory layer's `enable intel` (manifest block, intel/ directories, agenda, state/intel.json); then optionally seeds 3-5 starter entities and first P0 agenda questions, proposed and confirmed before writing. Also 'intel-onboarding competitive' — the competitive layer's setup (docs/INTEL-CI-SPEC.md §4): declares the self entity (us), confirms which competitor entities are in scope, optional audiences and half-life overrides, writes capabilities.intel.competitive. Trigger on 'enable intel', 'set up intelligence for this project', 'turn on the intel capability', 'start tracking the ecosystem', 'set up competitive intelligence', 'declare our self entity', or the digest's intel.not-initialized, intel.no-focus or intel.no-self. Refuses to enable without a focus. Routes every write through project-state."
+description: "Set up the intel (competitive intelligence) capability on a project — 'enable intel', 'set up competitive intelligence', 'onboard intel'. Asks for the focus, entity types and staleness threshold."
 map:
   tier: capability
   stage: ingest
@@ -10,6 +10,12 @@ map:
 ---
 
 # intel-onboarding — the enable flow
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Guided enablement of the intel capability for a project. Gathers the REQUIRED focus (the harvester's relevance lens), entity and mandate types, and staleness threshold conversationally; calls the memory layer's `enable intel` (manifest block, intel/ directories, agenda, state/intel.json); then optionally seeds 3-5 starter entities and first P0 agenda questions, proposed and confirmed before writing. Also 'intel-onboarding competitive' — the competitive layer's setup (docs/INTEL-CI-SPEC.md §4): declares the self entity (us), confirms which competitor entities are in scope, optional audiences and half-life overrides, writes capabilities.intel.competitive. Trigger on 'enable intel', 'set up intelligence for this project', 'turn on the intel capability', 'start tracking the ecosystem', 'set up competitive intelligence', 'declare our self entity', or the digest's intel.not-initialized, intel.no-focus or intel.no-self. Refuses to enable without a focus. Routes every write through project-state.
 
 Make the intel capability active for one project, with enough declared context that the
 harvester can judge relevance from day one. Enable without a focus is refused — that is

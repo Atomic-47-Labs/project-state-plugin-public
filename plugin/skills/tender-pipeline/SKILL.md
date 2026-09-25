@@ -1,6 +1,6 @@
 ---
 name: tender-pipeline
-description: "The workflow layer of the tender package. Move tenders through the pursuit lifecycle (discovered → preliminary_match → documents_required → under_review → qualified → bid_no_bid_pending → pursue/watch/partner_opportunity/dismissed → preparing_response → submitted → awarded/unsuccessful), open and record bid/no-bid decisions as ordinary facility decision entities, create pursuit tasks and deadline milestones, run the dismissal flow with reason codes, and on a win invoke project-scaffolder to spawn the delivery project. Trigger on 'move t-2026-0041 to under review', 'open a bid/no-bid on', 'record the decision', 'dismiss this tender', 'assign this tender to', 'we won', 'we lost', 'mark submitted', 'what's in the pipeline', 'set next action', or when tender-qualifier/tender-monitor suggest a transition."
+description: "Move tenders through the pursuit pipeline — 'show the tender pipeline', 'mark this tender pursue', 'bid/no-bid on X', 'what tenders are due'. Tracks status from discovered to submitted."
 map:
   tier: capability
   stage: keep
@@ -10,6 +10,12 @@ map:
 ---
 
 # tender-pipeline
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The workflow layer of the tender package. Move tenders through the pursuit lifecycle (discovered → preliminary_match → documents_required → under_review → qualified → bid_no_bid_pending → pursue/watch/partner_opportunity/dismissed → preparing_response → submitted → awarded/unsuccessful), open and record bid/no-bid decisions as ordinary facility decision entities, create pursuit tasks and deadline milestones, run the dismissal flow with reason codes, and on a win invoke project-scaffolder to spawn the delivery project. Trigger on 'move t-2026-0041 to under review', 'open a bid/no-bid on', 'record the decision', 'dismiss this tender', 'assign this tender to', 'we won', 'we lost', 'mark submitted', 'what's in the pipeline', 'set next action', or when tender-qualifier/tender-monitor suggest a transition.
 
 The only skill that changes `workflow.*` on a tender. Everything it does is a validated state transition through the `project-state` memory layer, so the kanban, activity log, and reports stay truthful by construction.
 

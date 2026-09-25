@@ -1,6 +1,6 @@
 ---
 name: project-website-publisher
-description: Build and deploy a full project website (Next.js 16 App Router on Vercel/Netlify) that surfaces every dimension of the project — dashboard, Gantt, milestones, risks, decisions, people, blog (scsiwyg), wiki (scsiwyg), calendar, reporting documents, and about pages. Reads project-state/ YAML/JSON/MD at runtime via server components with ISR revalidation. Use whenever the user says "publish to the site", "update the project website", "deploy", "regenerate the website", "rebuild and deploy", "init the project website", "what URL for [doc]", or any request to surface project state on the project URL.
+description: "Build and deploy the project website — 'build the project site', 'publish the website', 'update the public dashboard'. Next.js on Vercel/Netlify, from project-state/."
 map:
   tier: P2
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # Project Website Publisher
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Build and deploy a full project website (Next.js 16 App Router on Vercel/Netlify) that surfaces every dimension of the project — dashboard, Gantt, milestones, risks, decisions, people, blog (scsiwyg), wiki (scsiwyg), calendar, reporting documents, and about pages. Reads project-state/ YAML/JSON/MD at runtime via server components with ISR revalidation. Use whenever the user says "publish to the site", "update the project website", "deploy", "regenerate the website", "rebuild and deploy", "init the project website", "what URL for [doc]", or any request to surface project state on the project URL.
 
 This skill initialises, updates, and deploys a full project website from the `templates/website/` App Router starter. The website reads `project-state/` at request time — there is no static content pipeline and no rebuild needed for data changes.
 

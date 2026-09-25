@@ -1,9 +1,15 @@
 ---
 name: project-intake
-description: "Doc-driven fast-path init: drop documents (proposal, MPA, SOW, milestone schedule, grant agreement) and pick a pack — the skill extracts what it can, fills manifest.yaml and reporting-matrix.yaml from pack defaults + doc extraction, shows one confirmation screen, writes everything, then calls project-automator generate so the schedule is immediately ready. No interview, no wizard steps. Trigger on: 'intake this project', 'set up from docs', 'configure from documents', '/project-intake', 'quick init', 'init from proposal'. Use instead of project-scaffolder/project-onboarding when documents are available and fast setup is preferred."
+description: "Set up a project fast from its documents — 'set up from these docs', 'intake this project', 'init from the proposal/SOW'. Infers the work type and packs, fills manifest and matrix, one confirmation."
 ---
 
 # project-intake
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Doc-driven fast-path init: drop documents (proposal, MPA, SOW, milestone schedule, grant agreement) and pick a pack — the skill extracts what it can, fills manifest.yaml and reporting-matrix.yaml from pack defaults + doc extraction, shows one confirmation screen, writes everything, then calls project-automator generate so the schedule is immediately ready. No interview, no wizard steps. Trigger on: 'intake this project', 'set up from docs', 'configure from documents', '/project-intake', 'quick init', 'init from proposal'. Use instead of project-scaffolder/project-onboarding when documents are available and fast setup is preferred.
 
 ## Purpose
 
@@ -64,28 +70,41 @@ If no documents are provided: ask once — "Drop your project documents here (pr
 
 If user skips: proceed with pack defaults and empty manifest fields (valid-but-thin).
 
-### 1b. Infer or select pack
+### 1b. Infer or select packs
 
-Try to infer the pack from documents before asking:
+Infer from the documents before asking, on the three axes of `docs/PROJECT-TYPES-SPEC.md`: one **work
+type** (`axis: work`), any **accountability** packs, and the phase preset that follows from them.
 
-| Signal in documents | Inferred pack |
-|--------------------|---------------|
-| "Protein Industries Canada", "PCAIS", "PIC" | `pic-pcais` |
-| "NSERC", "IRAP", "Mitacs", "CFI", "SIF" | `grant-canada` |
+**The signals live in the packs, not here.** Read every `packs/*/manifest.yaml` and match the documents
+against each pack's `picker.signals` — then use judgement; the phrases are hints, not a keyword gate.
+Consider only `picker.listed: true` packs unless the operator names another. Never consider an
+`axis: capability` pack. (This section used to carry its own signal table, which is how a pack's
+presence in the product and its presence in intake drifted apart.) One signal stays here because it is a
+capability hand-off, not a pack:
+
+| Signal in documents | Result |
+|--------------------|--------|
 | "SR&ED", "T661", "experimental development" | *(not a pack)* → set `sred_interest: yes` and hand off to `sred-onboarding` after intake completes |
-| Sprint cadence, story points, backlog | `agile-default` |
-| "board of directors", "investors", "cap table" | `board-investor` |
-| SOW, "Statement of Work", "client deliverables" | `client-services` |
 
-If a pack is inferred: present it as a one-line confirmation — "Detected: pic-pcais (Protein Industries Canada). Correct?" — and proceed unless corrected. Do not run a pack selection wizard.
+If packs are inferred: present them as one confirmation line —
+"Detected: **Event** (work-event) for **Partner Summit**, reporting to **your exec sponsor**
+(sponsor-internal). Correct?" — and proceed unless corrected. Do not run a selection wizard. When no
+accountability signal is found, assume `sponsor-internal` (decision D3) and say so in the same line.
 
-If no pack is inferable and none was provided: show a compact pack list and ask for selection (not a wizard — a single prompt):
+If no work type is inferable and none was provided: show one compact prompt generated from the listed
+packs' `picker.label`s, grouped by axis, and ask once:
 ```
-Pack options: pic-pcais / grant-canada / client-services / board-investor / agile-default / open-source / none
-Which fits? (you can pick multiple, e.g. "grant-canada agile-default"):
+What is this?   General project / Campaign or launch / Event / Operating cycle / Software product
+Reports to?     My manager or exec sponsor ✓ / A client / Board or investors / Canadian grant / PIC (PCAIS) / Just me
+Pick one of the first and any of the second (e.g. "event, sponsor, board"):
 ```
 
-Multiple packs are additive — load all selected packs' reporting-matrix-defaults.yaml.
+Then take the preset from the primary work pack's `defaults.preset` (ask only when none is declared),
+and ask each `asks:` entry the loaded packs declare that the documents did not answer — a countdown
+preset's `phases.anchor_date` above all. Never guess a date.
+
+Multiple packs are additive — `project-scaffolder seed-pack` loads every selected pack's
+reporting-matrix defaults and queues its seeds for review.
 
 **SR&ED is deliberately absent from the pack list.** `sred-canada` exists, but it is the *bundled*
 pack of the `sred` capability and is loaded by that capability's enable step, not selected here.
@@ -105,7 +124,8 @@ Run the extraction pass. Do not ask questions during extraction. Extract:
 - `project.start_date` — YYYY-MM-DD (look for: "project start", "commencement date", "effective date")
 - `project.end_date` — YYYY-MM-DD
 - `project.budget_total_cad` — total budget figure if present (optional, skip if not found)
-- `project.kind` — infer: grant_consortium | client_engagement | startup | open_source | generic
+- `project.kind` — the primary work pack id from §1b (`work-general`, `work-campaign`, `work-event`,
+  `work-ops-cycle`, `agile-default`, …). Legacy free-text values are no longer written.
 
 **Milestones** — for each milestone found:
 - `id` — assign sequentially M01, M02... if not already numbered
@@ -290,7 +310,7 @@ fields:
 
 Append to `project-state/logs/activity.ndjson`:
 ```json
-{"ts":"[ISO-8601]","event":"project.intake.completed","actor":"project-intake","data":{"docs_processed":N,"fields_extracted":N,"gaps":N,"packs":[...],"schedule_compiled":true}}
+{"ts":"[ISO-8601]","event":"project.intake.completed","actor":"<actor>","data":{"docs_processed":N,"fields_extracted":N,"gaps":N,"packs":[...],"schedule_compiled":true}}
 ```
 
 ### 3h. Git initialization

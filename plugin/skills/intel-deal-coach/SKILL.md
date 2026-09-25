@@ -1,6 +1,6 @@
 ---
 name: intel-deal-coach
-description: "The intel capability's deal coach (OCI deal-compete-coach) — the highest-value competitive skill: evidence plus one live deal's context → what to do next in that opportunity. Reads deal context in competitive.deal_context order: a tender entity when the ref is a tender id, intel/deals/<ref>/context.md, inbox documents tagged with the ref, a CRM only through a deals.read connector. Produces a deal brief — deal read, what matters most, competitive dynamic, explicit vs inferred criteria, our best angle, risks and moves ranked (action · rationale · intended outcome), questions for the next call, talk track, proof to bring, do-not, missing context, confidence — and writes what it learned (objections, tactics) back as reported claims. Usage: 'intel-deal-coach <deal-ref> [--competitor INT-E-NNN]'. Trigger on 'help me win this deal against X', 'how do I handle X at <account>', 'prep me for the competitive call', 'review this deal and tell me how to position'. Never fabricates deal facts; names what it lacks."
+description: "Coach a live deal against competitors — 'we're up against X on the Acme deal', 'how do we win this opportunity', 'deal coach'. Combines intel evidence with the deal's context into next moves."
 map:
   tier: capability
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # intel-deal-coach — evidence plus this deal, into the next move
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The intel capability's deal coach (OCI deal-compete-coach) — the highest-value competitive skill: evidence plus one live deal's context → what to do next in that opportunity. Reads deal context in competitive.deal_context order: a tender entity when the ref is a tender id, intel/deals/<ref>/context.md, inbox documents tagged with the ref, a CRM only through a deals.read connector. Produces a deal brief — deal read, what matters most, competitive dynamic, explicit vs inferred criteria, our best angle, risks and moves ranked (action · rationale · intended outcome), questions for the next call, talk track, proof to bring, do-not, missing context, confidence — and writes what it learned (objections, tactics) back as reported claims. Usage: 'intel-deal-coach <deal-ref> [--competitor INT-E-NNN]'. Trigger on 'help me win this deal against X', 'how do I handle X at <account>', 'prep me for the competitive call', 'review this deal and tell me how to position'. Never fabricates deal facts; names what it lacks.
 
 A static library cannot do this; it is what the competitive layer exists for. The output is
 deal-shaped, not library-shaped: if the brief would read the same for any deal against this

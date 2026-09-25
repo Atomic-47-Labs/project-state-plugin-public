@@ -1,6 +1,6 @@
 ---
 name: project-review-meeting
-description: Generic recurring review-meeting lifecycle — schedule, agenda, pre-read pack, run/minutes, action-item filing. Reads name, attendees, cadence, agenda template, notice/minutes-distribution windows from a profile YAML in the active pack. The PIC pack ships a profile that reproduces v1.x Steering Committee behavior (Appendix A agenda, 5-business-day notice + 5-business-day minutes, four designate roles, quarterly minimum, PIC PM as non-voting). Other packs ship board-meeting, customer QBR, sprint-retro profiles. Use whenever the user says 'schedule the next [SC/board/QBR/retro]', 'review meeting', 'meeting pack', 'meeting agenda', 'distribute minutes', 'action items from the meeting', or any request to handle a recurring review meeting. Replaces v1.x project-sc-meeting; that name remains an alias if the PIC pack is loaded.
+description: "Run the recurring review meeting — steering committee, QBR, board, steering review, retro — 'prepare the SC pack', 'agenda for the review', 'file the minutes'. Shape comes from the pack's profile."
 map:
   tier: P2
   stage: generate
@@ -12,6 +12,12 @@ map:
 ---
 
 # Project Review Meeting (v2.0 — was project-sc-meeting)
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Generic recurring review-meeting lifecycle — schedule, agenda, pre-read pack, run/minutes, action-item filing. Reads name, attendees, cadence, agenda template, notice/minutes-distribution windows from a profile YAML in the active pack. The PIC pack ships a profile that reproduces v1.x Steering Committee behavior (Appendix A agenda, 5-business-day notice + 5-business-day minutes, four designate roles, quarterly minimum, PIC PM as non-voting). Other packs ship board-meeting, customer QBR, sprint-retro profiles. Use whenever the user says 'schedule the next [SC/board/QBR/retro]', 'review meeting', 'meeting pack', 'meeting agenda', 'distribute minutes', 'action items from the meeting', or any request to handle a recurring review meeting. Replaces v1.x project-sc-meeting; that name remains an alias if the PIC pack is loaded.
 
 Lifecycle for any recurring review meeting where decisions get made, status gets reported, and action items get filed. Steering Committees are the grant-world case; board meetings, customer QBRs, sprint retros, exec reviews, and partner check-ins are others.
 

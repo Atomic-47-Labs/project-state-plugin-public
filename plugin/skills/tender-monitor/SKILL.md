@@ -1,6 +1,6 @@
 ---
 name: tender-monitor
-description: "The change-detection layer of the tender package. Re-check followed tenders across their sources (CanadaBuys watch feeds, listing re-fetches, amendment emails flagged by tender-harvester), diff against stored state, and emit typed change events to tenders/events.ndjson and the activity log: tender.amended, tender.deadline.changed, tender.document.revised, tender.cancelled, tender.awarded. Trigger on 'check for amendments', 'any changes on the tenders we're watching', 'monitor t-2026-0041', 'follow this tender', 'did the closing date move', 'stop following', or when tender-harvester flags amendment notifications. Every material change carries previous value, new value, and an evidence URL."
+description: "Watch followed tenders for changes — 'any amendments on the tenders we follow', 'check tender updates', 'did the closing date move'. Diffs sources and flags changes."
 map:
   tier: capability
   stage: ingest
@@ -10,6 +10,12 @@ map:
 ---
 
 # tender-monitor
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The change-detection layer of the tender package. Re-check followed tenders across their sources (CanadaBuys watch feeds, listing re-fetches, amendment emails flagged by tender-harvester), diff against stored state, and emit typed change events to tenders/events.ndjson and the activity log: tender.amended, tender.deadline.changed, tender.document.revised, tender.cancelled, tender.awarded. Trigger on 'check for amendments', 'any changes on the tenders we're watching', 'monitor t-2026-0041', 'follow this tender', 'did the closing date move', 'stop following', or when tender-harvester flags amendment notifications. Every material change carries previous value, new value, and an evidence URL.
 
 Notice what changed on tenders the facility cares about, record it durably, and let the notifier escalate. Monitoring is per-tender (`monitoring.followed: true`), automatically enabled when a tender reaches `under_review` or later, or manually via "follow".
 

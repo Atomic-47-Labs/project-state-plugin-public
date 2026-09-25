@@ -1,6 +1,6 @@
 ---
 name: project-phase-gate
-description: Manage lifecycle phase transitions for any project. v2.0 supports user-defined phase sets via presets in templates/phase-presets/ — grant-default (LOI→Approval→Planning→Execution→Closeout→Archive), agile-default (Discovery→Build-loops→Hardening→Release), waterfall-default, client-engagement-default (Discovery→Proposal→Engagement→Wrap), open-source-default (Incubation→Active→Maintained→Archived), or custom. Active pack can override gate-in/gate-out criteria per phase. Enforces required artifacts; refuses to transition if gate artifacts missing. v2.1 adds the lifecycle declaration (terminal | continuous) and the increment layer for facilities that continue past closeout — opening, closing, and freezing increments so phase re-entry never clobbers a prior pass's gate evidence. Use whenever the user says 'what phase are we in', 'can we move to execution', 'what's blocking the gate', 'transition to the next phase', 'gate status', 'gate checklist', 'this project doesn't end', 'we shipped v1 but there's a v1.1', 'close the increment', 'start the next increment', 'what did this closeout close', 'make this continuous', 'the project continues after closeout'.
+description: "Check or move the project's phase — 'what phase are we in', 'can we move to the next phase', 'what's blocking the gate', 'gate checklist'. Refuses to transition while gate criteria are unmet."
 map:
   tier: P1
   stage: keep
@@ -12,17 +12,29 @@ map:
 
 # Project Phase Gate (v2.1 — user-defined phases, terminal or continuous)
 
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Manage lifecycle phase transitions for any project. Phase ladders come from presets in templates/phase-presets/ — grant, agile, waterfall, client-engagement, open-source, stage-gate, countdown (back from phases.anchor_date), cycle (one increment per period) or custom. Active pack can override gate-in/gate-out criteria per phase. Enforces required artifacts; refuses to transition if gate artifacts missing. v2.1 adds the lifecycle declaration (terminal | continuous) and the increment layer for facilities that continue past closeout — opening, closing, and freezing increments so phase re-entry never clobbers a prior pass's gate evidence. Use whenever the user says 'what phase are we in', 'can we move to execution', 'what's blocking the gate', 'transition to the next phase', 'gate status', 'gate checklist', 'this project doesn't end', 'we shipped v1 but there's a v1.1', 'close the increment', 'start the next increment', 'make this continuous', 'the project continues after closeout'.
+
 Manages the lifecycle phase transitions of a project. Each phase has a gate-in (what must be true to enter) and a gate-out (what must be true to leave). The skill refuses transitions when gate artifacts are missing.
 
 In v2.0, phase definitions are no longer hard-coded. They come from a preset (`templates/phase-presets/<preset-name>.yaml`) selected in the manifest, with optional overrides from active pack profiles.
 
-## Available presets (ship in v2.0)
+## Available presets
+
+The rhythm axis of onboarding (docs/PROJECT-TYPES-SPEC.md §6.1) offers `agile-default`, `stage-gate-default`,
+`countdown-default` and `cycle-default` as plain answers; the rest sit behind *Advanced*.
 
 - **`grant-default`** — LOI → Approval → Planning → Execution → Closeout → Archive. Reproduces v1.x lifecycle. Used by grant projects (PIC, NSERC, NIH, EU Horizon, etc.).
 - **`agile-default`** — Discovery → Build-loops (recurring) → Hardening → Release. For engineering teams running Scrum/Kanban with release trains.
 - **`waterfall-default`** — Requirements → Design → Build → Test → Deploy → Maintain. For traditional waterfall projects.
 - **`client-engagement-default`** — Discovery → Proposal → Engagement → Wrap. For consulting/client-services work.
 - **`open-source-default`** — Incubation → Active → Maintained → Archived. For community-governed projects.
+- **`stage-gate-default`** — Define → Plan → Deliver → Review → Close. The generic ladder for work that is neither software- nor funder-shaped. Terminal.
+- **`countdown-default`** — Plan → Build-out → Final countdown → Live → Wrap. Planned backwards from a fixed date; `requires: [anchor_date]`, and `04-live` opens on `phases.anchor_date`. Terminal. Used by `work-campaign` and `work-event`.
+- **`cycle-default`** — Prepare → Execute → Review → Close, cycling back to Prepare. One increment per period (month-end close, budget cycle). Continuous-capable. Used by `work-ops-cycle`.
 - **Custom** — write your own preset YAML; reference it from `manifest.yaml` as `phases.preset: "your-preset"`.
 
 ## Pack overrides
@@ -96,9 +108,11 @@ shipped and nothing ever wrote `phases.preset`, so selecting one meant hand-edit
 
 ## `set_preset(name)`
 
-Selects the phase ladder. `name` must be a preset that exists — one of the five shipped in
+Selects the phase ladder. `name` must be a preset that exists — a file in
 `templates/phase-presets/` (`grant-default`, `agile-default`, `waterfall-default`,
-`open-source-default`, `client-engagement-default`) or a custom preset YAML the facility provides.
+`open-source-default`, `client-engagement-default`, `stage-gate-default`, `countdown-default`,
+`cycle-default`) or a custom preset YAML the facility provides. A preset that declares
+`requires: [anchor_date]` (countdown) is refused until `phases.anchor_date` is set — ask for it.
 Refuse on an unresolvable name; do not create a preset as a side effect of selecting one.
 
 **This operation is FB-003 itself.** The paragraph above under `set_lifecycle` cites that record as

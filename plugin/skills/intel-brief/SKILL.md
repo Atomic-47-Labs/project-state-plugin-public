@@ -1,6 +1,6 @@
 ---
 name: intel-brief
-description: "The intel capability's competitive brief (OCI §7.6 competitive-brief) — a recurring digest for a named audience (exec, sales, product) built from the period's change events (noise suppressed), new material claims and deal briefs: what changed · why it matters · deals affected · recommended actions · what we are watching next. Prioritizes significance over volume, states the period, carries provenance (claim and change ids on every line), and is allowed to say 'nothing material changed this period'. Usage: 'intel-brief [--period YYYY-MM] [--audience exec|sales|product]'. Trigger on 'competitive brief', 'what changed with competitors this month', 'brief leadership on the competitive picture', or the intel-monthly-competitive-brief matrix entry. Writes intel/reports/brief-YYYY-MM.md through project-state; PL review before it leaves the Project."
+description: "Write the recurring competitive brief for an audience (exec, sales, product) — 'competitive brief', 'what changed with competitors this month', 'intel digest'. Built from the period's change events and new claims."
 map:
   tier: capability
   stage: generate
@@ -11,6 +11,12 @@ map:
 ---
 
 # intel-brief — the period's competitive picture, honestly sized
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The intel capability's competitive brief (OCI §7.6 competitive-brief) — a recurring digest for a named audience (exec, sales, product) built from the period's change events (noise suppressed), new material claims and deal briefs: what changed · why it matters · deals affected · recommended actions · what we are watching next. Prioritizes significance over volume, states the period, carries provenance (claim and change ids on every line), and is allowed to say 'nothing material changed this period'. Usage: 'intel-brief [--period YYYY-MM] [--audience exec|sales|product]'. Trigger on 'competitive brief', 'what changed with competitors this month', 'brief leadership on the competitive picture', or the intel-monthly-competitive-brief matrix entry. Writes intel/reports/brief-YYYY-MM.md through project-state; PL review before it leaves the Project.
 
 A brief that always finds five things is a brief nobody reads by month three. This one
 reports what the claim set and the change events actually say about the period, and says

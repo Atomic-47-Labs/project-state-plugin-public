@@ -1,6 +1,6 @@
 ---
 name: project-state
-description: "The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Also owns the capability lifecycle — enable, disable, and validate a capability plugin (sred, tender) for this project: 'enable SR&ED', 'turn on the sred capability', 'is SR&ED enabled', 'disable the capability'. Works for any `project-state/` found by walking up from cwd."
+description: "Read or write the project's state — 'what's the project state', 'record a decision', 'log a risk', 'who is on the team', 'validate the manifest', 'enable SR&ED'. The memory layer every project-* skill writes through."
 map:
   tier: P0
   stage: keep
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project State — the memory layer
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The shared memory of a grant-funded project. Read, write, or validate project state — manifest, current phase, milestones, decisions, risks, changes, people, documents, activity log. Trigger on 'what's the project state', 'record a decision', 'log this change', 'update milestone M03', 'who is on the steering committee', 'what phase are we in', 'append to activity log', 'check state health', 'validate the manifest', or any request that reads or writes `project-state/`. Also trigger automatically whenever another project-* skill (phase-gate, document-curator, milestone-manager, status-reporter, notifier, sc-meeting, claim-prep, change-register, orchestrator) needs to read or write state — they route through this one. Also owns the capability lifecycle — enable, disable, and validate a capability plugin (sred, tender) for this project: 'enable SR&ED', 'turn on the sred capability', 'is SR&ED enabled', 'disable the capability'. Works for any `project-state/` found by walking up from cwd.
 
 ## Purpose
 
@@ -84,6 +90,25 @@ Before every write, verify the document has all common frontmatter. Refuse to wr
 
 **Validate.** Walk every YAML/JSON in `project-state/`; confirm it parses **under a duplicate-key-strict loader** and has required frontmatter. Report deviations; do not auto-fix. Full check list under "Validate the state" below.
 
+### Who the actor is (every write)
+
+`created_by`, `last_modified_by`, the lock's `actor` and the activity line's `actor` all name **the
+person responsible for this write** — resolved once per session, in this order:
+
+1. **Deposit binding:** the token's email, server-resolved (see *Substrate binding*). Never claimed.
+2. **`$PROJECT_STATE_ACTOR`**, when set. Hosts set it: the kanban, scheduled routines, eval harnesses.
+3. **The signed-in person's email**, when the host tells you who you are talking to.
+4. **`git config user.email`** of the repository holding `project-state/` — skipping no-reply
+   addresses (`*@users.noreply.github.com`, `noreply@…`), which name an account, not a person.
+5. Otherwise **ask once**: "Whose name should go on these records?" — and reuse the answer.
+
+Never write a skill name (`project-state`), `TODO`, a placeholder, or the person the record is
+*about*. On-behalf entries keep the two apart: the operator who entered it is `created_by`; the person
+who decided or owns it goes in `decided_by` / `owner` (a `people/` id). Only a run **no person
+started** — a scheduled routine, a monitor — uses a machine actor, and it says so:
+`<skill> (automated)`, e.g. `project-orchestrator (fan-out: tick)`. (Found 2026-09-24: evals wrote
+`created_by: project-state` for a decision a person dictated.)
+
 ### Write operations (with locking + logging)
 
 For every write:
@@ -92,7 +117,7 @@ For every write:
 2. **Acquire lock.** Write `<target>.lock` = `{actor, acquired, ttl_seconds: 300}`.
 3. **Read current state** of the target if it exists.
 4. **Check staleness.** If the caller passed a `base_last_modified` and the current file's `last_modified` is newer, return a CONFLICT to the caller. Do not overwrite.
-5. **Apply the change.** Update `last_modified`, `last_modified_by`, fields under change. Preserve all other fields.
+5. **Apply the change.** Update `last_modified`, `last_modified_by` (the actor, above), fields under change. Preserve all other fields. A new entity gets `created` / `created_by` the same way.
 6. **Write the file.**
 7. **Release lock.** Delete `<target>.lock`.
 8. **Append to activity log.** One NDJSON line: `ts, actor, event, id, summary`. `summary` is

@@ -1,6 +1,6 @@
 ---
 name: project-scheduler
-description: "Talk the project's cadence into place. Conversational read and write over automation/tasks.yaml — the canonical cadence registry — using the same op vocabulary and proposed-ghost-card discipline as the kanban calendar's chat surface, but without needing the app running. Use when the user says 'schedule the weekly status report', 'move the SR&ED digest to Tuesday', 'pause the Monday tracker email', 'what's scheduled', 'what fires this week', 'set up the cadence for this project', 'add milestone check-ins for M03', 'stop that recurring report', 'run the weekly report now', or any request to read or change WHEN something runs. Creates land as status:proposed ghost tasks awaiting acceptance — never live on first write. Does NOT compile from the matrix (that is project-automator), does NOT dispatch generators (that is project-orchestrator tick), and never edits reporting-matrix.yaml. All writes route through project-state. Trigger: /project-scheduler"
+description: "Change when things happen — 'move the weekly report to Fridays', 'add a monthly review', 'what's scheduled this week'. Conversational edits to automation/tasks.yaml, proposed before applied."
 map:
   tier: P2
   stage: control
@@ -9,6 +9,12 @@ map:
 ---
 
 # project-scheduler
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Talk the project's cadence into place. Conversational read and write over automation/tasks.yaml — the canonical cadence registry — using the same op vocabulary and proposed-ghost-card discipline as the kanban calendar's chat surface, but without needing the app running. Use when the user says 'schedule the weekly status report', 'move the SR&ED digest to Tuesday', 'pause the Monday tracker email', 'what's scheduled', 'what fires this week', 'set up the cadence for this project', 'add milestone check-ins for M03', 'stop that recurring report', 'run the weekly report now', or any request to read or change WHEN something runs. Creates land as status:proposed ghost tasks awaiting acceptance — never live on first write. Does NOT compile from the matrix (that is project-automator), does NOT dispatch generators (that is project-orchestrator tick), and never edits reporting-matrix.yaml. All writes route through project-state. Trigger: /project-scheduler
 
 ## Purpose
 

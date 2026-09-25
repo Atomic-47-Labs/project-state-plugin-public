@@ -1,6 +1,6 @@
 ---
 name: project-onboarding
-description: "Guided onboarding experience for new project-state instances. Begins with an Inbox Orientation pre-check — if documents/inbox/ contains files, runs project-inbox triage and pre-fills context before the first question. Then runs nine chapters: project identity, document ingestion, pack selection, milestone capture, stakeholder mapping, examples, gap handling, substrate initialization, and orientation check. Pre-filled chapters become confirmation passes instead of blank-slate interviews. Writes references/examples/ as first-class substrate entities. Does NOT set goals — objectives + KPIs are owned by the dedicated Goals tab, not onboarding. Use when starting a new project or re-orienting an existing one. Trigger on: 'set up project-state', 'onboard this project', 'initialize my project', 'I am new to project-state', 'configure this project', 'start the setup'."
+description: "Set up or re-orient a project — 'set up project-state', 'onboard this project', 'start the setup'. Asks what the work is, who hears about it and how it moves, then seeds a starting plan."
 map:
   tier: P0
   stage: ingest
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project Onboarding
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Guided onboarding experience for new project-state instances. Begins with an Inbox Orientation pre-check — if documents/inbox/ contains files, runs project-inbox triage and pre-fills context before the first question. Then runs nine chapters: project identity, document ingestion, project type (what the work is, who hears about it, how it moves), milestone capture, stakeholder mapping, examples, gap handling, substrate initialization, and orientation check. Pre-filled chapters become confirmation passes instead of blank-slate interviews. Writes references/examples/ as first-class substrate entities. Does NOT set goals — objectives + KPIs are owned by the dedicated Goals tab, not onboarding. Use when starting a new project or re-orienting an existing one. Trigger on: 'set up project-state', 'onboard this project', 'initialize my project', 'I am new to project-state', 'configure this project', 'start the setup'.
 
 ## Purpose
 
@@ -244,51 +250,86 @@ Chapters with pre-filled data should:
 
 ---
 
-### Chapter 1 — Pack Selection
+### Chapter 1 — What kind of project this is
+
+Three questions, one per axis (`docs/PROJECT-TYPES-SPEC.md` §3, decision
+`2026-09-24-project-types-three-axes`): **what the work is** (one primary work pack), **who needs to hear
+how it's going** (accountability packs), and **how the work moves** (a phase preset). Then the questions
+that were always here: SR&ED, whether it ends, timezone.
+
+**Every option comes from the catalogue, never from this file.** Read `packs/*/manifest.yaml` and
+`templates/phase-presets/*.yaml`. A pack is offered by default only when `picker.listed: true`; show
+`picker.label` and `picker.blurb`. Unlisted packs appear only when the operator asks for *advanced*,
+marked *thin*. `axis: capability` packs are never offered here. The previous version of this chapter
+asked five yes/no questions from a hardcoded list and never asked what the work was; 7 of 13 registry
+facilities ended up with no pack, and two non-open-source projects loaded `open-source-community` as
+the least-wrong option.
 
 **Prose to present:**
 
-> Project-state adapts its behavior through compliance packs. Each pack configures how the system handles a specific kind of relationship — a government funder, a paying customer, investors, or a regulatory obligation.
->
-> Packs are additive. A project funded by a government grant that also has a client and files SR&ED would load three packs. The system handles all of them simultaneously.
->
-> Let me ask a few questions to recommend the right combination.
+> Project-state shapes itself to the kind of work you're doing: the phases it tracks, the milestones it
+> starts you with, and which reports go to whom. Three quick questions.
 
-**Ask the following questions in sequence.** Each question should be asked in natural prose — not as a numbered list. Wait for an answer before asking the next one.
+**Q1.0 — One sentence.**
 
-**Q1.1 — Government funder:**
-> Does this project receive funding from a government program, grant, or public research body?
+> In a sentence, what is this project trying to make happen?
 
-- Yes → Q1.1a: Is it a Canadian federal program?
-  - Yes → Q1.1b: Which funder program is it?
-    - Determine which funder pack applies (e.g., `pic-pcais` for PIC/PCAIS) and add it. Present a one-line description of what that pack configures. SR&ED is not a funder pack — if it comes up here, set `sred_interest: yes` and let Q1.6 handle it.
-    - If no matching pack exists: note the program name and continue. Present: "I don't have a production pack for that program yet, but the core skills still work. You can configure the funder-reporting profile manually."
-  - No → note the program; similar guidance.
-- No → skip government funder packs.
+If the inbox orientation already answers it, present your one-line reading instead and ask for a yes.
+Classify the answer against every listed `axis: work` pack: match its `picker.signals` phrases, then use
+judgement — the signals are hints, not a keyword gate. Present the best match as a confirmation, with the
+runner-up offered by name:
 
-**Q1.2 — Customer or client:**
-> Does this project have a paying customer or client — someone outside your organization receiving deliverables and paying for them?
+> This reads like **[picker.label]** — [picker.blurb] Is that right, or is it closer to **[runner-up]**?
 
-- Yes → add `client-services`. Present: "The Client Services pack will configure the suite for monthly invoicing, Quarterly Business Reviews, customer signoff gates, and customer-confidentiality review."
-- No → skip.
+If nothing fits well, offer **General project** (`work-general`) as a real choice: "General project gives
+you a define → plan → deliver → review → close ladder with dated starting milestones. Nothing is lost by
+choosing it."
 
-**Q1.3 — Board or investors:**
-> Does your organization report to a board of directors or investors on this project's progress?
+**Q1.A — Confirm the work type.** Write the confirmed pack as `work_type` on the intake record; it
+becomes `project.kind`. On *advanced*, list every work pack including unlisted ones, and allow
+*secondary* work packs (a software launch that is also a campaign): they add matrix entries and seeds but
+never the preset (decision D4).
 
-- Yes → add `board-investor`. Present: "The Board/Investor pack will configure board meeting lifecycle, monthly investor updates with KPI snapshots, and board pack assembly."
-- No → skip.
+**Q1.B — Who needs to hear how it's going?**
 
-**Q1.4 — Agile delivery:**
-> Does your team work in sprints or iterative cycles — Scrum, Kanban, or similar?
+> Who needs to hear how this is going? Pick any.
 
-- Yes → add `agile-default`. Present: "The Agile pack will configure sprint cadence, retrospective lifecycle, and a sprint phase model."
-- No → skip.
+Offer every listed `axis: accountability` pack plus **Just me**. Packs with `picker.preselected: true`
+(`sponsor-internal`, decision D3) start selected and are presented as a confirmation: "I've assumed
+there's a manager or sponsor who commissioned this — keep that?" **Just me** deselects everything.
 
-**Q1.5 — Open source:**
-> Is this project an open-source or community-governed project?
+When the operator names a **government funder or grant**, run the funder sub-questions:
+- Is it a Canadian federal program? Which one? Match against the funder packs' `picker.signals`
+  (`pic-pcais`, `grant-canada`). Present the pack's one-line blurb.
+- No matching pack → note the program and continue: "I don't have a pack for that program yet, but the
+  core skills still work. You can configure the funder-reporting profile manually." SR&ED is not a
+  funder pack — if it comes up here, set `sred_interest: yes` and let Q1.6 handle it.
 
-- Yes → add `open-source-community`. Present: "The Open-Source pack will configure community RFC review, contributor recognition, and a maintenance phase model."
-- No → skip.
+Write the confirmed list as `accountable_to` on the intake record.
+
+**Q1.C — How does the work move?**
+
+Pre-fill from the **primary work pack's** `defaults.preset` and present it as a confirmation ("Events are
+planned backwards from the date — right?"). With no work pack, an accountability pack's
+`defaults.preset` pre-fills (a PIC-funded project → `grant-default`). Otherwise ask, in these words:
+
+| Answer | Preset |
+|---|---|
+| "In sprints or iterations" | `agile-default` |
+| "Through stages, with sign-off between them" | `stage-gate-default` |
+| "Toward a fixed date" | `countdown-default` |
+| "In a repeating cycle" | `cycle-default` |
+| *advanced* | `grant-default` (proposal → approval → planning → execution → closeout → archive), `client-engagement-default` (discovery → proposal & SOW → engagement → wrap → archive), `waterfall-default` (requirements → design → build → test → deploy → maintain), `open-source-default` (incubation → active → maintained → archived), custom |
+
+Write the confirmed value as `phases.preset`. `project-phase-gate set_preset(name)` changes it later.
+
+Then, **in the same breath**, ask what the choices need:
+- If the preset declares `requires: [anchor_date]` (`countdown-default`), ask for the date — "What's the
+  launch date?" / "What's the event date?" — using the work pack's own `asks:` prompt when it has one.
+  Write `phases.anchor_date`. Never guess it: every countdown milestone and deadline hangs off it.
+- Ask each remaining `asks:` entry from the loaded packs' manifests, in pack order, writing each answer
+  to its `key` on the intake record. Offer `options` as the choices when declared. Skip an optional one
+  the operator leaves blank.
 
 **Q1.6 — SR&ED (Canada only):**
 > Is your organization Canadian, and does this project involve work that might qualify as Scientific Research or Experimental Development — meaning technical work where the outcome was genuinely uncertain and required systematic investigation?
@@ -315,8 +356,8 @@ belongs to the session that can refuse without wasting this one.
 
 **Q1.7 — Does this project end?**
 
-**Pre-fill from the pack before asking.** Read `defaults.lifecycle` from the manifests of the packs
-selected above. That value is a *suggestion*, and it turns this from a blank-slate interview into a
+**Pre-fill from the pack before asking.** Read `defaults.lifecycle` from the **primary work pack**
+first, then the accountability packs selected above. That value is a *suggestion*, and it turns this from a blank-slate interview into a
 confirmation pass — the same pattern as every other pre-filled chapter in this skill.
 
 - Pack suggests `terminal` → present: "The [pack] pack assumes projects of this kind end — a deadline,
@@ -347,6 +388,10 @@ vocabulary, not the operator's, and it invites a guess.
 **Never ask this question of a facility that already has a value** — re-orientation confirms, it does
 not re-interview.
 
+The preset from Q1.C usually settles it: on `stage-gate-default`, `countdown-default` or
+`grant-default` (no `cycles_back_to`) the only possible answer is *it ends* — record `terminal` without
+asking. On `cycle-default` the work pack suggests *continues*; confirm it.
+
 If `project-scaffolder` already wrote `terminal` because a selected pack declares it, skip Q1.7 —
 re-asking a settled question implies it is open. `sred-canada` is a capability pack and declares no
 lifecycle default by design: it layers onto whatever shape the project already has, so it never
@@ -371,41 +416,30 @@ wrong is worse than one that will not start.
 
 Write it to the working intake record as `automation.timezone`.
 
-**Q1.9 — Which phase ladder?**
-
-> Projects move through phases. Which shape fits this one?
-
-| Preset | Shape |
-| --- | --- |
-| `grant-default` | proposal → approval → planning → execution → closeout. Terminal by design. |
-| `agile-default` | discovery → build loops → release, cycling back to build. |
-| `waterfall-default` | requirements → design → build → test → deploy → maintain. |
-| `open-source-default` | inception → active → maintained, cycling back to active. |
-| `client-engagement-default` | pitch → scoping → engagement → wrap, cycling back to engagement. |
-
-Pre-fill from the pack answers where they settle it — Q1.1 (government funder) implies
-`grant-default`, Q1.4 (agile delivery) implies `agile-default` — and present it as a confirmation
-rather than an open question. Write the confirmed value to the intake record as `phases.preset`;
-`project-scaffolder` writes it to the manifest.
-
-This question exists because nothing wrote `phases.preset` for the first ten weeks the presets
-existed (FB-003). `project-phase-gate set_preset(name)` changes it afterwards.
-
-Q1.9 and Q1.7 interact: a preset that declares no `cycles_back_to` cannot host a `continuous`
-lifecycle. If Q1.7 answered "work continues" and Q1.9 lands on `grant-default`, say so and ask which
-of the two to change — do not silently resolve it.
+**Q1.9 — Which phase ladder?** Asked as Q1.C above. It exists because nothing wrote `phases.preset`
+for the first ten weeks the presets existed (FB-003); Q1.C is where it is now written. Q1.C and Q1.7
+interact: a preset that declares no `cycles_back_to` cannot host a `continuous` lifecycle. If Q1.7
+answered "work continues" and Q1.C landed on a terminal preset, say so and ask which of the two to change
+— do not silently resolve it.
 
 
 **Confirmation:**
-> Based on your answers, I recommend loading: [list]. Here's what each adds. Does this look right, or would you like to add or remove anything?
+> Here's how I'll set this project up: a **[work type]** that reports to **[accountability]**, moving
+> **[rhythm in plain words]**[, anchored on [date]]. Here's what each piece adds. Look right?
 
-Present the full recommended combination with a one-line description of each pack's contribution. Confirm before proceeding.
+Present one row per axis: the work pack (with its preset, how many draft milestones and risks it will
+queue), each accountability pack (its reports), the preset (its phases), and any capability hand-off
+flagged (`sred_interest`). Confirm before proceeding.
 
-**HTML artifact (Coworker):** After Q1.6, render the recommended pack combination as a row of OptionCard components in selected (green-bg) state. Show each pack's one-line contribution beneath its card. Add an [Add pack] OptionCard in unselected state for any pack not recommended. Render a NavRow: [Back] [Confirm selection →].
+**HTML artifact (Coworker):** Render three groups of OptionCard components in selected (green-bg) state —
+Work, Who hears about it, How it moves — each card showing `picker.label` with its contribution beneath.
+Add an [Advanced] OptionCard per group in unselected state. NavRow: [Back] [Confirm selection →].
 
-**Markdown mode (Claude Code):** Present as a markdown table: `| Pack | Contribution |` with recommended packs listed. Ask "Does this look right? Reply with any packs to add or remove."
+**Markdown mode (Claude Code):** Present as a markdown table `| Axis | Choice | What it adds |`. Ask "Does
+this look right? Reply with anything to change."
 
-Write the confirmed pack selection to the working intake record.
+Write `work_type`, `accountable_to`, `phases.preset`, `phases.anchor_date` and the `asks` answers to the
+working intake record. `packs_selected` is `[work_type, secondary work packs…, accountable_to…]`.
 
 ---
 
@@ -497,7 +531,14 @@ Write each stakeholder as a record in the working intake — they will become en
 
 **Prose to present:**
 
-> Milestones are the spine of the system. They drive claims, status reports, Steering Committee packs, and the project tracker. If you have a milestone schedule, this chapter is short. If not, we'll build one together.
+> Milestones are the spine of the system. They drive status reports, review meetings, claims where there's a funder, and the project tracker. If you have a milestone schedule, this chapter is short. If not, we'll build one together.
+
+**If the work pack ships milestone seeds** (`packs/<work_type>/seeds/milestones.yaml`): resolve their date
+expressions against the start, end and anchor dates captured so far and present them as the starting
+list — "For a [label], projects usually hit these. Keep, change, or drop any?" Merge with anything
+extracted from documents (a document's milestone outranks a seed with the same meaning). An undateable
+seed is shown undated with the missing date named, never guessed. These are still DRAFTS: Chapter 8's
+`seed-pack` queues the pack's seeds for review, and what the operator confirmed here is queued alongside.
 
 **If milestones were extracted from documents:** Present the extracted list and ask for confirmation + corrections. "Here are the milestones I found. Do they look right? Any missing, renamed, or reordered?"
 
@@ -616,16 +657,20 @@ Present a complete pre-flight summary:
 WILL CREATE
 ──────────────────────────────────────────
 manifest.yaml              — [N fields populated, N from documents, N from conversation, N synthetic]
-reporting-matrix.yaml      — seeded from: [pack list]
+reporting-matrix.yaml      — seeded from: [pack list] (project-scaffolder seed-pack)
+outbox/queue/*-seed-*      — [N draft milestones, N draft risks] from [work pack], for review
 milestones/                — [N milestone files]
 stakeholders/              — [N stakeholder records] (written into manifest)
 references/examples/      — [present/absent]
 references/examples/       — [N examples in good/, N in avoid/]
 references/context.md      — [present if synthesis was accepted / absent]
 
-PACKS LOADED
+PROJECT TYPE
 ──────────────────────────────────────────
-[confirmed pack list with one-line role each]
+Work:            [work pack label]  (project.kind: [id])
+Who hears:       [accountability pack labels]
+How it moves:    [preset] [· anchored on YYYY-MM-DD]
+Packs loaded:    [packs_selected, one-line role each]
 
 SYNTHETIC CONTENT (will be labeled)
 ──────────────────────────────────────────
@@ -702,7 +747,7 @@ If they say yes, invoke `sred-onboarding`, passing the intake record so it can p
 `sred_candidate` milestones instead of interviewing cold. If they defer, say so plainly and stop —
 `project-orchestrator` will not nag about a capability that was never enabled.
 
-The same pattern applies to any other capability flagged during pack selection. Onboard the
+The same pattern applies to any other capability flagged during the project-type chapter. Onboard the
 project first; layer capabilities after.
 
 ---
@@ -714,6 +759,14 @@ When the user says "re-orient project-state" or runs `project-onboarding re-orie
 1. Run Chapters 6 and 7 only (goals + examples + gap check)
 2. Offer to revisit any other chapter by name
 3. Do not re-run initialization unless the user explicitly asks
+4. **Offer a work type once, if the facility has none** (decision D5). When `project.kind` is not the id
+   of a loaded `axis: work` pack — a legacy value like `grant_consortium`, or absent — run Q1.0 as a
+   *proposal*: "This project has no work type. From its manifest and milestones it reads like a
+   **[label]** — want me to add it? That would add [N] matrix entries and queue [N] draft milestones for
+   review; nothing existing changes." On yes, append the pack to `packs_loaded`, set `project.kind`,
+   and run `project-scaffolder seed-pack`. On no, record nothing and do not ask again this session. Never
+   change `phases.preset` as a side effect — a live facility's ladder moves only through
+   `project-phase-gate set_preset`.
 
 Re-orientation is appropriate when:
 - The project has changed significantly
@@ -732,7 +785,14 @@ intake:
   session_date: "YYYY-MM-DD"
   operator: "user@email"
 
-  packs_selected: []
+  work_type: ~            # primary axis:work pack id → project.kind   (PROJECT-TYPES-SPEC §4)
+  secondary_work: []      # optional extra work packs (matrix + seeds only, never the preset)
+  accountable_to: []      # axis:accountability pack ids; [] == "just me"
+  packs_selected: []      # [work_type, secondary_work…, accountable_to…] → project.packs_loaded
+  phases:
+    preset: ~             # Q1.C
+    anchor_date: ~        # Q1.C, when the preset requires it
+  asks: {}                # dotted manifest key → answer, from the packs' asks: blocks
 
   project:
     short_name: {value: "...", source: "document|conversation|synthetic"}

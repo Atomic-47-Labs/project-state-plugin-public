@@ -1,6 +1,6 @@
 ---
 name: project-sred-tracker
-description: "Continuous SR&ED work capture for Canadian T661 claims. Records technological uncertainties (TUs), experiments (EXs), technological advancements (ADVs), and contemporaneous evidence entries into sred/ substrate. Enforces TU→EX→ADV traceability. Runs gap analysis, weekly progress digests, quarterly completeness reviews, cost roll-ups, and the innovation-criteria interview. Active when the sred capability is enabled. Use whenever the user says 'record a technical uncertainty', 'log SR&ED work', 'add an experiment', 'capture an advancement', 'SR&ED evidence', 'what's our SR&ED status', 'weekly SR&ED update', 'SR&ED digest', 'quarterly SR&ED review', 'gap analysis', 'define innovation criteria', 'what counts as innovation here', 'is this SR&ED', 'evaluate this SR&ED opportunity', 'screen this for SR&ED', or any request to track or screen experimental development work for CRA."
+description: "Capture SR&ED work as it happens — 'log an uncertainty', 'record this experiment', 'we learned X', 'SR&ED note'. Records uncertainties, experiments, advancements and evidence for the T661."
 map:
   tier: capability
   stage: keep
@@ -10,6 +10,12 @@ map:
 ---
 
 # Project SR&ED Tracker
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Continuous SR&ED work capture for Canadian T661 claims. Records technological uncertainties (TUs), experiments (EXs), technological advancements (ADVs), and contemporaneous evidence entries into sred/ substrate. Enforces TU→EX→ADV traceability. Runs gap analysis, weekly progress digests, quarterly completeness reviews, cost roll-ups, and the innovation-criteria interview. Active when the sred capability is enabled. Use whenever the user says 'record a technical uncertainty', 'log SR&ED work', 'add an experiment', 'capture an advancement', 'SR&ED evidence', 'what's our SR&ED status', 'weekly SR&ED update', 'SR&ED digest', 'quarterly SR&ED review', 'gap analysis', 'define innovation criteria', 'what counts as innovation here', 'is this SR&ED', 'evaluate this SR&ED opportunity', 'screen this for SR&ED', or any request to track or screen experimental development work for CRA.
 
 ## Purpose
 
@@ -70,7 +76,7 @@ status: "active"    # active | resolved | removed
 resolution: ~       # if resolved: brief statement of how uncertainty was resolved
 
 # Meta
-created_by: "TODO"
+created_by: "<actor>"             # the person, per project-state "Who the actor is"
 last_modified: "YYYY-MM-DDThh:mm:ssZ"
 ```
 
@@ -126,7 +132,7 @@ status: "in_progress"  # in_progress | complete | abandoned
 abandonment_reason: ~  # if abandoned: why
 
 # Meta
-created_by: "TODO"
+created_by: "<actor>"             # the person, per project-state "Who the actor is"
 last_modified: "YYYY-MM-DDThh:mm:ssZ"
 ```
 
@@ -157,7 +163,7 @@ established_date: "YYYY-MM-DD"  # when the advancement was achieved / knowledge 
 fiscal_year: "YYYY"
 
 # Meta
-created_by: "TODO"
+created_by: "<actor>"             # the person, per project-state "Who the actor is"
 last_modified: "YYYY-MM-DDThh:mm:ssZ"
 ```
 

@@ -1,6 +1,6 @@
 pack:
   id: "agile-default"
-  name: "Agile Engineering Defaults"
+  name: "Software Product (Agile)"
   version: "0.1.0-starter"
   compatible_core: ">=4.0,<5.0"
   description: |
@@ -12,15 +12,37 @@ pack:
   governing_documents:
     - "Scrum Guide (Schwaber & Sutherland) — sprint cadence and retrospective shape"
     - "Kanban Method (Anderson) — flow and WIP conventions"
-    - "templates/phase-presets/agile.yaml — the release-phase model this pack assumes"
+    - "templates/phase-presets/agile-default.yaml — the release-phase model this pack assumes"
   released: "2026-04-27"
   maturity: "starter"
+  axis: work   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: true
+  label: "Software product"
+  blurb: "Building and shipping software in sprints: sprint summaries, retros, a release loop."
+  signals:
+    - "sprint"
+    - "backlog"
+    - "story points"
+    - "release"
+    - "app"
+    - "platform"
+    - "API"
+    - "codebase"
+    - "MVP"
+    - "software"
 
 provides:
   profiles:
     - review-meeting     # sprint retrospective
     # phase-gate was declared here with no profile file behind it — trimmed 2026-08-21
     # (FB-014 / issue #17). Re-declare it in the same change that adds profiles/phase-gate.yaml.
+  seeds: [milestones, risks, kpis]   # the Software product work type's starting plan (PROJECT-TYPES-SPEC 5.2)
   reporting_matrix_defaults: true
 
 # ----------------------------------------------------------------------------
@@ -35,3 +57,6 @@ provides:
 defaults:
   # A product ships and keeps shipping. agile-default cycles 04-release -> 02-build-loops.
   lifecycle: continuous
+  # preset is a suggestion too: it pre-fills the rhythm question and project-scaffolder Step 2
+  # resolution step 2. The facility\'s phases.preset always wins.
+  preset: agile-default

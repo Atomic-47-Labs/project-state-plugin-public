@@ -1,6 +1,6 @@
 ---
 name: project-onepager
-description: "Generate audience-framed documents from project state — one-pagers, briefs, deep-dives, whitepapers. A document is a RECIPE (audience × altitude × purpose × evidence filters) stored in reports/custom-defs/, rendered against current state into branded HTML (print-ready → PDF) with every claim carrying provenance back to a typed record. Audience voice comes from pack profiles (onepager.yaml) or built-in defaults; drafts land in outbox/queue/ for review — never sent or published automatically. Recipes regenerate: re-running one against newer state refreshes the document and reports what changed. Use whenever the user says 'one-pager', 'write a brief', 'leave-behind', 'whitepaper', 'exec summary doc', 'funder one-pager', 'make a doc for <audience>', 'regenerate the onepager', or when the reporting matrix schedules a onepager entry. Reads state through project-state; distributes via project-blog-publisher / project-website-publisher / project-notifier after human approval."
+description: "Write an audience-framed document from project state — 'one-pager for the board', 'brief for investors', 'write a whitepaper about the project'. Stored recipes, regenerable, with provenance."
 map:
   tier: P2
   stage: generate
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project One-Pager (documents as views over state)
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Generate audience-framed documents from project state — one-pagers, briefs, deep-dives, whitepapers. A document is a RECIPE (audience × altitude × purpose × evidence filters) stored in reports/custom-defs/, rendered against current state into branded HTML (print-ready → PDF) with every claim carrying provenance back to a typed record. Audience voice comes from pack profiles (onepager.yaml) or built-in defaults; drafts land in outbox/queue/ for review — never sent or published automatically. Recipes regenerate: re-running one against newer state refreshes the document and reports what changed. Use whenever the user says 'one-pager', 'write a brief', 'leave-behind', 'whitepaper', 'exec summary doc', 'funder one-pager', 'make a doc for <audience>', 'regenerate the onepager', or when the reporting matrix schedules a onepager entry. Reads state through project-state; distributes via project-blog-publisher / project-website-publisher / project-notifier after human approval.
 
 Long-form documents — from a 400-word leave-behind to a structured whitepaper —
 generated from the substrate, framed for an audience, and regenerable. The core

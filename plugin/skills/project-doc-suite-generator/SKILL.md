@@ -1,11 +1,17 @@
 ---
 name: project-doc-suite-generator
-description: "⚠️ DEPRECATED in v3.0 — use project-doc-suite instead. project-doc-suite generates the same governance Office files plus a full software documentation suite, all from a unified context that reads both project-state/ and the live codebase. This skill will be removed in v3.1. If you are on v2.x and cannot upgrade, this skill still functions: generates index, tracker xlsx, project plan, risk register, milestone specs, architecture overview, and roadmap/KPIs from project-state/ only."
+description: "DEPRECATED — use project-doc-suite. Legacy governance Office-file generator kept for existing matrix entries."
 map: {deprecated: true, superseded_by: project-doc-suite}
 map: {deprecated: true, superseded_by: project-doc-suite}
 ---
 
 # Project Doc Suite Generator
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> ⚠️ DEPRECATED in v3.0 — use project-doc-suite instead. project-doc-suite generates the same governance Office files plus a full software documentation suite, all from a unified context that reads both project-state/ and the live codebase. This skill will be removed in v3.1. If you are on v2.x and cannot upgrade, this skill still functions: generates index, tracker xlsx, project plan, risk register, milestone specs, architecture overview, and roadmap/KPIs from project-state/ only.
 
 > ⚠️ **Deprecated in v3.0.** Use `project-doc-suite` instead.
 >

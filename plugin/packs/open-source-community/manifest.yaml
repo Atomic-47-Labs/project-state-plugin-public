@@ -11,9 +11,26 @@ pack:
     - "David Olsson <david@atomic47.co>"
   governing_documents:
     - "RFC process conventions (IETF/Rust-style) — the governance pipeline this pack encodes"
-    - "templates/phase-presets/open-source.yaml — the sunset/maintenance phase model this pack assumes"
+    - "templates/phase-presets/open-source-default.yaml — the sunset/maintenance phase model this pack assumes"
   released: "2026-04-27"
   maturity: "starter — minimal scaffold"
+  axis: accountability   # work | accountability | capability - PROJECT-TYPES-SPEC section 3
+
+# ----------------------------------------------------------------------------
+# Picker presentation - docs/PROJECT-TYPES-SPEC.md section 5. Every front door (onboarding,
+# scaffolder, intake, kanban wizard) reads this block; none keeps its own table of packs.
+# ----------------------------------------------------------------------------
+picker:
+  listed: false   # section 5.1: no profile, no seed - Advanced only until it ships one (decision D2)
+  label: "An open-source community"
+  blurb: "Community-governed open source: RFC pipeline, contributor digest. Thin - no profiles yet."
+  signals:
+    - "open source"
+    - "open-source"
+    - "contributors"
+    - "RFC"
+    - "maintainers"
+    - "community-governed"
 
 provides:
   profiles: []           # planned for v0.2: external-comms (public-by-default community review), phase-gate (incubation→active→maintained→archived)
@@ -32,3 +49,6 @@ defaults:
   # A maintained project can return to active development. open-source-default cycles
   # 03-maintained -> 02-active and keeps 04-archived for a real sunset.
   lifecycle: continuous
+  # preset is a suggestion too: it pre-fills the rhythm question and project-scaffolder Step 2
+  # resolution step 2. The facility\'s phases.preset always wins.
+  preset: open-source-default

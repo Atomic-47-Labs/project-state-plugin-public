@@ -1,6 +1,6 @@
 ---
 name: portfolio-collector
-description: "Snapshot, index and understand the member projects of a portfolio. For each active member, resolves its location (local path, pulled hub clone, or appliance read API), reads that member's own project-state/ — manifest, state, milestones, risks, decisions, matrix, people, activity tail, harvest cursors, document index incl. dismissed items, capability strips — and writes one dated, never-edited snapshot. Then compiles the cross-member index (one flat file per entity kind, every row tagged with member and path), recompiles the registry, regenerates one cited understanding page per member, and on the scheduled run writes the weekly change note. Skips unchanged members; records unreachable ones honestly. Trigger on '/portfolio-collector all', 'collect the portfolio', 'refresh the index', 'regenerate the understanding pages', or when the digest reports a member unreachable or a harvest stale; scheduled weekly by the portfolio-default pack. Unattended, idempotent, read-only toward members. Never harvests."
+description: "Collect a portfolio's member projects into dated snapshots and a cross-project index — 'collect the portfolio', 'snapshot the members', 'refresh the portfolio index'. Read-only toward members."
 map:
   tier: capability
   stage: ingest
@@ -13,6 +13,12 @@ map:
 ---
 
 # portfolio-collector — snapshot, index, understand
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Snapshot, index and understand the member projects of a portfolio. For each active member, resolves its location (local path, pulled hub clone, or appliance read API), reads that member's own project-state/ — manifest, state, milestones, risks, decisions, matrix, people, activity tail, harvest cursors, document index incl. dismissed items, capability strips — and writes one dated, never-edited snapshot. Then compiles the cross-member index (one flat file per entity kind, every row tagged with member and path), recompiles the registry, regenerates one cited understanding page per member, and on the scheduled run writes the weekly change note. Skips unchanged members; records unreachable ones honestly. Trigger on '/portfolio-collector all', 'collect the portfolio', 'refresh the index', 'regenerate the understanding pages', or when the digest reports a member unreachable or a harvest stale; scheduled weekly by the portfolio-default pack. Unattended, idempotent, read-only toward members. Never harvests.
 
 The portfolio's eyes and its memory. It reads each member's substrate as it is, writes what it
 saw dated, compiles the index the reviewer queries, and writes the page the model reads

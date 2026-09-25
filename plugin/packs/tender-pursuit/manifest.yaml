@@ -16,6 +16,7 @@ pack:
     - "docs/TENDER-ONEPAGER.md"
   released: "2026-07-21"
   maturity: "stable"
+  axis: capability   # bundled by a capability; never listed in a project pack picker (PROJECT-TYPES-SPEC section 3)
 
 provides:
   profiles:

@@ -1,6 +1,6 @@
 ---
 name: project-jira-publisher
-description: "Publish project-state entities to Jira via the REST API — milestones, risks, decisions, objectives and KPIs become Jira issues. Idempotent: the first run creates an issue and writes the returned key back onto the entity (jira_key: PROJ-123); later runs update that issue, never duplicating. Non-secret config (base_url, project_key, issue types) lives in manifest.yaml surfaces.jira; the API token comes from the JIRA_API_TOKEN env var so it never touches the substrate. Use whenever the user says 'publish to Jira', 'push milestones to Jira', 'sync to Jira', 'create Jira issues from the project', 'export the project to Jira', or 'set up Jira'. Always preview with --dry-run first and confirm before the live push; nothing is sent without the user's go-ahead."
+description: "Publish milestones, risks, decisions, objectives and KPIs to Jira — 'push to Jira', 'sync milestones to Jira', 'create Jira issues for the risks'. Idempotent; writes jira_key back."
 map:
   tier: P2
   stage: generate
@@ -10,6 +10,12 @@ map:
 ---
 
 # project-jira-publisher
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Publish project-state entities to Jira via the REST API — milestones, risks, decisions, objectives and KPIs become Jira issues. Idempotent: the first run creates an issue and writes the returned key back onto the entity (jira_key: PROJ-123); later runs update that issue, never duplicating. Non-secret config (base_url, project_key, issue types) lives in manifest.yaml surfaces.jira; the API token comes from the JIRA_API_TOKEN env var so it never touches the substrate. Use whenever the user says 'publish to Jira', 'push milestones to Jira', 'sync to Jira', 'create Jira issues from the project', 'export the project to Jira', or 'set up Jira'. Always preview with --dry-run first and confirm before the live push; nothing is sent without the user's go-ahead.
 
 Push the project's structured entities into Jira and keep them linked, so a Jira-using
 team sees the plan without leaving Jira. The work is done by `publish.py` (a stdlib +

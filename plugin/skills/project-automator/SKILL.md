@@ -1,6 +1,6 @@
 ---
 name: project-automator
-description: "Compile the project's reporting-matrix.yaml into automation/tasks.yaml — the canonical cadence registry that every scheduling host (the kanban in-app scheduler, the cron-curled /api/cron/tick, the appliance headless runner) fires from and the calendar UI edits. Reads every matrix entry, classifies it as cadence (time-fired) or event-driven (hook), normalizes to the task cadence shape (kind/day/hour/dom/month/start), spreads fire hours across the configured window, and writes tasks additively — never clobbering operator reschedules made in the calendar. Also applies named cadence presets (typical daily/weekly/funder/agile bundles) per project or per milestone. Modes: plan (preview), generate (write), update (re-diff, preserve overrides), status (registry health), preset list|apply. Does NOT register crons or call generators — the host fires, the orchestrator tick dispatches. Trigger: /project-automator"
+description: "Compile the reporting matrix into the automation schedule (automation/tasks.yaml) — 'generate the schedule', 'update automation', 'why isn't this report scheduled', 'automation status'."
 map:
   tier: P2
   stage: control
@@ -9,6 +9,12 @@ map:
 ---
 
 # project-automator
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Compile the project's reporting-matrix.yaml into automation/tasks.yaml — the canonical cadence registry that every scheduling host (the kanban in-app scheduler, the cron-curled /api/cron/tick, the appliance headless runner) fires from and the calendar UI edits. Reads every matrix entry, classifies it as cadence (time-fired) or event-driven (hook), normalizes to the task cadence shape (kind/day/hour/dom/month/start), spreads fire hours across the configured window, and writes tasks additively — never clobbering operator reschedules made in the calendar. Also applies named cadence presets (typical daily/weekly/funder/agile bundles) per project or per milestone. Modes: plan (preview), generate (write), update (re-diff, preserve overrides), status (registry health), preset list|apply. Does NOT register crons or call generators — the host fires, the orchestrator tick dispatches. Trigger: /project-automator
 
 ## Purpose
 
@@ -100,6 +106,18 @@ Normalize the matrix's rich cadence into the registry shape
 | `annual` | `{kind: annual, month: <due_month>, dom: 1, hour}` |
 | `sprint-aligned` | `{kind: sprint-aligned, hour}` — fires last day of sprint; inert until `state.json:sprint_calendar` (`{length_days, anchor}`) exists. If absent, note it in the output: "sprint-aligned tasks compiled but dormant — set sprint_calendar". |
 | `deadline` | One dated task **per anchor instance** (per fiscal year for `recur: annual`): `{kind: deadline, due, hard?, escalation?, lead_days, hour}` + top-level `fy` — id `auto-<entry.id>-<FY>`. Resolve `anchor` (manifest path / state pointer / literal); `due = instance + offset_months`; `hard = instance + hard_offset_months`. New instances added on `update` when a new FY opens; tasks for FYs with terminal claim status (`filed \| waived \| forfeited`) are marked retired, never deleted — **except** FYs registered as an archive tail, which stay live post-archive. The `hard` date is not operator-editable — reschedules apply to fire timing only. Copy `after`/`review_gate` from the entry onto the task verbatim. |
+
+**One-shot deadlines** (a `deadline` with **no `recur`**, anchored to a single date — typically
+`phases.anchor_date` on a countdown facility): compile to one task `{kind: once, start: <anchor +
+offset_days>, hour}`, id `auto-<entry.id>`. `offset_days` may be negative (a run of show 7 days before
+the event). If the anchor does not resolve to a date, compile nothing and report the entry as
+*waiting for an anchor* — never schedule it on a guessed date. Spec: `docs/PROJECT-TYPES-SPEC.md` §6.3.
+
+**Phase gating:** a matrix entry may declare `active_phases: [<phase-id>, …]`. Compile it exactly as
+above and copy nothing extra — the gate is read from the matrix entry at fire time (the matrix entry
+is the enable authority for matrix tasks). The scheduler skips the task while `state.json:current_phase`
+is not in the list, without recording a run, so it fires for the current period as soon as the phase
+arrives. In `plan`/`status` output, mark gated tasks `gated: <phases>`.
 
 **Window placement:** assign each task an `hour` spread across the window (deadline-bound
 first, then weekly, monthly, quarterly, annual) so jobs don't stack on one hour.

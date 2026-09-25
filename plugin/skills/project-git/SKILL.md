@@ -1,6 +1,6 @@
 ---
 name: project-git
-description: "Strategic git checkpointing for project-state facilities. Generates commit messages automatically from the activity log. Sub-actions: checkpoint (commit local changes), push (share with team), sync (pull teammates changes, rebase-safe), status (what has changed since last commit). Use when the user says 'checkpoint the project', 'commit my work', 'sync with the team', 'push the state', 'what have I changed', 'share my changes', 'end of session', 'before the meeting', or any request to checkpoint, share, or receive project-state changes via git."
+description: "Checkpoint, push or sync a project-state substrate with git — 'checkpoint', 'push the project state', 'sync with the team', 'commit the project changes'. Writes commit messages from the activity log."
 map:
   tier: P3
   stage: keep
@@ -9,6 +9,12 @@ map:
 ---
 
 # Project Git
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Strategic git checkpointing for project-state facilities. Generates commit messages automatically from the activity log. Sub-actions: checkpoint (commit local changes), push (share with team), sync (pull teammates changes, rebase-safe), status (what has changed since last commit). Use when the user says 'checkpoint the project', 'commit my work', 'sync with the team', 'push the state', 'what have I changed', 'share my changes', 'end of session', 'before the meeting', or any request to checkpoint, share, or receive project-state changes via git.
 
 ## Purpose
 

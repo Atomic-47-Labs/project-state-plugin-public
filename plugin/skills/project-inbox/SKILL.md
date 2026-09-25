@@ -1,6 +1,6 @@
 ---
 name: project-inbox
-description: "Smart inbox triage for project-state. Scans documents/inbox/, classifies each file with an LLM-driven pass (doc type, use designation, relevance score, action flags, extraction summary), writes enriched metadata to documents/index.yaml, copies imprint-flagged documents to references/imprint/, and generates references/inbox-orientation.yaml as onboarding pre-context. Use when the user says 'audit the inbox', 'triage documents', 'what's in the inbox', 'orient before onboarding', 'flag this doc', 'smart inbox', or any request to assess, sort, or extract context from dropped documents. Also automatically suggested at the start of project-onboarding when documents are present."
+description: "Triage the project inbox — 'triage the inbox', 'what's in the inbox', 'what did we just receive', 'sort these documents'. Use instead of reading project-state/documents/inbox/ yourself; classifies, indexes and logs each file."
 map:
   tier: P1
   stage: ingest
@@ -11,6 +11,12 @@ map:
 ---
 
 # Project Inbox
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Use to triage a project's inbox — 'triage the inbox', 'triage the project inbox', 'what's in the inbox', 'audit the inbox', 'sort these documents', 'what did we just receive', 'flag this doc', 'smart inbox' — instead of reading the dropped files yourself. Scans project-state/documents/inbox/, classifies each file (doc type, use designation, relevance to this project's milestones and risks, action flags, extraction summary), writes documents/index.yaml, logs inbox.triage.document per file, copies imprint-flagged documents to references/imprint/, and writes references/inbox-orientation.yaml as onboarding pre-context. Also suggested at the start of project-onboarding when documents are present, and by project-orchestrator when the inbox has unindexed files.
 
 ## Purpose
 

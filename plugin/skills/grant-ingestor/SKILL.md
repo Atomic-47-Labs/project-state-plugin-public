@@ -1,6 +1,6 @@
 ---
 name: grant-ingestor
-description: "Drain grant-state/documents/inbox/ of program guides, eligibility docs, RFPs, and partner materials; produce a strategy pass that maps content to required narrative sections and compliance gates; generate an eligibility verdict. Sub-actions: triage (classify inbox docs), strategy (produce strategy pass memo + section-coverage map), verdict (eligibility verdict with confidence), harvest (pull overnight signals from Gmail/Slack for this submission), lessons (capture lessons from a rejected submission). Use for 'drain the inbox', 'run strategy pass', 'are we eligible', 'what sections do we need', 'harvest overnight grant signals'."
+description: "Process grant documents dropped in grant-state/documents/inbox/ — program guides, RFPs, eligibility docs — 'ingest the program guide', 'are we eligible', 'map requirements'. Produces an eligibility verdict."
 map:
   tier: grant
   stage: ingest
@@ -11,6 +11,12 @@ map:
 ---
 
 # Grant Ingestor
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> Drain grant-state/documents/inbox/ of program guides, eligibility docs, RFPs, and partner materials; produce a strategy pass that maps content to required narrative sections and compliance gates; generate an eligibility verdict. Sub-actions: triage (classify inbox docs), strategy (produce strategy pass memo + section-coverage map), verdict (eligibility verdict with confidence), harvest (pull overnight signals from Gmail/Slack for this submission), lessons (capture lessons from a rejected submission). Use for 'drain the inbox', 'run strategy pass', 'are we eligible', 'what sections do we need', 'harvest overnight grant signals'.
 
 ## Purpose
 

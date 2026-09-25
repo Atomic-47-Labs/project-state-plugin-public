@@ -1,6 +1,6 @@
 ---
 name: intel-harvester
-description: "The intel capability's research engine. Takes an entity, a question, an agenda tier or the whole facility and investigates via web search, writing append-only INT-S signals and entity updates through project-state. Relevance is judged against capabilities.intel.focus — no focus, no harvest. Verbs: 'entity INT-E-NNN', 'question \"...\"', 'agenda p0..p3', 'longlist [--tier --max --entities-only --agenda-only --dry-run]' (breadth-first, unattended), 'sweep' (news check), and 'competitor INT-E-NNN|self|all [--depth --refresh --stale-only]' — OCI competitor-research: INT-C claims before prose (epistemic status, source class, rubric confidence), sourced signals lifted into claims, supersedes: chains and change events on reconciliation, the cited profile with its coverage block. Trigger on 'research entity', 'run the longlist', 'sweep the landscape', 'answer the P0 questions', 'what's new on <entity>', 'research competitor X', or matrix entries from the intel-default pack. Requires the intel capability enabled."
+description: "Research competitors and the market on the web — 'research X', 'harvest intel', 'refresh stale claims', 'what's new with our competitors'. Writes append-only signals and entity updates for the intel capability."
 map:
   tier: capability
   stage: ingest
@@ -11,6 +11,12 @@ map:
 ---
 
 # intel-harvester — the research engine
+
+> **When to use — full trigger description.** The frontmatter carries a short, trigger-first
+> description so all of the suite's skills fit Claude Code's skill-listing budget (see
+> docs/SKILL-SPEC.md, *Description budget*). The complete version, kept here:
+>
+> The intel capability's research engine. Takes an entity, a question, an agenda tier or the whole facility and investigates via web search, writing append-only INT-S signals and entity updates through project-state. Relevance is judged against capabilities.intel.focus — no focus, no harvest. Verbs: 'entity INT-E-NNN', 'question "..."', 'agenda p0..p3', 'longlist [--tier --max --entities-only --agenda-only --dry-run]' (breadth-first, unattended), 'sweep' (news check), and 'competitor INT-E-NNN|self|all [--depth --refresh --stale-only]' — OCI competitor-research: INT-C claims before prose (epistemic status, source class, rubric confidence), sourced signals lifted into claims, supersedes: chains and change events on reconciliation, the cited profile with its coverage block. Trigger on 'research entity', 'run the longlist', 'sweep the landscape', 'answer the P0 questions', 'what's new on <entity>', 'research competitor X', or matrix entries from the intel-default pack. Requires the intel capability enabled.
 
 Research the ecosystem the project declared in `capabilities.intel.focus`, and write what
 is learned as signals. Scheduling lives in the reporting matrix (the intel-default pack
